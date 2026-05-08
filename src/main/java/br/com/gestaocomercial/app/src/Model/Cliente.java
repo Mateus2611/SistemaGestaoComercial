@@ -1,13 +1,12 @@
 package br.com.gestaocomercial.app.src.Model;
 
-import jakarta.persistence.Column;
-import jakarta.persistence.Id;
-import jakarta.persistence.Table;
+import jakarta.persistence.*;
 
 import java.sql.Date;
 import java.util.ArrayList;
 import java.util.List;
 
+@Entity
 @Table(name = "avaliacao")
 public class Cliente {
 
@@ -49,10 +48,11 @@ public class Cliente {
     public Integer Id;
     @Column(name = "Nome")
     public String Nome;
+    @OneToMany(mappedBy = "cliente", cascade = CascadeType.REMOVE)
     public List<Email> Emails = new ArrayList<Email>();
     @Column(name = "Id_Endereco")
     public Integer IdEndereco;
-    @Column(name = "Endereco")
+    @OneToOne
     public Endereco Endereco;
     @Column(name = "Data_Cadastro")
     public Date DataCadastro;
