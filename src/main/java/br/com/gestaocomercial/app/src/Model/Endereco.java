@@ -1,9 +1,11 @@
 package br.com.gestaocomercial.app.src.Model;
 
 import jakarta.persistence.Column;
+import jakarta.persistence.Entity;
 import jakarta.persistence.Id;
 import jakarta.persistence.Table;
 
+@Entity
 @Table(name = "endereco")
 public class Endereco {
 
