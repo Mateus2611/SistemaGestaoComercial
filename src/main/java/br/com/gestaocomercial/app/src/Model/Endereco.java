@@ -35,15 +35,15 @@ public class Endereco {
     @Column(name = "Id")
     private Integer Id;
     @Column(name = "CEP")
-    public String Cep;
+    private String Cep;
     @Column(name = "Bairro")
-    public String Bairro;
+    private String Bairro;
     @Column(name = "Estado")
-    public String Estado;
+    private String Estado;
     @Column(name = "Cidade")
-    public String Cidade;
+    private String Cidade;
     @Column(name = "Logradouro")
-    public String Logradouro;
+    private String Logradouro;
 
     public Integer getId() {
         return Id;

@@ -45,23 +45,23 @@ public class Cliente {
 
     @Id
     @Column(name = "Id")
-    public Integer Id;
+    private Integer Id;
     @Column(name = "Nome")
-    public String Nome;
+    private String Nome;
     @OneToMany(mappedBy = "cliente", cascade = CascadeType.REMOVE)
-    public List<Email> Emails = new ArrayList<Email>();
+    private List<Email> Emails = new ArrayList<Email>();
     @Column(name = "Id_Endereco")
-    public Integer IdEndereco;
+    private Integer IdEndereco;
     @OneToOne
-    public Endereco Endereco;
+    private Endereco Endereco;
     @Column(name = "Data_Cadastro")
-    public Date DataCadastro;
+    private Date DataCadastro;
     @Column(name = "Data_Inativacao")
-    public Date DataInativacao;
+    private Date DataInativacao;
     @Column(name = "Tipo")
-    public TipoCliente Tipo;
+    private TipoCliente Tipo;
     @Column(name = "Status_Cliente")
-    public StatusCliente Status;
+    private StatusCliente Status;
 
     public Integer getId() {
         return Id;
@@ -75,8 +75,8 @@ public class Cliente {
         return Emails;
     }
 
-    public void setEmails(List<Email> emails) {
-        Emails = emails;
+    public void setEmails(Email email) {
+        Emails.add(email);
     }
 
     public Integer getIdEndereco() {

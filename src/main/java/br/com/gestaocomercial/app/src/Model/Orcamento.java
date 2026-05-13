@@ -53,15 +53,15 @@ public class Orcamento {
     private String nomeCliente;
     private List<String> nomeProdutos;
     @Column(name = "Data_Criacao")
-    public Date DataCriacao;
+    private Date DataCriacao;
     @Column(name = "Data_Validade")
-    public Date DataValidade;
+    private Date DataValidade;
     @Column(name = "Valor")
-    public BigDecimal Valor;
+    private BigDecimal Valor;
     @Column(name = "Status_Orcamento")
-    public StatusOrcamento Status;
+    private StatusOrcamento Status;
     @Column(name = "Desconto")
-    public BigDecimal Desconto;
+    private BigDecimal Desconto;
 
 
     public Integer getId() {

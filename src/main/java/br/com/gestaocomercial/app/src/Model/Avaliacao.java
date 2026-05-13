@@ -38,13 +38,13 @@ public class Avaliacao {
     @Column(name = "Id_Venda")
     private Integer IdVenda;
     @Column(name = "Titulo")
-    public String Titulo;
+    private String Titulo;
     @Column(name = "Descricao")
-    public String Descricao;
+    private String Descricao;
     @Column(name = "Data_Criacao")
-    public Date DataCriacao;
+    private Date DataCriacao;
     @Column(name = "Nota")
-    public Float Nota;
+    private Float Nota;
 
     public Integer getId() {
         return Id;

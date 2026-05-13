@@ -26,9 +26,9 @@ public class Email {
     @Column(name = "Id")
     private Integer Id;
     @Column(name = "Id_Cliente")
-    public Integer IdCliente;
+    private Integer IdCliente;
     @Column(name = "Endereco")
-    public String Endereco;
+    private String Endereco;
 
     public Integer getId() {
         return Id;
