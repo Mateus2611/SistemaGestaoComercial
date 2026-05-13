@@ -27,9 +27,9 @@ public class Produto {
     @Column(name = "Id")
     private Integer Id;
     @Column(name = "Nome")
-    public String Nome;
+    private String Nome;
     @Column(name = "Valor")
-    public BigDecimal Valor;
+    private BigDecimal Valor;
 
     public Integer getId() {
         return Id;

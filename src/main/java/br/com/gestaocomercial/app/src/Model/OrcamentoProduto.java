@@ -1,6 +1,7 @@
 package br.com.gestaocomercial.app.src.Model;
 
 import jakarta.persistence.Column;
+import jakarta.persistence.Id;
 import jakarta.persistence.Table;
 
 @Table(name = "orcamento_produto")
@@ -20,12 +21,14 @@ public class OrcamentoProduto {
         IdProduto = idProduto;
     }
 
+    @Id
     @Column(name = "Id_Orcamento")
     private Integer IdOrcamento;
+    @Id
     @Column(name = "Id_Produto")
     private Integer IdProduto;
     @Column(name = "Quantidade")
-    public Integer Quantidade;
+    private Integer Quantidade;
 
     public Integer getIdOrcamento() {
         return IdOrcamento;

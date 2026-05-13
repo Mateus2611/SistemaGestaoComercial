@@ -1,0 +1,59 @@
+package br.com.gestaocomercial.app.src.Service;
+
+import br.com.gestaocomercial.app.src.Model.Produto;
+import br.com.gestaocomercial.app.src.Repository.IProdutoRepository;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+
+@Service
+public class ProdutoService {
+
+    @Autowired
+    private IProdutoRepository _produtoRepository;
+
+    public Produto Criar(Produto produto) {
+        if (produto == null)
+            throw new RuntimeException("Objeto vazio. Preencha as informações");
+
+        try {
+            return _produtoRepository.save(produto);
+        } catch (RuntimeException e) {
+            throw new RuntimeException(e.getMessage());
+        }
+    }
+
+    public Iterable<Produto> BuscaGeral() {
+        try {
+            return _produtoRepository.findAll();
+        } catch (RuntimeException e) {
+            throw new RuntimeException(e.getMessage());
+        }
+    }
+
+    public Produto BuscaPorId(Integer id) {
+        try {
+            return _produtoRepository.findById(id).get();
+        } catch (RuntimeException e) {
+            throw new RuntimeException(e.getMessage());
+        }
+    }
+
+    public Produto Atualizar(Produto produto) {
+        if (produto == null)
+            throw new RuntimeException("Objeto vazio. Preencha as informações.");
+
+        try {
+            return _produtoRepository.save(produto);
+        } catch (Exception e) {
+            throw new RuntimeException(e.getMessage());
+        }
+    }
+
+    public void Excluir(Integer id) {
+        try {
+            _produtoRepository.deleteById(id);
+        } catch (Exception e) {
+            throw new RuntimeException(e.getMessage());
+        }
+    }
+}

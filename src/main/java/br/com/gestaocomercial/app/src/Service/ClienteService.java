@@ -43,7 +43,7 @@ public class ClienteService {
 
             for (Email email :  emails) {
                 email.setIdCliente(cliente.getId());
-                cliente.Emails.add(_emailRepository.save(email));
+                cliente.setEmails(_emailRepository.save(email));
             }
 
             return cliente;
