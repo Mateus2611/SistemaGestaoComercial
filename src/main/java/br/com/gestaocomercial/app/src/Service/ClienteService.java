@@ -1,6 +1,7 @@
 package br.com.gestaocomercial.app.src.Service;
 
 import br.com.gestaocomercial.app.src.Model.Cliente;
+import br.com.gestaocomercial.app.src.Model.DTO.UpdateClienteDTO;
 import br.com.gestaocomercial.app.src.Model.Email;
 import br.com.gestaocomercial.app.src.Model.Endereco;
 import br.com.gestaocomercial.app.src.Repository.IClienteRepository;
@@ -9,6 +10,9 @@ import br.com.gestaocomercial.app.src.Repository.IEnderecoRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.sql.Date;
+import java.time.LocalDate;
+import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 
@@ -63,108 +67,87 @@ public class ClienteService {
         }
     }
 
-//    public Cliente BuscaPorId(Integer id) {
-//        try {
-//            Cliente cliente = _clienteDAO.BuscaPorId(id);
-//
-//            cliente.setEndereco(_enderecoDAO.BuscaPorId(cliente.getIdEndereco()));
-//
-//            cliente.setEmails(_emailDAO.BuscaGeral(cliente.getId()));
-//
-//            return cliente;
-//        } catch (RuntimeException ex) {
-//            throw new RuntimeException(ex.getMessage());
-//        }
-//    }
-//
-//    public List<Email> ExibirEmailsCliente(Integer idCliente) {
-//        try {
-//            return _emailDAO.BuscaGeral(idCliente);
-//        } catch (RuntimeException ex) {
-//            throw new RuntimeException(ex.getMessage());
-//        }
-//    }
-//
-//    public Cliente AtualizarTipoCliente(Integer id, String tipoCliente) {
-//        try {
-//
-//            _clienteDAO.AtualizarTipoCliente(id, tipoCliente);
-//
-//            return BuscaPorId(id);
-//        } catch (RuntimeException ex) {
-//            throw new RuntimeException(ex.getMessage());
-//        }
-//    }
-//
-//    public Cliente AtualizarNomeCliente(Integer id, String nome) {
-//        try {
-//
-//            _clienteDAO.AtualizarNomeCliente(id, nome);
-//
-//            return BuscaPorId(id);
-//        } catch (RuntimeException ex) {
-//            throw new RuntimeException(ex.getMessage());
-//        }
-//    }
-//
-//    public Cliente AtualizarEnderecoCliente(Integer idCliente, Endereco endereco) {
-//        try {
-//            Cliente cliente = _clienteDAO.BuscaPorId(idCliente);
-//            Integer idEnderecoDesatualizado = cliente.IdEndereco;
-//
-//            endereco = _enderecoDAO.Criar(endereco);
-//            _clienteDAO.AtualizarEnderecoCliente(idCliente, endereco.getId());
-//
-//            _enderecoDAO.Excluir(idEnderecoDesatualizado);
-//
-//            return BuscaPorId(idCliente);
-//        } catch (RuntimeException ex) {
-//            throw new RuntimeException(ex.getMessage());
-//        }
-//    }
-//
-//    public List<Email> CriarEmailCliente(Integer idCliente, List<Email> emails) {
-//        try {
-//            List<Email> novosEmails = new ArrayList<Email>();
-//
-//            for (Email email : emails) {
-//                email.setIdCliente(idCliente);
-//                novosEmails.add(_emailDAO.Criar(email));
-//            }
-//
-//            return novosEmails;
-//        } catch (RuntimeException ex) {
-//            throw new RuntimeException(ex.getMessage());
-//        }
-//    }
-//
-//    public void ExcluirEmailCliente(Integer idEmail) {
-//        try {
-//            _emailDAO.Excluir(idEmail);
-//        } catch (RuntimeException ex) {
-//            throw new RuntimeException(ex.getMessage());
-//        }
-//    }
-//
-//    public Cliente InativarCliente(int id) {
-//        try {
-//
-//            _clienteDAO.InativarCliente(id);
-//
-//            return BuscaPorId(id);
-//        } catch (RuntimeException ex) {
-//            throw new RuntimeException(ex.getMessage());
-//        }
-//    }
-//
-//    public Cliente AtivarCliente(int id) {
-//        try {
-//
-//            _clienteDAO.AtivarCliente(id);
-//
-//            return BuscaPorId(id);
-//        } catch (RuntimeException ex) {
-//            throw new RuntimeException(ex.getMessage());
-//        }
-//    }
+    public Cliente BuscaPorId(Integer id) {
+        try {
+            Cliente cliente = _clienteRepository.findById(id).get();
+
+            cliente.setEndereco(_enderecoRepository.findById(cliente.getIdEndereco()).get());
+
+            cliente.setEmails(_emailRepository.findAllById(cliente.getId()));
+
+            return cliente;
+        } catch (RuntimeException ex) {
+            throw new RuntimeException(ex.getMessage());
+        }
+    }
+
+    public Cliente Atualizar(UpdateClienteDTO clienteDTO) {
+        Cliente cliente = _clienteRepository.findById(clienteDTO.id).get();
+
+        if (clienteDTO.Nome != null) cliente.setNome(clienteDTO.Nome);
+        if (clienteDTO.Tipo != null) cliente.setTipo(Cliente.TipoCliente.valueOf(clienteDTO.Tipo));
+
+        if (clienteDTO.Endereco != null) {
+            Endereco endereco = _enderecoRepository.save(clienteDTO.Endereco);
+
+            _enderecoRepository.deleteById(cliente.getIdEndereco());
+
+            cliente.setIdEndereco(endereco.getId());
+        };
+
+        return _clienteRepository.save(cliente);
+    }
+
+    public Cliente InativarCliente(int id) {
+        try {
+
+            _clienteRepository.Disable(id, Date.valueOf(LocalDate.now()));
+
+            return BuscaPorId(id);
+        } catch (RuntimeException ex) {
+            throw new RuntimeException(ex.getMessage());
+        }
+    }
+
+    public Cliente AtivarCliente(int id) {
+        try {
+
+            _clienteRepository.Activate(id);
+
+            return BuscaPorId(id);
+        } catch (RuntimeException ex) {
+            throw new RuntimeException(ex.getMessage());
+        }
+    }
+
+    public List<Email> ExibirEmailsCliente(Integer idCliente) {
+        try {
+            return _emailRepository.findAllById(idCliente);
+        } catch (RuntimeException ex) {
+            throw new RuntimeException(ex.getMessage());
+        }
+    }
+
+    public List<Email> CriarEmailCliente(Integer idCliente, List<Email> emails) {
+        try {
+            List<Email> novosEmails = new ArrayList<Email>();
+
+            for (Email email : emails) {
+                email.setIdCliente(idCliente);
+                novosEmails.add(_emailRepository.save(email));
+            }
+
+            return novosEmails;
+        } catch (RuntimeException ex) {
+            throw new RuntimeException(ex.getMessage());
+        }
+    }
+
+    public void ExcluirEmailCliente(Integer idEmail) {
+        try {
+            _emailRepository.deleteById(idEmail);
+        } catch (RuntimeException ex) {
+            throw new RuntimeException(ex.getMessage());
+        }
+    }
 }
