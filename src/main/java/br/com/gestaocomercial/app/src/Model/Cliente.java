@@ -75,8 +75,8 @@ public class Cliente {
         return Emails;
     }
 
-    public void setEmails(Email email) {
-        Emails.add(email);
+    public void setEmails(List<Email> emails) {
+        Emails = emails;
     }
 
     public Integer getIdEndereco() {
