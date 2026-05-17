@@ -90,7 +90,7 @@ public class Avaliacao {
         return IdVenda;
     }
 
-    public void setIdVenda(Integer idVenda) {
-        IdVenda = idVenda;
+    public void setIdVenda(Venda idVenda) {
+        IdVenda = idVenda.getId();
     }
 }

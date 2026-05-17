@@ -1,4 +1,9 @@
 package br.com.gestaocomercial.app.src.Repository;
 
-public interface IVendaRepository {
+import br.com.gestaocomercial.app.src.Model.Venda;
+import org.springframework.data.repository.CrudRepository;
+import org.springframework.stereotype.Repository;
+
+@Repository
+public interface IVendaRepository extends CrudRepository<Venda, Integer> {
 }
