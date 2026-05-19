@@ -1,8 +1,6 @@
 package br.com.gestaocomercial.app.src.Model;
 
-import jakarta.persistence.Column;
-import jakarta.persistence.Id;
-import jakarta.persistence.Table;
+import jakarta.persistence.*;
 
 import java.math.BigDecimal;
 import java.sql.Date;
@@ -15,43 +13,23 @@ public class Orcamento {
     public Orcamento() {
     }
 
-    public Orcamento(Integer id, Integer idCliente, Date dataCriacao, Date dataValidade,
-                     BigDecimal valor, StatusOrcamento status, BigDecimal desconto) {
-        Id = id;
+    public Orcamento(Integer idCliente, Date dataCriacao, Date dataValidade, StatusOrcamento status, BigDecimal desconto) {
         IdCliente = idCliente;
         DataCriacao = dataCriacao;
         DataValidade = dataValidade;
-        Valor = valor;
         Status = status;
         Desconto = desconto;
     }
-
-    public Orcamento(Integer idCliente, Date dataCriacao, Date dataValidade,
-                     BigDecimal valor, StatusOrcamento status, BigDecimal desconto) {
-        IdCliente = idCliente;
-        DataCriacao = dataCriacao;
-        DataValidade = dataValidade;
-        Valor = valor;
-        Status = status;
-        Desconto = desconto;
-    }
-
-    public Orcamento(Integer idCliente, BigDecimal valor, StatusOrcamento status, BigDecimal desconto) {
-        IdCliente = idCliente;
-        Valor = valor;
-        Status = status;
-        Desconto = desconto;
-    }
-
-    SimpleDateFormat format = new SimpleDateFormat("dd/MM/yyyy");
 
     @Id
     @Column(name = "Id")
     private Integer Id;
     @Column(name = "Id_Cliente")
     private Integer IdCliente;
-    private String nomeCliente;
-    private List<String> nomeProdutos;
+    @OneToOne(mappedBy = "orcamento", cascade = CascadeType.REMOVE)
+    private Cliente Cliente;
+    @OneToMany(mappedBy = "orcamento_produto", cascade = CascadeType.REMOVE)
+    private Iterable<Produto> Produtos;
     @Column(name = "Data_Criacao")
     private Date DataCriacao;
     @Column(name = "Data_Validade")
@@ -80,23 +58,23 @@ public class Orcamento {
         IdCliente = idCliente;
     }
 
-    public String getNomeCliente() {
-        return nomeCliente;
+    public Cliente getCliente() {
+        return Cliente;
     }
 
-    public void setNomeCliente(String nomeCliente) {
-        this.nomeCliente = nomeCliente;
+    public void setCliente(Cliente cliente) {
+        Cliente = cliente;
     }
 
-    public List<String> getNomeProdutos() {
-        return nomeProdutos;
+    public Iterable<Produto> getProdutos() {
+        return Produtos;
     }
 
-    public void setNomeProdutos(List<String> nomeProdutos) {
-        this.nomeProdutos = nomeProdutos;
+    public void setProdutos(List<Produto> produto) {
+        Produtos = produto;
     }
 
-    public java.util.Date getDataCriacao() {
+    public Date getDataCriacao() {
         return DataCriacao;
     }
 
@@ -104,7 +82,7 @@ public class Orcamento {
         DataCriacao = dataCriacao;
     }
 
-    public java.util.Date getDataValidade() {
+    public Date getDataValidade() {
         return DataValidade;
     }
 
