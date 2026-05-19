@@ -13,6 +13,7 @@ import org.springframework.stereotype.Service;
 import java.sql.Date;
 import java.time.LocalDate;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
 
@@ -44,7 +45,7 @@ public class ClienteService {
 
             for (Email email : emails) {
                 email.setIdCliente(cliente.getId());
-                cliente.setEmails(_emailRepository.save(email));
+                cliente.setEmails(Collections.singletonList(_emailRepository.save(email)));
             }
 
             return cliente;
