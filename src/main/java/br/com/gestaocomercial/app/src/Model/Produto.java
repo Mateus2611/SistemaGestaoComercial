@@ -1,10 +1,9 @@
 package br.com.gestaocomercial.app.src.Model;
 
-import jakarta.persistence.Column;
-import jakarta.persistence.Id;
-import jakarta.persistence.Table;
+import jakarta.persistence.*;
 
 import java.math.BigDecimal;
+import java.util.List;
 
 @Table(name = "produto")
 public class Produto {
@@ -30,6 +29,8 @@ public class Produto {
     private String Nome;
     @Column(name = "Valor")
     private BigDecimal Valor;
+    @OneToMany(mappedBy = "orcamento_produto", cascade = CascadeType.REMOVE)
+    private List<Orcamento> Orcamentos;
 
     public Integer getId() {
         return Id;

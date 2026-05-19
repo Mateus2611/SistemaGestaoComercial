@@ -28,20 +28,21 @@ public class ClienteService {
 
     public Cliente Criar(Cliente cliente, Endereco endereco, List<Email> emails) {
 
-        if (cliente == null)
-            throw new RuntimeException("Dados do cliente vazio. Preencha as informações");
-        if (endereco == null)
-            throw new RuntimeException("Dados de endereço vazio. Preencha as informações");
-        if (emails== null)
-            throw new RuntimeException("Endereço de email vazio. Preencha a informação");
-
         try {
+
+            if (cliente == null)
+                throw new RuntimeException("Dados do cliente vazio. Preencha as informações");
+            if (endereco == null)
+                throw new RuntimeException("Dados de endereço vazio. Preencha as informações");
+            if (emails== null)
+                throw new RuntimeException("Endereço de email vazio. Preencha a informação");
+
             endereco = _enderecoRepository.save(endereco);
             cliente.setIdEndereco(endereco.getId());
             cliente = _clienteRepository.save(cliente);
             cliente.setEndereco(endereco);
 
-            for (Email email :  emails) {
+            for (Email email : emails) {
                 email.setIdCliente(cliente.getId());
                 cliente.setEmails(_emailRepository.save(email));
             }
@@ -57,9 +58,10 @@ public class ClienteService {
         try {
             Iterable<Cliente> clientes = _clienteRepository.findAll();
 
-            for (Cliente cliente : clientes) {
-                cliente.setEndereco(_enderecoRepository.findById(cliente.getId()).get());
-            }
+            clientes.forEach(c -> {
+                c.setEndereco(_enderecoRepository.findById(c.getIdEndereco()).get());
+                _emailRepository.findAllById(c.getId()).forEach(c::setEmails);
+            });
 
             return clientes;
         } catch (RuntimeException ex) {
@@ -72,8 +74,7 @@ public class ClienteService {
             Cliente cliente = _clienteRepository.findById(id).get();
 
             cliente.setEndereco(_enderecoRepository.findById(cliente.getIdEndereco()).get());
-
-            cliente.setEmails(_emailRepository.findAllById(cliente.getId()));
+            (_emailRepository.findAllById(cliente.getId())).forEach(cliente::setEmails);
 
             return cliente;
         } catch (RuntimeException ex) {

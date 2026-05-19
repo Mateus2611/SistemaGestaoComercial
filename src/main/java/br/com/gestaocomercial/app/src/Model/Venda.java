@@ -12,23 +12,9 @@ public class Venda {
     public Venda() {
     }
 
-    public Venda(Integer idOrcamento, Date dataCriacao, Date prazoPagamento, Date dataConclusao, StatusPagamento statusPagamento) {
+    public Venda(Integer idOrcamento) {
         IdOrcamento = idOrcamento;
-        DataCriacao = dataCriacao;
-        PrazoPagamento = prazoPagamento;
-        DataConclusao = dataConclusao;
-        StatusPagamento = statusPagamento;
     }
-
-    public Venda(Integer id, Integer idOrcamento, Date dataCriacao, Date prazoPagamento, Date dataConclusao, StatusPagamento statusPagamento) {
-        Id = id;
-        IdOrcamento = idOrcamento;
-        DataCriacao = dataCriacao;
-        PrazoPagamento = prazoPagamento;
-        DataConclusao = dataConclusao;
-        StatusPagamento = statusPagamento;
-    }
-
 
     @Id
     @Column(name = "Id")
@@ -97,8 +83,8 @@ public class Venda {
         return StatusPagamento;
     }
 
-    public void setStatusPagamento(StatusPagamento statusPagamento) {
-        StatusPagamento = statusPagamento;
+    public void setStatusPagamento(String statusPagamento) {
+        StatusPagamento = StatusPagamento.valueOf(statusPagamento);
     }
 
     public enum StatusPagamento {
