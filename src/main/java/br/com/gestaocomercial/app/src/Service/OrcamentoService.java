@@ -7,6 +7,7 @@ import br.com.gestaocomercial.app.src.Model.DTO.UpdateOrcamentoDTO;
 import br.com.gestaocomercial.app.src.Model.Orcamento;
 import br.com.gestaocomercial.app.src.Model.OrcamentoProduto;
 import br.com.gestaocomercial.app.src.Model.Produto;
+import br.com.gestaocomercial.app.src.Model.Response.OrcamentoResponse;
 import br.com.gestaocomercial.app.src.Repository.IClienteRepository;
 import br.com.gestaocomercial.app.src.Repository.IOrcamentoProdutoRepository;
 import br.com.gestaocomercial.app.src.Repository.IOrcamentoRepository;
@@ -32,7 +33,7 @@ public class OrcamentoService {
     @Autowired
     private IProdutoRepository _produtoRepository;
 
-    public Orcamento Criar(CreateOrcamentoDTO orcamentoDTO) {
+    public OrcamentoResponse Criar(CreateOrcamentoDTO orcamentoDTO) {
         if (orcamentoDTO == null)
             throw new RuntimeException("Objeto vazio. Preencha as informações.");
 
@@ -60,18 +61,18 @@ public class OrcamentoService {
             orcamentoDTO.Produtos.forEach( ps -> _orcamentoProdutoRepository.save(new OrcamentoProduto(orcamentoCriado.getId(), ps.ProdutoId, ps.Quantidade)));
 
             orcamentoCriado.setCliente(cliente);
-            orcamentoCriado.setProdutos(produtos);
 
-            return orcamentoCriado;
+            return new OrcamentoResponse(orcamentoCriado.getId(), orcamentoCriado.getIdCliente(), cliente, produtos, orcamentoCriado.getDataCriacao(), orcamentoCriado.getDataValidade(), orcamentoCriado.getValor(), orcamentoCriado.getStatus(), orcamentoCriado.getDesconto());
         } catch (RuntimeException e) {
             throw new RuntimeException(e.getMessage());
         }
     }
 
-    public Iterable<Orcamento> BuscaGeral() {
+    public Iterable<OrcamentoResponse> BuscaGeral() {
 
         try {
             Iterable<Orcamento> orcamentos = _orcamentoRepository.findAll();
+            List<OrcamentoResponse> responses = new ArrayList<>();
 
             orcamentos.forEach( o -> {
                 List<Produto> produtos = new ArrayList<>();
@@ -79,16 +80,28 @@ public class OrcamentoService {
                 o.setCliente(_clienteRepository.findById(o.getIdCliente()).get());
                 _orcamentoProdutoRepository.findAllById(o.getId()).forEach(op -> produtos.add(
                         _produtoRepository.findById(op.getIdProduto()).get()));
-                o.setProdutos(produtos);
+
+                responses.add(
+                        new OrcamentoResponse(
+                                o.getId(),
+                                o.getIdCliente(),
+                                o.getCliente(),
+                                produtos,
+                                o.getDataCriacao(),
+                                o.getDataValidade(),
+                                o.getValor(),
+                                o.getStatus(),
+                                o.getDesconto())
+                );
             });
 
-            return orcamentos;
+            return responses;
         } catch (RuntimeException e) {
             throw new RuntimeException(e.getMessage());
         }
     }
 
-    public Orcamento BuscaPorId(Integer id) {
+    public OrcamentoResponse BuscaPorId(Integer id) {
         try {
             Orcamento orcamento = _orcamentoRepository.findById(id).get();
             orcamento.setCliente(_clienteRepository.findById(orcamento.getIdCliente()).get());
@@ -97,9 +110,16 @@ public class OrcamentoService {
             _orcamentoProdutoRepository.findAllById(orcamento.getId()).forEach(op -> produtos.add(
                     _produtoRepository.findById(op.getIdProduto()).get()));
 
-            orcamento.setProdutos(produtos);
-
-            return orcamento;
+            return new OrcamentoResponse(
+                    orcamento.getId(),
+                    orcamento.getIdCliente(),
+                    orcamento.getCliente(),
+                    produtos,
+                    orcamento.getDataCriacao(),
+                    orcamento.getDataValidade(),
+                    orcamento.getValor(),
+                    orcamento.getStatus(),
+                    orcamento.getDesconto());
         } catch (RuntimeException e) {
             throw new RuntimeException(e.getMessage());
         }

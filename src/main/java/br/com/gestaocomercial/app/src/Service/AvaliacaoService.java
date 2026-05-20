@@ -13,7 +13,7 @@ public class AvaliacaoService {
     @Autowired
     private IAvaliacaoRepository _avaliacaoRepository;
     @Autowired
-    IVendaRepository _vendaRepository;
+    private IVendaRepository _vendaRepository;
 
     public Avaliacao Criar(Avaliacao avaliacao, Venda venda) {
 

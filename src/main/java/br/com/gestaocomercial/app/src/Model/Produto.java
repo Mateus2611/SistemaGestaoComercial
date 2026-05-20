@@ -5,6 +5,7 @@ import jakarta.persistence.*;
 import java.math.BigDecimal;
 import java.util.List;
 
+@Entity
 @Table(name = "produto")
 public class Produto {
 
@@ -29,8 +30,9 @@ public class Produto {
     private String Nome;
     @Column(name = "Valor")
     private BigDecimal Valor;
-    @OneToMany(mappedBy = "orcamento_produto", cascade = CascadeType.REMOVE)
-    private List<Orcamento> Orcamentos;
+    @OneToMany(orphanRemoval = true)
+    @JoinColumn(name = "Id_Produto")
+    private List<OrcamentoProduto> OrcamentoProduto;
 
     public Integer getId() {
         return Id;
@@ -54,5 +56,13 @@ public class Produto {
 
     public void setValor(BigDecimal valor) {
         Valor = valor;
+    }
+
+    public List<OrcamentoProduto> getOrcamentoProduto() {
+        return OrcamentoProduto;
+    }
+
+    public void setOrcamentoProduto(List<OrcamentoProduto> orcamentoProduto) {
+        OrcamentoProduto = orcamentoProduto;
     }
 }

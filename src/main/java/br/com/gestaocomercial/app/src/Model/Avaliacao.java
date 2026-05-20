@@ -2,11 +2,13 @@ package br.com.gestaocomercial.app.src.Model;
 
 
 import jakarta.persistence.Column;
+import jakarta.persistence.Entity;
 import jakarta.persistence.Id;
 import jakarta.persistence.Table;
 
 import java.sql.Date;
 
+@Entity
 @Table(name = "avaliacao")
 public class Avaliacao {
 
