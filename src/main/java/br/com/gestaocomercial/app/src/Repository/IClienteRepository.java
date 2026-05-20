@@ -12,9 +12,9 @@ import java.util.Optional;
 
 @Repository
 public interface IClienteRepository extends CrudRepository<Cliente, Integer> {
-    @Query("UPDATE `Cliente` SET `Status_Cliente` = 'INATIVO', `Data_Inativacao` = :date WHERE `Id` = :id")
+    @Query(value = "UPDATE Cliente SET Status_Cliente = 'INATIVO', Data_Inativacao = :date WHERE Id = :id", nativeQuery = true)
     void Disable(@Param("id") Integer id, @Param("data") Date date);
 
-    @Query("UPDATE `Cliente` SET `Status_Cliente` = 'ATIVO' WHERE `Id` = :id")
+    @Query(value = "UPDATE Cliente SET Status_Cliente = 'ATIVO' WHERE Id = :id", nativeQuery = true)
     void Activate(@Param("id") Integer id);
 }

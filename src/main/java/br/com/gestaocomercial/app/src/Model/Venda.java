@@ -1,11 +1,10 @@
 package br.com.gestaocomercial.app.src.Model;
 
-import jakarta.persistence.Column;
-import jakarta.persistence.Id;
-import jakarta.persistence.Table;
+import jakarta.persistence.*;
 
 import java.sql.Date;
 
+@Entity
 @Table(name = "venda")
 public class Venda {
 
@@ -21,6 +20,7 @@ public class Venda {
     private Integer Id;
     @Column(name = "Id_Orcamento")
     private Integer IdOrcamento;
+    @OneToOne
     private Orcamento Orcamento;
     @Column(name = "Data_Criacao")
     private Date DataCriacao;

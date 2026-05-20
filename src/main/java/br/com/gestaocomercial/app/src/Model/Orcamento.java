@@ -7,6 +7,7 @@ import java.sql.Date;
 import java.text.SimpleDateFormat;
 import java.util.List;
 
+@Entity
 @Table(name = "orcamento")
 public class Orcamento {
 
@@ -26,10 +27,11 @@ public class Orcamento {
     private Integer Id;
     @Column(name = "Id_Cliente")
     private Integer IdCliente;
-    @OneToOne(mappedBy = "orcamento", cascade = CascadeType.REMOVE)
+    @OneToOne
     private Cliente Cliente;
-    @OneToMany(mappedBy = "orcamento_produto", cascade = CascadeType.REMOVE)
-    private Iterable<Produto> Produtos;
+    @OneToMany(orphanRemoval = true)
+    @JoinColumn(name = "Id_Orcamento")
+    private List<OrcamentoProduto> OrcamentoProdutos;
     @Column(name = "Data_Criacao")
     private Date DataCriacao;
     @Column(name = "Data_Validade")
@@ -66,12 +68,12 @@ public class Orcamento {
         Cliente = cliente;
     }
 
-    public Iterable<Produto> getProdutos() {
-        return Produtos;
+    public List<OrcamentoProduto> getOrcamentoProdutos() {
+        return OrcamentoProdutos;
     }
 
-    public void setProdutos(List<Produto> produto) {
-        Produtos = produto;
+    public void setOrcamentoProdutos(List<OrcamentoProduto> orcamentoProdutos) {
+        OrcamentoProdutos = orcamentoProdutos;
     }
 
     public Date getDataCriacao() {

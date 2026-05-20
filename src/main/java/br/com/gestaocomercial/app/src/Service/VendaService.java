@@ -65,8 +65,7 @@ public class VendaService {
     public Venda Atualizar(UpdateVendaDTO vendaDTO) {
         Venda venda = _vendaRepository.findById(vendaDTO.id).get();
 
-        if (vendaDTO.statusPagamento != null) venda.setStatusPagamento
-                (Venda.StatusPagamento.valueOf(String.valueOf(vendaDTO.statusPagamento)));
+        if (vendaDTO.statusPagamento != null) venda.setStatusPagamento(vendaDTO.statusPagamento.toString());
 
         if (vendaDTO.orcamento != null) {
             Orcamento orcamento = _orcamentoRepository.save(vendaDTO.orcamento);

@@ -1,9 +1,8 @@
 package br.com.gestaocomercial.app.src.Model;
 
-import jakarta.persistence.Column;
-import jakarta.persistence.Id;
-import jakarta.persistence.Table;
+import jakarta.persistence.*;
 
+@Entity
 @Table(name = "orcamento_produto")
 public class OrcamentoProduto {
 

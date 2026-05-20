@@ -61,7 +61,7 @@ public class ClienteService {
 
             clientes.forEach(c -> {
                 c.setEndereco(_enderecoRepository.findById(c.getIdEndereco()).get());
-                _emailRepository.findAllById(c.getId()).forEach(c::setEmails);
+                c.setEmails(_emailRepository.findAllById(c.getId()));
             });
 
             return clientes;
@@ -75,7 +75,7 @@ public class ClienteService {
             Cliente cliente = _clienteRepository.findById(id).get();
 
             cliente.setEndereco(_enderecoRepository.findById(cliente.getIdEndereco()).get());
-            (_emailRepository.findAllById(cliente.getId())).forEach(cliente::setEmails);
+            cliente.setEmails(_emailRepository.findAllById(cliente.getId()));
 
             return cliente;
         } catch (RuntimeException ex) {

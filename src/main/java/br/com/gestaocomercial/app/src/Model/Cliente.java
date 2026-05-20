@@ -7,7 +7,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 @Entity
-@Table(name = "avaliacao")
+@Table(name = "cliente")
 public class Cliente {
 
     public Cliente() {
@@ -48,8 +48,9 @@ public class Cliente {
     private Integer Id;
     @Column(name = "Nome")
     private String Nome;
-    @OneToMany(mappedBy = "cliente", cascade = CascadeType.REMOVE)
-    private List<Email> Emails = new ArrayList<Email>();
+    @OneToMany(orphanRemoval = true)
+    @JoinColumn(name = "Id_Cliente")
+    private List<Email> Emails;
     @Column(name = "Id_Endereco")
     private Integer IdEndereco;
     @OneToOne

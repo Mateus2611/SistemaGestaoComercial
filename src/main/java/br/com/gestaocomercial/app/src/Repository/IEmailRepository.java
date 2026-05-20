@@ -11,6 +11,6 @@ import java.util.List;
 @Repository
 public interface IEmailRepository extends CrudRepository<Email, Integer> {
 
-    @Query("SELECT '*' FROM `Email` WHERE Id_Cliente = :id ")
+    @Query(value = "SELECT * FROM Email WHERE Id_Cliente = :id", nativeQuery = true)
     List<Email> findAllById(@Param("id") Integer id);
 }
