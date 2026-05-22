@@ -1,0 +1,494 @@
+<!DOCTYPE html>
+<html lang="pt-br" xmlns:th="http://www.thymeleaf.org" xmlns="http://www.w3.org/1999/html">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Orçamentos</title>
+
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css">
+    <link rel="stylesheet" type="text/css" href="../../static/css/styles.css" th:href="@{/css/styles.css}"/>
+
+    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.11.8/dist/umd/popper.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.min.js"></script>
+</head>
+<body>
+
+<div class="d-flex">
+
+    <div class="sidebar-custom d-flex flex-column flex-shrink-0">
+
+        <a href="#" class="nav-link-custom text-uppercase">
+            <i class="bi bi-house-door-fill"></i>
+            <span>Início</span>
+        </a>
+
+        <a href="#" class="nav-link-custom text-uppercase">
+            <i class="bi bi-box-seam-fill"></i>
+            <span>Produtos</span>
+        </a>
+
+        <a href="#" class="nav-link-custom text-uppercase">
+            <i class="bi bi-cart-fill"></i>
+            <span>Vendas</span>
+        </a>
+
+        <a href="#" class="nav-link-custom active text-uppercase">
+            <i class="bi bi-file-earmark-text-fill"></i>
+            <span>Orçamentos</span>
+        </a>
+
+        <a href="#" class="nav-link-custom text-uppercase">
+            <i class="bi bi-people-fill"></i>
+            <span>Clientes</span>
+        </a>
+
+        <a href="#" class="nav-link-custom text-uppercase">
+            <i class="bi bi-star-fill"></i>
+            <span>Avaliações</span>
+        </a>
+
+        <a href="#" class="nav-link-custom mt-auto text-uppercase no-hover">
+            <i class="bi bi-info-circle-fill"></i>
+            <span>Sobre</span>
+        </a>
+
+    </div>
+
+    <div class="main-content flex-grow-1 p-5">
+
+        <h1 class="page-title mb-4">ORÇAMENTOS</h1>
+
+        <div class="d-flex align-items-center gap-3 mb-4 flex-wrap">
+            <div class="search-container">
+                <i class="bi bi-search"></i>
+                <input type="text" class="search-input" placeholder="Procurar orçamento">
+            </div>
+
+            <button class="btn btn-orange text-uppercase" data-bs-toggle="modal" data-bs-target="#modalCriarOrcamento">
+                Novo Orçamento
+            </button>
+
+            <button class="btn btn-orange text-uppercase ms-auto">Ordenar</button>
+        </div>
+
+        <div class="table-responsive">
+            <table class="table table-custom">
+                <thead>
+                <tr>
+                    <th>ID</th>
+                    <th>Cliente</th>
+                    <th>Emissão</th>
+                    <th>Validade</th>
+                    <th>Status</th>
+                    <th>Valor Total (R$)</th>
+                    <th class="text-end">Ações</th>
+                </tr>
+                </thead>
+                <tbody>
+
+                <tr th:each="orcamento : ${orcamentos}">
+                    <td th:text="${orcamento.id}">1</td>
+                    <td th:text="${orcamento.cliente.nome}">João da Silva</td>
+                    <td th:text="${#dates.format(orcamento.dataCriacao, 'dd/MM/yyyy')}">20/05/2026</td>
+                    <td th:text="${#dates.format(orcamento.dataValidade, 'dd/MM/yyyy')}">30/05/2026</td>
+                    <td>
+                        <span class="badge bg-warning text-black"
+                              th:classappend="${orcamento.status.name() == 'APROVADO' ? 'bg-success text-white' : (orcamento.status.name() == 'PENDENTE' ? 'bg-warning text-black' : 'bg-danger text-white')}"
+                              th:text="${orcamento.status}">PENDENTE</span>
+                    </td>
+                    <td th:text="${#numbers.formatDecimal(orcamento.valor, 1, 'POINT', 2, 'COMMA')}">1500,00</td>
+                    <td class="text-end">
+                        <button class="btn btn-sm btn-outline-secondary me-2"
+                                data-bs-toggle="modal" data-bs-target="#modalEditarOrcamento"
+                                th:attr="data-id=${orcamento.id},
+                                         data-cliente=${orcamento.cliente.id},
+                                         data-validade=${#dates.format(orcamento.dataValidade, 'yyyy-MM-dd')},
+                                         data-status=${orcamento.status.name()},
+                                         data-desconto=${orcamento.desconto},
+                                         data-total=${orcamento.valor}"
+                                title="Editar">
+                            <i class="bi bi-pencil-fill"></i>
+                        </button>
+                        <button class="btn btn-sm btn-outline-danger" title="Excluir">
+                            <i class="bi bi-trash-fill"></i>
+                        </button>
+                    </td>
+                </tr>
+
+                <tr>
+                    <td>101</td>
+                    <td>Construtora Alfa Ltda</td>
+                    <td>15/05/2026</td>
+                    <td>25/05/2026</td>
+                    <td><span class="badge bg-warning text-dark">PENDENTE</span></td>
+                    <td>4.500,00</td>
+                    <td class="text-end">
+                        <button class="btn btn-sm btn-outline-secondary me-2"
+                                data-bs-toggle="modal" data-bs-target="#modalEditarOrcamento"
+                                data-id="101" data-cliente="" data-validade="2026-05-25"
+                                data-status="PENDENTE" data-desconto="0" data-total="4500.00"
+                                title="Editar"><i class="bi bi-pencil-fill"></i></button>
+                        <button class="btn btn-sm btn-outline-danger" title="Excluir"><i class="bi bi-trash-fill"></i></button>
+                    </td>
+                </tr>
+                <tr>
+                    <td>102</td>
+                    <td>Maria Oliveira</td>
+                    <td>10/05/2026</td>
+                    <td>20/05/2026</td>
+                    <td><span class="badge bg-success">APROVADO</span></td>
+                    <td>850,50</td>
+                    <td class="text-end">
+                        <button class="btn btn-sm btn-outline-secondary me-2"
+                                data-bs-toggle="modal" data-bs-target="#modalEditarOrcamento"
+                                data-id="102" data-cliente="" data-validade="2026-05-20"
+                                data-status="APROVADO" data-desconto="50" data-total="850.50"
+                                title="Editar"><i class="bi bi-pencil-fill"></i></button>
+                        <button class="btn btn-sm btn-outline-danger" title="Excluir"><i class="bi bi-trash-fill"></i></button>
+                    </td>
+                </tr>
+                <tr>
+                    <td>103</td>
+                    <td>Oficina Mecânica São José</td>
+                    <td>01/05/2026</td>
+                    <td>10/05/2026</td>
+                    <td><span class="badge bg-danger">EXPIRADO</span></td>
+                    <td>1.200,00</td>
+                    <td class="text-end">
+                        <button class="btn btn-sm btn-outline-secondary me-2"
+                                data-bs-toggle="modal" data-bs-target="#modalEditarOrcamento"
+                                data-id="103" data-cliente="" data-validade="2026-05-10"
+                                data-status="EXPIRADO" data-desconto="100" data-total="1200.00"
+                                title="Editar"><i class="bi bi-pencil-fill"></i></button>
+                        <button class="btn btn-sm btn-outline-danger" title="Excluir"><i class="bi bi-trash-fill"></i></button>
+                    </td>
+                </tr>
+                </tbody>
+            </table>
+        </div>
+
+    </div>
+</div>
+
+<div th:fragment="modalCriar" class="modal fade" id="modalCriarOrcamento" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered modal-lg">
+        <div class="modal-content shadow-lg border-0" style="border-radius: 4px;">
+            <div class="modal-header border-0 pb-0">
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body px-5 pb-5 pt-2 text-center">
+                <h1 class="page-title text-uppercase mb-3" style="line-height: 1;">
+                    Criar<br>Orçamento
+                </h1>
+                <hr class="mx-auto mb-4" style="width: 80%; border-top: 2px solid #000; opacity: 1;">
+
+                <form class="text-start px-md-4">
+                    <div class="row g-4">
+                        <div class="col-md-7">
+                            <label class="form-label fw-bold text-uppercase text-dark mb-1" style="font-size: 1.1rem;">Cliente</label>
+                            <select class="form-select form-select-lg"
+                                    style="border: 2px solid #000; border-radius: 0;"
+                                    id="clienteSelect" name="clienteId">
+                                <option selected disabled value="">Selecione o Cliente</option>
+                                <option th:each="cliente : ${clientes}"
+                                        th:value="${cliente.id}"
+                                        th:text="${cliente.nome}">
+                                </option>
+                            </select>
+                        </div>
+                        <div class="col-md-5">
+                            <label class="form-label fw-bold text-uppercase text-dark mb-1" style="font-size: 1.1rem;">Data de Validade</label>
+                            <input type="date" class="form-control form-control-lg"
+                                   style="border: 2px solid #000; border-radius: 0;">
+                        </div>
+                        <div class="col-md-4 offset-md-2">
+                            <label class="form-label fw-bold text-uppercase text-dark mb-1" style="font-size: 1.1rem;">Desconto (R$)</label>
+                            <input type="number" step="0.01" class="form-control form-control-lg" value="0.00"
+                                   style="border: 2px solid #000; border-radius: 0;">
+                        </div>
+                        <div class="col-md-4">
+                            <label class="form-label fw-bold text-uppercase text-dark mb-1" style="font-size: 1.1rem;">Total (R$)</label>
+                            <input type="text" id="valorOrcamentoInput" class="form-control form-control-lg fw-bold" readonly value="0.00"
+                                   style="border: 2px solid #000; border-radius: 0; background-color: #e9e9e9;">
+                        </div>
+
+                        <div class="col-12 mt-5">
+                            <div class="d-flex justify-content-center">
+                                <h5 class="fw-bold text-uppercase border-bottom border-dark pb-2 mb-4 text-center" style="width: 100%;">
+                                    Produtos do Orçamento
+                                </h5>
+                            </div>
+                            <div class="d-flex gap-2 mb-3 justify-content-center mx-auto" style="max-width: 800px;">
+                                <select id="produtoSelect" class="form-select form-select-lg flex-grow-1" style="border: 2px solid #000; border-radius: 0;">
+                                    <option selected disabled value="">Selecione um produto...</option>
+                                    <option th:each="produto : ${produtos}"
+                                            th:value="${produto.id}"
+                                            th:text="${produto.nome}"
+                                            th:attr="data-valor=${produto.valor}"> </option>
+                                </select>
+                                <input type="number" id="produtoQuantidade" class="form-control form-control-lg text-center" value="1" min="1" style="width: 100px; border: 2px solid #000; border-radius: 0;">
+                                <button type="button" class="btn btn-dark text-uppercase fw-bold" onclick="adicionarProdutoNaTabela()" style="border-radius: 0; padding: 0 30px;">
+                                    Adicionar
+                                </button>
+                            </div>
+                            <div class="table-responsive mx-auto" style="max-width: 800px;">
+                                <table class="table table-bordered table-custom" id="tabelaProdutosOrcamento">
+                                    <thead class="table-dark">
+                                    <tr>
+                                        <th>Produto</th>
+                                        <th class="text-center" style="width: 100px;">Qtd</th>
+                                        <th class="text-end" style="width: 150px;">Valor Unit.</th>
+                                        <th class="text-end" style="width: 150px;">Subtotal</th>
+                                        <th class="text-center" style="width: 80px;">Ação</th>
+                                    </tr>
+                                    </thead>
+                                    <tbody id="corpoTabelaProdutos">
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="d-flex justify-content-center gap-3 mt-5">
+                        <button type="button" class="btn btn-outline-secondary fw-bolder text-uppercase" data-bs-dismiss="modal"
+                                style="font-size: 1.2rem; padding: 12px 40px; border-radius: 0; border-width: 2px;">
+                            Cancelar
+                        </button>
+                        <button type="button" class="btn btn-orange fw-bolder text-uppercase text-white"
+                                style="font-size: 1.2rem; padding: 12px 40px; border-radius: 0; background-color: #ff9433; border: none;">
+                            Salvar
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div th:fragment="modalEditar" class="modal fade" id="modalEditarOrcamento" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered modal-lg">
+        <div class="modal-content shadow-lg border-0" style="border-radius: 4px;">
+            <div class="modal-header border-0 pb-0">
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body px-5 pb-5 pt-2 text-center">
+                <h1 class="page-title text-uppercase mb-3" style="line-height: 1;">
+                    Editar<br>Orçamento
+                </h1>
+                <hr class="mx-auto mb-4" style="width: 80%; border-top: 2px solid #000; opacity: 1;">
+
+                <form class="text-start px-md-4">
+                    <input type="hidden" id="editOrcamentoId" name="Id">
+
+                    <div class="row g-4">
+                        <div class="col-md-7">
+                            <label class="form-label fw-bold text-uppercase text-dark mb-1" style="font-size: 1.1rem;">Cliente</label>
+                            <select class="form-select form-select-lg"
+                                    style="border: 2px solid #000; border-radius: 0;"
+                                    id="editClienteSelect" name="clienteId" disabled>
+                                <option selected disabled value="">Selecione o Cliente</option>
+                                <option th:each="cliente : ${clientes}"
+                                        th:value="${cliente.id}"
+                                        th:text="${cliente.nome}">
+                                </option>
+                            </select>
+                        </div>
+                        <div class="col-md-5">
+                            <label class="form-label fw-bold text-uppercase text-dark mb-1" style="font-size: 1.1rem;">Data de Validade</label>
+                            <input type="date" class="form-control form-control-lg" id="editDataValidade" disabled
+                                   style="border: 2px solid #000; border-radius: 0; background-color: #e9e9e9;">
+                        </div>
+                        <div class="col-md-4">
+                            <label class="form-label fw-bold text-uppercase text-dark mb-1" style="font-size: 1.1rem;">Status</label>
+                            <select class="form-select form-select-lg" id="editStatusSelect" name="Status"
+                                    style="border: 2px solid #000; border-radius: 0; background-color: #fff9e6;">
+                                <option disabled value="">Selecione</option>
+                                <option value="APROVADO">APROVADO</option>
+                                <option value="REPROVADO">REPROVADO</option>
+                                <option value="EXPIRADO">EXPIRADO</option>
+                                <option value="PENDENTE">PENDENTE</option>
+                            </select>
+                        </div>
+                        <div class="col-md-4">
+                            <label class="form-label fw-bold text-uppercase text-dark mb-1" style="font-size: 1.1rem;">Desconto (R$)</label>
+                            <input type="number" step="0.01" class="form-control form-control-lg" id="editDesconto" value="0.00" disabled
+                                   style="border: 2px solid #000; border-radius: 0; background-color: #e9e9e9;">
+                        </div>
+                        <div class="col-md-4">
+                            <label class="form-label fw-bold text-uppercase text-dark mb-1" style="font-size: 1.1rem;">Total (R$)</label>
+                            <input type="text" id="editValorOrcamentoInput" class="form-control form-control-lg fw-bold" readonly value="0.00"
+                                   style="border: 2px solid #000; border-radius: 0; background-color: #e9e9e9;">
+                        </div>
+
+                        <div class="col-12 mt-5">
+                            <div class="d-flex justify-content-center">
+                                <h5 class="fw-bold text-uppercase border-bottom border-dark pb-2 mb-4 text-center" style="width: 100%;">
+                                    Produtos do Orçamento
+                                </h5>
+                            </div>
+                            <div class="table-responsive mx-auto" style="max-width: 800px;">
+                                <table class="table table-bordered table-custom" id="tabelaEditProdutosOrcamento">
+                                    <thead class="table-dark">
+                                    <tr>
+                                        <th>Produto</th>
+                                        <th class="text-center" style="width: 100px;">Qtd</th>
+                                        <th class="text-end" style="width: 150px;">Valor Unit.</th>
+                                        <th class="text-end" style="width: 150px;">Subtotal</th>
+                                    </tr>
+                                    </thead>
+                                    <tbody id="corpoEditTabelaProdutos">
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="d-flex justify-content-center gap-3 mt-5">
+                        <button type="button" class="btn btn-outline-secondary fw-bolder text-uppercase" data-bs-dismiss="modal"
+                                style="font-size: 1.2rem; padding: 12px 40px; border-radius: 0; border-width: 2px;">
+                            Cancelar
+                        </button>
+                        <button type="button" class="btn btn-orange fw-bolder text-uppercase text-white"
+                                style="font-size: 1.2rem; padding: 12px 40px; border-radius: 0; background-color: #ff9433; border: none;">
+                            Salvar Alterações
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    // ==========================================
+    // SCRIPTS DO MODAL DE CRIAR
+    // ==========================================
+    let produtoIndex = 0;
+
+    function adicionarProdutoNaTabela() {
+        const select = document.getElementById('produtoSelect');
+        const inputQuantidade = document.getElementById('produtoQuantidade');
+        const inputValorTotal = document.getElementById('valorOrcamentoInput');
+
+        const opcaoSelecionada = select.options[select.selectedIndex];
+
+        if (!opcaoSelecionada.value) {
+            alert("Por favor, selecione um produto.");
+            return;
+        }
+
+        const idProduto = opcaoSelecionada.value;
+        const nomeProduto = opcaoSelecionada.text;
+        const valorUnitario = parseFloat(opcaoSelecionada.getAttribute('data-valor'));
+        const quantidade = parseInt(inputQuantidade.value);
+        const subtotal = valorUnitario * quantidade;
+
+        const tbody = document.getElementById('corpoTabelaProdutos');
+
+        const tr = document.createElement('tr');
+        tr.id = `linha-produto-${produtoIndex}`;
+        tr.setAttribute('data-subtotal', subtotal);
+
+        tr.innerHTML = `
+            <td>
+                ${nomeProduto}
+                <input type="hidden" name="Produtos[${produtoIndex}].ProdutoId" value="${idProduto}">
+                <input type="hidden" name="Produtos[${produtoIndex}].Quantidade" value="${quantidade}">
+            </td>
+            <td class="text-center">${quantidade}</td>
+            <td class="text-end">R$ ${valorUnitario.toFixed(2)}</td>
+            <td class="text-end fw-bold">R$ ${subtotal.toFixed(2)}</td>
+            <td class="text-center">
+                <button type="button" class="btn btn-sm btn-outline-danger" onclick="removerProduto(${produtoIndex})">
+                    <i class="bi bi-trash-fill"></i>
+                </button>
+            </td>
+        `;
+
+        tbody.appendChild(tr);
+
+        produtoIndex++;
+        atualizarValorTotal();
+
+        select.selectedIndex = 0;
+        inputQuantidade.value = 1;
+    }
+
+    function removerProduto(index) {
+        const linha = document.getElementById(`linha-produto-${index}`);
+        if (linha) {
+            linha.remove();
+            atualizarValorTotal();
+        }
+    }
+
+    function atualizarValorTotal() {
+        let total = 0;
+        const linhas = document.querySelectorAll('#corpoTabelaProdutos tr');
+
+        linhas.forEach(linha => {
+            total += parseFloat(linha.getAttribute('data-subtotal'));
+        });
+
+        const inputValorTotal = document.getElementById('valorOrcamentoInput');
+        if(inputValorTotal) {
+            inputValorTotal.value = total.toFixed(2);
+        }
+    }
+
+    // ==========================================
+    // SCRIPTS DO MODAL DE EDITAR (NOVO)
+    // ==========================================
+    document.addEventListener('DOMContentLoaded', function () {
+        const modalEditar = document.getElementById('modalEditarOrcamento');
+
+        if (modalEditar) {
+            // Evento disparado pelo Bootstrap toda vez que o Modal é aberto
+            modalEditar.addEventListener('show.bs.modal', function (event) {
+
+                // O botão exato que o usuário clicou na tabela (o lápis)
+                const button = event.relatedTarget;
+
+                // Extraindo os dados dos atributos data-* que colocamos no botão HTML
+                const id = button.getAttribute('data-id');
+                const clienteId = button.getAttribute('data-cliente');
+                const validade = button.getAttribute('data-validade');
+                const status = button.getAttribute('data-status');
+                const desconto = button.getAttribute('data-desconto');
+                const total = button.getAttribute('data-total');
+
+                // Injetando os dados nos inputs do Modal de Edição
+                document.getElementById('editOrcamentoId').value = id;
+
+                if (clienteId) {
+                    document.getElementById('editClienteSelect').value = clienteId;
+                } else {
+                    document.getElementById('editClienteSelect').selectedIndex = 0; // Para os placeholders sem id válido
+                }
+
+                document.getElementById('editDataValidade').value = validade;
+
+                if (status) {
+                    document.getElementById('editStatusSelect').value = status;
+                }
+
+                // Formatando os valores decimais
+                document.getElementById('editDesconto').value = parseFloat(desconto || 0).toFixed(2);
+                document.getElementById('editValorOrcamentoInput').value = parseFloat(total || 0).toFixed(2);
+
+                // IMPORTANTE: Para a tabela de produtos no modal de editar,
+                // o ideal é fazer uma requisição (fetch/AJAX) para o backend para trazer a lista
+                // Neste exemplo, vamos colocar um aviso, já que passar uma lista inteira via atributo HTML não é recomendado.
+                document.getElementById('corpoEditTabelaProdutos').innerHTML = `
+                    <tr>
+                        <td colspan="4" class="text-center text-muted py-3">
+                            <em>Faça um "fetch('/orcamento/${id}')" no JavaScript para carregar os produtos.</em>
+                        </td>
+                    </tr>
+                `;
+            });
+        }
+    });
+</script>
+
+</body>
+</html>
