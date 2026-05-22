@@ -14,6 +14,10 @@ public class AvaliacaoController {
     private AvaliacaoService _avaliacaoService;
 
     @RequestMapping("/avaliacao")
+    public String avaliacao() {
+        return "avaliacao";
+    }
+
     public Iterable<Avaliacao> get() {
         return _avaliacaoService.BuscaGeral();
     }
