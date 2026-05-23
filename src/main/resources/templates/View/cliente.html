@@ -11,49 +11,52 @@
 
     <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.11.8/dist/umd/popper.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.min.js"></script>
+
+    <style>
+        .tr-clicavel {
+            cursor: pointer;
+            transition: background-color 0.2s;
+        }
+        .tr-clicavel:hover {
+            background-color: #dcdcdc !important;
+        }
+    </style>
 </head>
 <body>
 
 <div class="d-flex">
 
     <div class="sidebar-custom d-flex flex-column flex-shrink-0">
-
-        <a href="#" class="nav-link-custom text-uppercase">
+        <a th:href="@{/}" class="nav-link-custom text-uppercase">
             <i class="bi bi-house-door-fill"></i>
             <span>Início</span>
         </a>
-
-        <a href="#" class="nav-link-custom text-uppercase">
+        <a th:href="@{produto}" class="nav-link-custom text-uppercase">
             <i class="bi bi-box-seam-fill"></i>
             <span>Produtos</span>
         </a>
-
-        <a href="#" class="nav-link-custom text-uppercase">
+        <a th:href="@{venda}" class="nav-link-custom text-uppercase">
             <i class="bi bi-cart-fill"></i>
             <span>Vendas</span>
         </a>
-
-        <a href="#" class="nav-link-custom text-uppercase">
+        <a th:href="@{orcamento}" class="nav-link-custom text-uppercase">
             <i class="bi bi-file-earmark-text-fill"></i>
             <span>Orçamentos</span>
         </a>
-
-        <a href="#" class="nav-link-custom active text-uppercase">
+        <a th:href="@{cliente}" class="nav-link-custom active text-uppercase">
             <i class="bi bi-people-fill"></i>
             <span>Clientes</span>
         </a>
-
-        <a href="#" class="nav-link-custom text-uppercase">
+        <a th:href="@{avaliacao}" class="nav-link-custom text-uppercase">
             <i class="bi bi-star-fill"></i>
             <span>Avaliações</span>
         </a>
-
-        <a href="#" class="nav-link-custom mt-auto text-uppercase no-hover">
+        <a th:href="@{sobre}" class="nav-link-custom mt-auto text-uppercase no-hover">
             <i class="bi bi-info-circle-fill"></i>
             <span>Sobre</span>
         </a>
-
     </div>
+
     <div class="main-content flex-grow-1 p-5">
 
         <h1 class="page-title mb-4">CLIENTES</h1>
@@ -72,7 +75,7 @@
         </div>
 
         <div class="table-responsive">
-            <table class="table table-custom">
+            <table class="table table-custom table-hover">
                 <thead>
                 <tr>
                     <th>ID</th>
@@ -86,7 +89,17 @@
                 </thead>
                 <tbody>
 
-                <tr th:each="cliente : ${clientes}">
+                <tr th:each="cliente : ${clientes}"
+                    class="tr-clicavel"
+                    onclick="abrirModalDetalhes(this)"
+                    th:attr="data-id=${cliente.id},
+                             data-nome=${cliente.nome},
+                             data-documento=${cliente.documento != null ? cliente.documento : 'N/A'},
+                             data-email=${cliente.email != null ? cliente.email : 'N/A'},
+                             data-telefone=${cliente.telefone != null ? cliente.telefone : 'N/A'},
+                             data-status=${cliente.status != null ? cliente.status.name() : ''},
+                             data-tipo=${cliente.tipo != null ? cliente.tipo.name() : ''}">
+
                     <td th:text="${cliente.id}">1</td>
                     <td th:text="${cliente.nome}">João da Silva</td>
                     <td th:text="${cliente.documento != null ? cliente.documento : 'N/A'}">000.000.000-00</td>
@@ -100,11 +113,7 @@
                     <td class="text-end">
                         <button class="btn btn-sm btn-outline-secondary me-2" title="Editar"
                                 data-bs-toggle="modal" data-bs-target="#modalEditarCliente"
-                                th:attr="data-id=${cliente.id},
-                                         data-nome=${cliente.nome},
-                                         data-email=${cliente.email},
-                                         data-telefone=${cliente.telefone},
-                                         data-status=${cliente.status}">
+                                th:attr="data-id=${cliente.id}, data-nome=${cliente.nome}, data-email=${cliente.email}, data-telefone=${cliente.telefone}, data-status=${cliente.status}">
                             <i class="bi bi-pencil-fill"></i>
                         </button>
                         <button class="btn btn-sm btn-outline-danger" title="Excluir">
@@ -113,7 +122,8 @@
                     </td>
                 </tr>
 
-                <tr>
+                <tr class="tr-clicavel" onclick="abrirModalDetalhes(this)"
+                    data-id="2" data-nome="Maria Oliveira" data-documento="123.456.789-00" data-email="maria.oliveira@empresa.com" data-telefone="(11) 98888-7777" data-status="ATIVO" data-tipo="CPF">
                     <td>2</td>
                     <td>Maria Oliveira</td>
                     <td>123.456.789-00</td>
@@ -131,7 +141,9 @@
                         </button>
                     </td>
                 </tr>
-                <tr>
+
+                <tr class="tr-clicavel" onclick="abrirModalDetalhes(this)"
+                    data-id="3" data-nome="Construtora Alfa Ltda" data-documento="12.345.678/0001-99" data-email="contato@alfa.com.br" data-telefone="(21) 3333-4444" data-status="INATIVO" data-tipo="CNPJ">
                     <td>3</td>
                     <td>Construtora Alfa Ltda</td>
                     <td>12.345.678/0001-99</td>
@@ -149,30 +161,77 @@
                         </button>
                     </td>
                 </tr>
-                <tr>
-                    <td>4</td>
-                    <td>Oficina Mecânica São José</td>
-                    <td>98.765.432/0001-11</td>
-                    <td>oficina.saojose@gmail.com</td>
-                    <td>(19) 99999-1111</td>
-                    <td><span class="badge bg-success">ATIVO</span></td>
-                    <td class="text-end">
-                        <button class="btn btn-sm btn-outline-secondary me-2" title="Editar"
-                                data-bs-toggle="modal" data-bs-target="#modalEditarCliente"
-                                data-id="4" data-nome="Oficina Mecânica São José" data-email="oficina.saojose@gmail.com" data-telefone="(19) 99999-1111" data-status="ATIVO">
-                            <i class="bi bi-pencil-fill"></i>
-                        </button>
-                        <button class="btn btn-sm btn-outline-danger" title="Excluir">
-                            <i class="bi bi-trash-fill"></i>
-                        </button>
-                    </td>
-                </tr>
                 </tbody>
             </table>
         </div>
 
     </div>
 </div>
+
+
+<div class="modal fade" id="modalDetalhesCliente" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered modal-lg">
+        <div class="modal-content shadow-lg border-0" style="border-radius: 4px;">
+            <div class="modal-header border-0 pb-0">
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body px-5 pb-5 pt-2 text-center">
+                <h1 class="page-title text-uppercase mb-3" style="line-height: 1;">
+                    Detalhes<br>Cliente
+                </h1>
+                <hr class="mx-auto mb-5" style="width: 80%; border-top: 2px solid #000; opacity: 1;">
+
+                <div class="text-start px-md-4">
+                    <div class="row g-4">
+                        <div class="col-md-8">
+                            <label class="form-label fw-bold text-uppercase text-dark mb-1" style="font-size: 1.1rem;">Nome Completo / Razão Social :</label>
+                            <input type="text" id="detalheClienteNome" class="form-control form-control-lg fw-bold" readonly
+                                   style="border: 2px solid #ccc; border-radius: 0; background-color: #f8f9fa;">
+                        </div>
+
+                        <div class="col-md-4">
+                            <label class="form-label fw-bold text-uppercase text-dark mb-1" style="font-size: 1.1rem;">Status :</label>
+                            <input type="text" id="detalheClienteStatus" class="form-control form-control-lg fw-bold" readonly
+                                   style="border: 2px solid #ccc; border-radius: 0; background-color: #f8f9fa;">
+                        </div>
+
+                        <div class="col-md-6">
+                            <label class="form-label fw-bold text-uppercase text-dark mb-1" style="font-size: 1.1rem;">Tipo :</label>
+                            <input type="text" id="detalheClienteTipo" class="form-control form-control-lg" readonly
+                                   style="border: 2px solid #ccc; border-radius: 0; background-color: #f8f9fa;">
+                        </div>
+
+                        <div class="col-md-6">
+                            <label class="form-label fw-bold text-uppercase text-dark mb-1" style="font-size: 1.1rem;">Documento :</label>
+                            <input type="text" id="detalheClienteDocumento" class="form-control form-control-lg" readonly
+                                   style="border: 2px solid #ccc; border-radius: 0; background-color: #f8f9fa;">
+                        </div>
+
+                        <div class="col-md-6">
+                            <label class="form-label fw-bold text-uppercase text-dark mb-1" style="font-size: 1.1rem;">Email :</label>
+                            <input type="email" id="detalheClienteEmail" class="form-control form-control-lg" readonly
+                                   style="border: 2px solid #ccc; border-radius: 0; background-color: #f8f9fa;">
+                        </div>
+
+                        <div class="col-md-6">
+                            <label class="form-label fw-bold text-uppercase text-dark mb-1" style="font-size: 1.1rem;">Telefone :</label>
+                            <input type="text" id="detalheClienteTelefone" class="form-control form-control-lg" readonly
+                                   style="border: 2px solid #ccc; border-radius: 0; background-color: #f8f9fa;">
+                        </div>
+                    </div>
+
+                    <div class="d-flex justify-content-center mt-5">
+                        <button type="button" class="btn btn-outline-secondary fw-bolder text-uppercase" data-bs-dismiss="modal"
+                                style="font-size: 1.2rem; padding: 12px 40px; border-radius: 0; border-width: 2px;">
+                            Fechar
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
 
 <div th:fragment="modalCriar" class="modal fade" id="modalCriarCliente" tabindex="-1" aria-hidden="true">
     <div class="modal-dialog modal-dialog-centered modal-lg">
@@ -313,12 +372,43 @@
 
 <script>
     // ==========================================
+    // SCRIPT PARA ABRIR MODAL DE DETALHES NO CLICK SIMPLES
+    // ==========================================
+    function abrirModalDetalhes(row) {
+        // Pega os dados dos atributos data-* da tag <tr>
+        const nome = row.getAttribute('data-nome');
+        const documento = row.getAttribute('data-documento');
+        const email = row.getAttribute('data-email');
+        const telefone = row.getAttribute('data-telefone');
+        const status = row.getAttribute('data-status');
+        const tipo = row.getAttribute('data-tipo');
+
+        // Preenche os campos do modal de detalhes
+        document.getElementById('detalheClienteNome').value = nome || '';
+        document.getElementById('detalheClienteDocumento').value = documento || '';
+        document.getElementById('detalheClienteEmail').value = email || '';
+        document.getElementById('detalheClienteTelefone').value = telefone || '';
+        document.getElementById('detalheClienteStatus').value = status || '';
+
+        let tipoDisplay = '';
+        if(tipo === 'CPF') tipoDisplay = 'Pessoa Física';
+        else if(tipo === 'CNPJ') tipoDisplay = 'Pessoa Jurídica';
+        else tipoDisplay = tipo || 'N/A';
+
+        document.getElementById('detalheClienteTipo').value = tipoDisplay;
+
+        // Exibe o modal
+        const modal = new bootstrap.Modal(document.getElementById('modalDetalhesCliente'));
+        modal.show();
+    }
+
+
+    // ==========================================
     // SCRIPT DOS CAMPOS CPF / CNPJ (DINÂMICO)
     // ==========================================
     function alternarCampoDocumento(modalTipo) {
         let selectTipo, divDocumento, labelDocumento, inputDocumento;
 
-        // Identifica qual modal disparou a ação (Criar ou Editar)
         if (modalTipo === 'criar') {
             selectTipo = document.getElementById('criarClienteTipo');
             divDocumento = document.getElementById('divCriarDocumento');
@@ -346,12 +436,12 @@
         }
     }
 
-    // Limpa os campos quando o Modal de Criar é fechado para não deixar lixo na próxima abertura
     document.getElementById('modalCriarCliente').addEventListener('hidden.bs.modal', function () {
         document.getElementById('criarClienteTipo').selectedIndex = 0;
         document.getElementById('divCriarDocumento').style.display = 'none';
         document.getElementById('inputCriarDocumento').value = '';
     });
+
 
     // ==========================================
     // SCRIPT DO MODAL DE EDITAR CLIENTE
@@ -363,12 +453,13 @@
             modalEditar.addEventListener('show.bs.modal', function (event) {
                 const button = event.relatedTarget;
 
+                if(!button) return;
+
                 const id = button.getAttribute('data-id');
                 const nome = button.getAttribute('data-nome');
                 const email = button.getAttribute('data-email');
                 const telefone = button.getAttribute('data-telefone');
                 const status = button.getAttribute('data-status');
-                // Se futuramente você trouxer o tipo e documento do banco, pegue os atributos aqui!
 
                 document.getElementById('editClienteId').value = id;
                 document.getElementById('editClienteNome').value = nome;
@@ -380,6 +471,14 @@
                 }
             });
         }
+    });
+
+    // Impede que o clique na linha aconteça quando clicar especificamente nos botões de Editar/Deletar
+    // (Alterado de 'dblclick' para 'click')
+    document.querySelectorAll('.table-custom button').forEach(button => {
+        button.addEventListener('click', function (e) {
+            e.stopPropagation();
+        });
     });
 
     // ==========================================
