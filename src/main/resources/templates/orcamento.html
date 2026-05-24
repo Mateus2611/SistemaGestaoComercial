@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="pt-br" xmlns:th="http://www.thymeleaf.org" xmlns="http://www.w3.org/1999/html">
+<html lang="pt-br" xmlns:th="http://www.thymeleaf.org">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
@@ -11,6 +11,17 @@
 
     <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.11.8/dist/umd/popper.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.min.js"></script>
+
+    <style>
+        /* Indica visualmente que a linha é interativa */
+        .tr-clicavel {
+            cursor: pointer;
+            transition: background-color 0.2s;
+        }
+        .tr-clicavel:hover {
+            background-color: #dcdcdc !important;
+        }
+    </style>
 </head>
 <body>
 
@@ -69,11 +80,11 @@
                 Novo Orçamento
             </button>
 
-            <button class="btn btn-orange text-uppercase ms-auto">Ordenar</button>
+            <button class="btn btn-orange text-uppercase ms-auto" onclick="ordenarTabela()">Ordenar</button>
         </div>
 
         <div class="table-responsive">
-            <table class="table table-custom">
+            <table class="table table-custom table-hover">
                 <thead>
                 <tr>
                     <th>ID</th>
@@ -87,7 +98,17 @@
                 </thead>
                 <tbody>
 
-                <tr th:each="orcamento : ${orcamentos}">
+                <tr th:each="orcamento : ${orcamentos}"
+                    class="tr-clicavel"
+                    onclick="abrirModalDetalhes(this)"
+                    th:attr="data-id=${orcamento.id},
+                             data-cliente=${orcamento.cliente != null ? orcamento.cliente.nome : 'N/A'},
+                             data-emissao=${#dates.format(orcamento.dataCriacao, 'dd/MM/yyyy')},
+                             data-validade=${#dates.format(orcamento.dataValidade, 'dd/MM/yyyy')},
+                             data-status=${orcamento.status != null ? orcamento.status.name() : ''},
+                             data-desconto=${orcamento.desconto},
+                             data-total=${orcamento.valor}">
+
                     <td th:text="${orcamento.id}">1</td>
                     <td th:text="${orcamento.cliente.nome}">João da Silva</td>
                     <td th:text="${#dates.format(orcamento.dataCriacao, 'dd/MM/yyyy')}">20/05/2026</td>
@@ -116,7 +137,8 @@
                     </td>
                 </tr>
 
-                <tr>
+                <tr class="tr-clicavel" onclick="abrirModalDetalhes(this)"
+                    data-id="101" data-cliente="Construtora Alfa Ltda" data-emissao="15/05/2026" data-validade="25/05/2026" data-status="PENDENTE" data-desconto="0" data-total="4500.00">
                     <td>101</td>
                     <td>Construtora Alfa Ltda</td>
                     <td>15/05/2026</td>
@@ -132,7 +154,8 @@
                         <button class="btn btn-sm btn-outline-danger" title="Excluir"><i class="bi bi-trash-fill"></i></button>
                     </td>
                 </tr>
-                <tr>
+                <tr class="tr-clicavel" onclick="abrirModalDetalhes(this)"
+                    data-id="102" data-cliente="Maria Oliveira" data-emissao="10/05/2026" data-validade="20/05/2026" data-status="APROVADO" data-desconto="50" data-total="850.50">
                     <td>102</td>
                     <td>Maria Oliveira</td>
                     <td>10/05/2026</td>
@@ -148,7 +171,8 @@
                         <button class="btn btn-sm btn-outline-danger" title="Excluir"><i class="bi bi-trash-fill"></i></button>
                     </td>
                 </tr>
-                <tr>
+                <tr class="tr-clicavel" onclick="abrirModalDetalhes(this)"
+                    data-id="103" data-cliente="Oficina Mecânica São José" data-emissao="01/05/2026" data-validade="10/05/2026" data-status="EXPIRADO" data-desconto="100" data-total="1200.00">
                     <td>103</td>
                     <td>Oficina Mecânica São José</td>
                     <td>01/05/2026</td>
@@ -168,6 +192,89 @@
             </table>
         </div>
 
+    </div>
+</div>
+
+<div class="modal fade" id="modalDetalhesOrcamento" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered modal-lg">
+        <div class="modal-content shadow-lg border-0" style="border-radius: 4px;">
+            <div class="modal-header border-0 pb-0">
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body px-5 pb-5 pt-2 text-center">
+                <h1 class="page-title text-uppercase mb-3" style="line-height: 1;">
+                    Detalhes<br>Orçamento
+                </h1>
+                <hr class="mx-auto mb-4" style="width: 80%; border-top: 2px solid #000; opacity: 1;">
+
+                <div class="text-start px-md-4">
+                    <div class="row g-4">
+                        <div class="col-md-8">
+                            <label class="form-label fw-bold text-uppercase text-dark mb-1" style="font-size: 1.1rem;">Cliente :</label>
+                            <input type="text" id="detalheOrcamentoCliente" class="form-control form-control-lg fw-bold" readonly
+                                   style="border: 2px solid #ccc; border-radius: 0; background-color: #f8f9fa;">
+                        </div>
+
+                        <div class="col-md-4">
+                            <label class="form-label fw-bold text-uppercase text-dark mb-1" style="font-size: 1.1rem;">Status :</label>
+                            <input type="text" id="detalheOrcamentoStatus" class="form-control form-control-lg fw-bold" readonly
+                                   style="border: 2px solid #ccc; border-radius: 0; background-color: #f8f9fa;">
+                        </div>
+
+                        <div class="col-md-6">
+                            <label class="form-label fw-bold text-uppercase text-dark mb-1" style="font-size: 1.1rem;">Data de Emissão :</label>
+                            <input type="text" id="detalheOrcamentoEmissao" class="form-control form-control-lg" readonly
+                                   style="border: 2px solid #ccc; border-radius: 0; background-color: #f8f9fa;">
+                        </div>
+
+                        <div class="col-md-6">
+                            <label class="form-label fw-bold text-uppercase text-dark mb-1" style="font-size: 1.1rem;">Data de Validade :</label>
+                            <input type="text" id="detalheOrcamentoValidade" class="form-control form-control-lg" readonly
+                                   style="border: 2px solid #ccc; border-radius: 0; background-color: #f8f9fa;">
+                        </div>
+
+                        <div class="col-md-6">
+                            <label class="form-label fw-bold text-uppercase text-dark mb-1" style="font-size: 1.1rem;">Desconto :</label>
+                            <input type="text" id="detalheOrcamentoDesconto" class="form-control form-control-lg" readonly
+                                   style="border: 2px solid #ccc; border-radius: 0; background-color: #f8f9fa;">
+                        </div>
+
+                        <div class="col-md-6">
+                            <label class="form-label fw-bold text-uppercase text-dark mb-1" style="font-size: 1.1rem;">Total :</label>
+                            <input type="text" id="detalheOrcamentoTotal" class="form-control form-control-lg fw-bold text-success" readonly
+                                   style="border: 2px solid #ccc; border-radius: 0; background-color: #f8f9fa;">
+                        </div>
+
+                        <div class="col-12 mt-4">
+                            <div class="table-responsive mx-auto" style="max-width: 800px;">
+                                <table class="table table-bordered table-custom">
+                                    <thead class="table-dark">
+                                    <tr>
+                                        <th class="text-center">Produtos do Orçamento</th>
+                                    </tr>
+                                    </thead>
+                                    <tbody>
+                                    <tr>
+                                        <td class="text-center text-muted py-3">
+                                            <em>Clique em "Editar" para visualizar ou alterar a lista de produtos.</em>
+                                        </td>
+                                    </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+
+                    </div>
+
+                    <div class="d-flex justify-content-center mt-5">
+                        <button type="button" class="btn btn-outline-secondary fw-bolder text-uppercase" data-bs-dismiss="modal"
+                                style="font-size: 1.2rem; padding: 12px 40px; border-radius: 0; border-width: 2px;">
+                            Fechar
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
     </div>
 </div>
 
@@ -360,6 +467,32 @@
 
 <script>
     // ==========================================
+    // SCRIPT PARA ABRIR MODAL DE DETALHES NO CLICK SIMPLES
+    // ==========================================
+    function abrirModalDetalhes(row) {
+        const cliente = row.getAttribute('data-cliente');
+        const emissao = row.getAttribute('data-emissao');
+        const validade = row.getAttribute('data-validade');
+        const status = row.getAttribute('data-status');
+        let desconto = row.getAttribute('data-desconto');
+        let total = row.getAttribute('data-total');
+
+        if(desconto) desconto = parseFloat(desconto).toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' });
+        if(total) total = parseFloat(total).toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' });
+
+        document.getElementById('detalheOrcamentoCliente').value = cliente || '';
+        document.getElementById('detalheOrcamentoEmissao').value = emissao || '';
+        document.getElementById('detalheOrcamentoValidade').value = validade || '';
+        document.getElementById('detalheOrcamentoStatus').value = status || '';
+        document.getElementById('detalheOrcamentoDesconto').value = desconto || 'R$ 0,00';
+        document.getElementById('detalheOrcamentoTotal').value = total || 'R$ 0,00';
+
+        const modal = new bootstrap.Modal(document.getElementById('modalDetalhesOrcamento'));
+        modal.show();
+    }
+
+
+    // ==========================================
     // SCRIPTS DO MODAL DE CRIAR
     // ==========================================
     let produtoIndex = 0;
@@ -436,19 +569,17 @@
     }
 
     // ==========================================
-    // SCRIPTS DO MODAL DE EDITAR (NOVO)
+    // SCRIPTS DO MODAL DE EDITAR (E PREVENÇÃO DE CLIQUE)
     // ==========================================
     document.addEventListener('DOMContentLoaded', function () {
         const modalEditar = document.getElementById('modalEditarOrcamento');
 
         if (modalEditar) {
-            // Evento disparado pelo Bootstrap toda vez que o Modal é aberto
             modalEditar.addEventListener('show.bs.modal', function (event) {
 
-                // O botão exato que o usuário clicou na tabela (o lápis)
                 const button = event.relatedTarget;
+                if(!button) return; // Evita falha se aberto por script
 
-                // Extraindo os dados dos atributos data-* que colocamos no botão HTML
                 const id = button.getAttribute('data-id');
                 const clienteId = button.getAttribute('data-cliente');
                 const validade = button.getAttribute('data-validade');
@@ -456,13 +587,12 @@
                 const desconto = button.getAttribute('data-desconto');
                 const total = button.getAttribute('data-total');
 
-                // Injetando os dados nos inputs do Modal de Edição
                 document.getElementById('editOrcamentoId').value = id;
 
                 if (clienteId) {
                     document.getElementById('editClienteSelect').value = clienteId;
                 } else {
-                    document.getElementById('editClienteSelect').selectedIndex = 0; // Para os placeholders sem id válido
+                    document.getElementById('editClienteSelect').selectedIndex = 0;
                 }
 
                 document.getElementById('editDataValidade').value = validade;
@@ -471,13 +601,9 @@
                     document.getElementById('editStatusSelect').value = status;
                 }
 
-                // Formatando os valores decimais
                 document.getElementById('editDesconto').value = parseFloat(desconto || 0).toFixed(2);
                 document.getElementById('editValorOrcamentoInput').value = parseFloat(total || 0).toFixed(2);
 
-                // IMPORTANTE: Para a tabela de produtos no modal de editar,
-                // o ideal é fazer uma requisição (fetch/AJAX) para o backend para trazer a lista
-                // Neste exemplo, vamos colocar um aviso, já que passar uma lista inteira via atributo HTML não é recomendado.
                 document.getElementById('corpoEditTabelaProdutos').innerHTML = `
                     <tr>
                         <td colspan="4" class="text-center text-muted py-3">
@@ -488,6 +614,39 @@
             });
         }
     });
+
+    // Impede que o clique nos botões de ação dispare a linha inteira
+    document.querySelectorAll('.table-custom button').forEach(button => {
+        button.addEventListener('click', function (e) {
+            e.stopPropagation();
+        });
+    });
+
+    // ==========================================
+    // SCRIPT DE ORDENAÇÃO DA TABELA
+    // ==========================================
+    let ordemCrescente = false;
+
+    function ordenarTabela() {
+        const tbody = document.querySelector('.table-custom tbody');
+        const linhas = Array.from(tbody.querySelectorAll('tr'));
+
+        linhas.sort((linhaA, linhaB) => {
+            const idA = parseInt(linhaA.cells[0].innerText.trim());
+            const idB = parseInt(linhaB.cells[0].innerText.trim());
+
+            if (ordemCrescente) {
+                return idA - idB;
+            } else {
+                return idB - idA;
+            }
+        });
+
+        ordemCrescente = !ordemCrescente;
+
+        tbody.innerHTML = '';
+        linhas.forEach(linha => tbody.appendChild(linha));
+    }
 </script>
 
 </body>
