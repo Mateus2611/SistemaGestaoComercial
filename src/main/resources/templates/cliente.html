@@ -68,7 +68,7 @@
             </div>
 
             <button class="btn btn-orange text-uppercase" data-bs-toggle="modal" data-bs-target="#modalCriarCliente">
-                Novo Cliente
+                Cadastrar Cliente
             </button>
 
             <button class="btn btn-orange text-uppercase ms-auto" onclick="ordenarTabela()">Ordenar</button>
@@ -107,7 +107,7 @@
                     <td th:text="${cliente.telefone != null ? cliente.telefone : 'N/A'}">(11) 90000-0000</td>
                     <td>
                         <span class="badge"
-                              th:classappend="${cliente.status != null and cliente.status.name() == 'ATIVO' ? 'bg-success' : 'bg-danger'}"
+                              th:classappend="${cliente.status != null and cliente.status.name() == 'ATIVO' ? 'badge-ativo' : 'badge-inativo'}"
                               th:text="${cliente.status}">ATIVO</span>
                     </td>
                     <td class="text-end">
@@ -129,7 +129,7 @@
                     <td>123.456.789-00</td>
                     <td>maria.oliveira@empresa.com</td>
                     <td>(11) 98888-7777</td>
-                    <td><span class="badge bg-success">ATIVO</span></td>
+                    <td><span class="badge badge-ativo">ATIVO</span></td>
                     <td class="text-end">
                         <button class="btn btn-sm btn-outline-secondary me-2" title="Editar"
                                 data-bs-toggle="modal" data-bs-target="#modalEditarCliente"
@@ -149,7 +149,7 @@
                     <td>12.345.678/0001-99</td>
                     <td>contato@alfa.com.br</td>
                     <td>(21) 3333-4444</td>
-                    <td><span class="badge bg-danger">INATIVO</span></td>
+                    <td><span class="badge badge-inativo">INATIVO</span></td>
                     <td class="text-end">
                         <button class="btn btn-sm btn-outline-secondary me-2" title="Editar"
                                 data-bs-toggle="modal" data-bs-target="#modalEditarCliente"
@@ -171,63 +171,71 @@
 
 <div class="modal fade" id="modalDetalhesCliente" tabindex="-1" aria-hidden="true">
     <div class="modal-dialog modal-dialog-centered modal-lg">
-        <div class="modal-content shadow-lg border-0" style="border-radius: 4px;">
-            <div class="modal-header border-0 pb-0">
-                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-            </div>
-            <div class="modal-body px-5 pb-5 pt-2 text-center">
-                <h1 class="page-title text-uppercase mb-3" style="line-height: 1;">
-                    Detalhes<br>Cliente
-                </h1>
-                <hr class="mx-auto mb-5" style="width: 80%; border-top: 2px solid #000; opacity: 1;">
 
-                <div class="text-start px-md-4">
-                    <div class="row g-4">
-                        <div class="col-md-8">
-                            <label class="form-label fw-bold text-uppercase text-dark mb-1" style="font-size: 1.1rem;">Nome Completo / Razão Social :</label>
-                            <input type="text" id="detalheClienteNome" class="form-control form-control-lg fw-bold" readonly
-                                   style="border: 2px solid #ccc; border-radius: 0; background-color: #f8f9fa;">
+        <div class="modal-content shadow-lg border-0" style="border-radius: 16px; padding: 6px; background-color: #ffffff;">
+
+            <div style="border: 1.8px solid #14213d; border-radius: 12px; height: 100%;">
+
+                <div class="modal-header border-0 pb-0">
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+
+                <div class="modal-body px-5 pb-5 pt-2 text-center">
+                    <h1 class="page-title text-uppercase mb-3" style="line-height: 1.1;">
+                        Detalhes<br>Cliente
+                    </h1>
+                    <hr class="mx-auto mb-5" style="width: 60%; border-top: 1px solid #000; opacity: 1;">
+
+                    <div class="text-start px-md-4">
+                        <div class="row g-4">
+                            <div class="col-md-8">
+                                <label class="form-label fw-bold text-uppercase text-dark mb-1" style="font-size: 1.1rem;">Nome Completo / Razão Social :</label>
+                                <input type="text" id="detalheClienteNome" class="form-control form-control-lg fw-bold" readonly
+                                       style="border: 1.8px solid #ccc; border-radius: 8px; background-color: #f8f9fa;">
+                            </div>
+
+                            <div class="col-md-4">
+                                <label class="form-label fw-bold text-uppercase text-dark mb-1" style="font-size: 1.1rem;">Status :</label>
+                                <input type="text" id="detalheClienteStatus" class="form-control form-control-lg fw-bold" readonly
+                                       style="border: 1.8px solid #ccc; border-radius: 8px; background-color: #f8f9fa;">
+                            </div>
+
+                            <div class="col-md-6">
+                                <label class="form-label fw-bold text-uppercase text-dark mb-1" style="font-size: 1.1rem;">Tipo :</label>
+                                <input type="text" id="detalheClienteTipo" class="form-control form-control-lg" readonly
+                                       style="border: 1.8px solid #ccc; border-radius: 8px; background-color: #f8f9fa;">
+                            </div>
+
+                            <div class="col-md-6">
+                                <label class="form-label fw-bold text-uppercase text-dark mb-1" style="font-size: 1.1rem;">Documento :</label>
+                                <input type="text" id="detalheClienteDocumento" class="form-control form-control-lg" readonly
+                                       style="border: 1.8px solid #ccc; border-radius: 8px; background-color: #f8f9fa;">
+                            </div>
+
+                            <div class="col-md-6">
+                                <label class="form-label fw-bold text-uppercase text-dark mb-1" style="font-size: 1.1rem;">Email :</label>
+                                <input type="email" id="detalheClienteEmail" class="form-control form-control-lg" readonly
+                                       style="border: 1.8px solid #ccc; border-radius: 8px; background-color: #f8f9fa;">
+                            </div>
+
+                            <div class="col-md-6">
+                                <label class="form-label fw-bold text-uppercase text-dark mb-1" style="font-size: 1.1rem;">Telefone :</label>
+                                <input type="text" id="detalheClienteTelefone" class="form-control form-control-lg" readonly
+                                       style="border: 1.8px solid #ccc; border-radius: 8px; background-color: #f8f9fa;">
+                            </div>
                         </div>
 
-                        <div class="col-md-4">
-                            <label class="form-label fw-bold text-uppercase text-dark mb-1" style="font-size: 1.1rem;">Status :</label>
-                            <input type="text" id="detalheClienteStatus" class="form-control form-control-lg fw-bold" readonly
-                                   style="border: 2px solid #ccc; border-radius: 0; background-color: #f8f9fa;">
+                        <div class="d-flex justify-content-center mt-5">
+                            <button type="button" class="btn btn-outline-secondary fw-bolder text-uppercase" data-bs-dismiss="modal"
+                                    style="font-size: 1.2rem; padding: 12px 40px; border-radius: 8px; border-width: 1.8px;">
+                                Fechar
+                            </button>
                         </div>
-
-                        <div class="col-md-6">
-                            <label class="form-label fw-bold text-uppercase text-dark mb-1" style="font-size: 1.1rem;">Tipo :</label>
-                            <input type="text" id="detalheClienteTipo" class="form-control form-control-lg" readonly
-                                   style="border: 2px solid #ccc; border-radius: 0; background-color: #f8f9fa;">
-                        </div>
-
-                        <div class="col-md-6">
-                            <label class="form-label fw-bold text-uppercase text-dark mb-1" style="font-size: 1.1rem;">Documento :</label>
-                            <input type="text" id="detalheClienteDocumento" class="form-control form-control-lg" readonly
-                                   style="border: 2px solid #ccc; border-radius: 0; background-color: #f8f9fa;">
-                        </div>
-
-                        <div class="col-md-6">
-                            <label class="form-label fw-bold text-uppercase text-dark mb-1" style="font-size: 1.1rem;">Email :</label>
-                            <input type="email" id="detalheClienteEmail" class="form-control form-control-lg" readonly
-                                   style="border: 2px solid #ccc; border-radius: 0; background-color: #f8f9fa;">
-                        </div>
-
-                        <div class="col-md-6">
-                            <label class="form-label fw-bold text-uppercase text-dark mb-1" style="font-size: 1.1rem;">Telefone :</label>
-                            <input type="text" id="detalheClienteTelefone" class="form-control form-control-lg" readonly
-                                   style="border: 2px solid #ccc; border-radius: 0; background-color: #f8f9fa;">
-                        </div>
-                    </div>
-
-                    <div class="d-flex justify-content-center mt-5">
-                        <button type="button" class="btn btn-outline-secondary fw-bolder text-uppercase" data-bs-dismiss="modal"
-                                style="font-size: 1.2rem; padding: 12px 40px; border-radius: 0; border-width: 2px;">
-                            Fechar
-                        </button>
                     </div>
                 </div>
+
             </div>
+
         </div>
     </div>
 </div>
@@ -235,136 +243,145 @@
 
 <div th:fragment="modalCriar" class="modal fade" id="modalCriarCliente" tabindex="-1" aria-hidden="true">
     <div class="modal-dialog modal-dialog-centered modal-lg">
-        <div class="modal-content shadow-lg border-0" style="border-radius: 4px;">
-            <div class="modal-header border-0 pb-0">
-                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-            </div>
-            <div class="modal-body px-5 pb-5 pt-2 text-center">
-                <h1 class="page-title text-uppercase mb-3" style="line-height: 1;">
-                    Criar<br>Cliente
-                </h1>
-                <hr class="mx-auto mb-5" style="width: 80%; border-top: 2px solid #000; opacity: 1;">
 
-                <form class="text-start px-md-4">
-                    <div class="row g-4">
-                        <div class="col-md-12">
-                            <label class="form-label fw-bold text-uppercase text-dark mb-1" style="font-size: 1.1rem;">Nome Completo / Razão Social :</label>
-                            <input type="text" class="form-control form-control-lg"
-                                   style="border: 2px solid #000; border-radius: 0; box-shadow: none;">
+        <div class="modal-content shadow-lg border-0" style="border-radius: 16px; padding: 6px; background-color: #ffffff;">
+
+            <div style="border: 1.8px solid #14213d; border-radius: 12px; height: 100%;">
+
+                <div class="modal-header border-0 pb-0">
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+
+                <div class="modal-body px-5 pb-5 pt-2 text-center">
+                    <h1 class="page-title text-uppercase mb-3" style="line-height: 1.1;">
+                        Criar<br>Cliente
+                    </h1>
+                    <hr class="mx-auto mb-5" style="width: 60%; border-top: 1px solid #000; opacity: 1;">
+
+                    <form class="text-start px-md-4">
+                        <div class="row g-4">
+                            <div class="col-md-12">
+                                <label class="form-label fw-bold text-uppercase text-dark mb-1" style="font-size: 1.1rem;">Nome Completo / Razão Social :</label>
+                                <input type="text" class="form-control form-control-lg"
+                                       style="border: 1.8px solid #000; border-radius: 8px; box-shadow: none;">
+                            </div>
+
+                            <div class="col-md-4">
+                                <label class="form-label fw-bold text-uppercase text-dark mb-1" style="font-size: 1.1rem;">Tipo :</label>
+                                <select id="criarClienteTipo" class="form-select form-select-lg" style="border: 1.8px solid #000; border-radius: 8px;" onchange="alternarCampoDocumento('criar')">
+                                    <option selected disabled value="">Selecione</option>
+                                    <option value="CPF">Pessoa Física</option>
+                                    <option value="CNPJ">Pessoa Jurídica</option>
+                                </select>
+                            </div>
+
+                            <div class="col-md-8" id="divCriarDocumento" style="display: none;">
+                                <label id="labelCriarDocumento" class="form-label fw-bold text-uppercase text-dark mb-1" style="font-size: 1.1rem;">Documento :</label>
+                                <input type="text" id="inputCriarDocumento" class="form-control form-control-lg"
+                                       style="border: 1.8px solid #000; border-radius: 8px; box-shadow: none;">
+                            </div>
+
+                            <div class="col-md-6">
+                                <label class="form-label fw-bold text-uppercase text-dark mb-1" style="font-size: 1.1rem;">Email :</label>
+                                <input type="email" class="form-control form-control-lg"
+                                       style="border: 1.8px solid #000; border-radius: 8px; box-shadow: none;">
+                            </div>
+
+                            <div class="col-md-6">
+                                <label class="form-label fw-bold text-uppercase text-dark mb-1" style="font-size: 1.1rem;">Telefone :</label>
+                                <input type="text" class="form-control form-control-lg"
+                                       style="border: 1.8px solid #000; border-radius: 8px; box-shadow: none;">
+                            </div>
                         </div>
 
-                        <div class="col-md-4">
-                            <label class="form-label fw-bold text-uppercase text-dark mb-1" style="font-size: 1.1rem;">Tipo :</label>
-                            <select id="criarClienteTipo" class="form-select form-select-lg" style="border: 2px solid #000; border-radius: 0;" onchange="alternarCampoDocumento('criar')">
-                                <option selected disabled value="">Selecione</option>
-                                <option value="CPF">Pessoa Física</option>
-                                <option value="CNPJ">Pessoa Jurídica</option>
-                            </select>
+                        <div class="d-flex justify-content-center gap-3 mt-5">
+                            <button type="button" class="btn btn-outline-secondary fw-bolder text-uppercase" data-bs-dismiss="modal"
+                                    style="font-size: 1.2rem; padding: 12px 40px; border-radius: 8px; border-width: 1.8px;">
+                                Cancelar
+                            </button>
+                            <button type="button" class="btn btn-orange fw-bolder text-uppercase text-white"
+                                    style="font-size: 1.2rem; padding: 12px 40px; border-radius: 8px; background-color: #ff9433; border: none;">
+                                Salvar
+                            </button>
                         </div>
+                    </form>
+                </div>
 
-                        <div class="col-md-8" id="divCriarDocumento" style="display: none;">
-                            <label id="labelCriarDocumento" class="form-label fw-bold text-uppercase text-dark mb-1" style="font-size: 1.1rem;">Documento :</label>
-                            <input type="text" id="inputCriarDocumento" class="form-control form-control-lg"
-                                   style="border: 2px solid #000; border-radius: 0; box-shadow: none;">
-                        </div>
-
-                        <div class="col-md-6">
-                            <label class="form-label fw-bold text-uppercase text-dark mb-1" style="font-size: 1.1rem;">Email :</label>
-                            <input type="email" class="form-control form-control-lg"
-                                   style="border: 2px solid #000; border-radius: 0; box-shadow: none;">
-                        </div>
-                        <div class="col-md-6">
-                            <label class="form-label fw-bold text-uppercase text-dark mb-1" style="font-size: 1.1rem;">Telefone :</label>
-                            <input type="text" class="form-control form-control-lg"
-                                   style="border: 2px solid #000; border-radius: 0; box-shadow: none;">
-                        </div>
-                    </div>
-
-                    <div class="d-flex justify-content-center gap-3 mt-5">
-                        <button type="button" class="btn btn-outline-secondary fw-bolder text-uppercase" data-bs-dismiss="modal"
-                                style="font-size: 1.2rem; padding: 12px 40px; border-radius: 0; border-width: 2px;">
-                            Cancelar
-                        </button>
-                        <button type="button" class="btn btn-orange fw-bolder text-uppercase text-white"
-                                style="font-size: 1.2rem; padding: 12px 40px; border-radius: 0; background-color: #ff9433; border: none;">
-                            Salvar
-                        </button>
-                    </div>
-                </form>
-            </div>
-        </div>
+            </div> </div>
     </div>
 </div>
 
 <div th:fragment="modalEditar" class="modal fade" id="modalEditarCliente" tabindex="-1" aria-hidden="true">
     <div class="modal-dialog modal-dialog-centered modal-lg">
-        <div class="modal-content shadow-lg border-0" style="border-radius: 4px;">
-            <div class="modal-header border-0 pb-0">
-                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-            </div>
-            <div class="modal-body px-5 pb-5 pt-2 text-center">
-                <h1 class="page-title text-uppercase mb-3" style="line-height: 1;">
-                    Editar<br>Cliente
-                </h1>
-                <hr class="mx-auto mb-5" style="width: 80%; border-top: 2px solid #000; opacity: 1;">
+        <div class="modal-content shadow-lg border-0" style="border-radius: 16px; padding: 6px; background-color: #ffffff;">
+            <div style="border: 1.8px solid #14213d; border-radius: 12px; height: 100%;">
+                <div class="modal-header border-0 pb-0">
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body px-5 pb-5 pt-2 text-center">
+                    <h1 class="page-title text-uppercase mb-3" style="line-height: 1.1;">
+                        Editar<br>Cliente
+                    </h1>
+                    <hr class="mx-auto mb-5" style="width: 60%; border-top: 1px solid #000; opacity: 1;">
 
-                <form class="text-start px-md-4">
-                    <input type="hidden" id="editClienteId" name="Id">
+                    <form class="text-start px-md-4">
+                        <input type="hidden" id="editClienteId" name="Id">
 
-                    <div class="row g-4">
-                        <div class="col-md-8">
-                            <label class="form-label fw-bold text-uppercase text-dark mb-1" style="font-size: 1.1rem;">Nome Completo / Razão Social :</label>
-                            <input type="text" id="editClienteNome" class="form-control form-control-lg"
-                                   style="border: 2px solid #000; border-radius: 0; box-shadow: none;">
+                        <div class="row g-4">
+                            <div class="col-md-8">
+                                <label class="form-label fw-bold text-uppercase text-dark mb-1" style="font-size: 1.1rem;">Nome Completo / Razão Social :</label>
+                                <input type="text" id="editClienteNome" class="form-control form-control-lg"
+                                       style="border: 1.8px solid #000; border-radius: 8px; box-shadow: none;">
+                            </div>
+
+                            <div class="col-md-4">
+                                <label class="form-label fw-bold text-uppercase text-dark mb-1" style="font-size: 1.1rem;">Status :</label>
+                                <select id="editClienteStatus" class="form-select form-select-lg" style="border: 1.8px solid #000; border-radius: 8px;">
+                                    <option value="ATIVO">ATIVO</option>
+                                    <option value="INATIVO">INATIVO</option>
+                                </select>
+                            </div>
+
+                            <div class="col-md-4">
+                                <label class="form-label fw-bold text-uppercase text-dark mb-1" style="font-size: 1.1rem;">Tipo :</label>
+                                <select id="editClienteTipo" class="form-select form-select-lg" style="border: 1.8px solid #000; border-radius: 8px;" onchange="alternarCampoDocumento('edit')">
+                                    <option selected disabled value="">Selecione</option>
+                                    <option value="CPF">Pessoa Física</option>
+                                    <option value="CNPJ">Pessoa Jurídica</option>
+                                </select>
+                            </div>
+
+                            <div class="col-md-8" id="divEditDocumento" style="display: none;">
+                                <label id="labelEditDocumento" class="form-label fw-bold text-uppercase text-dark mb-1" style="font-size: 1.1rem;">Documento :</label>
+                                <input type="text" id="inputEditDocumento" class="form-control form-control-lg"
+                                       style="border: 1.8px solid #000; border-radius: 8px; box-shadow: none;">
+                            </div>
+
+                            <div class="col-md-6">
+                                <label class="form-label fw-bold text-uppercase text-dark mb-1" style="font-size: 1.1rem;">Email :</label>
+                                <input type="email" id="editClienteEmail" class="form-control form-control-lg"
+                                       style="border: 1.8px solid #000; border-radius: 8px; box-shadow: none;">
+                            </div>
+
+                            <div class="col-md-6">
+                                <label class="form-label fw-bold text-uppercase text-dark mb-1" style="font-size: 1.1rem;">Telefone :</label>
+                                <input type="text" id="editClienteTelefone" class="form-control form-control-lg"
+                                       style="border: 1.8px solid #000; border-radius: 8px; box-shadow: none;">
+                            </div>
                         </div>
 
-                        <div class="col-md-4">
-                            <label class="form-label fw-bold text-uppercase text-dark mb-1" style="font-size: 1.1rem;">Status :</label>
-                            <select id="editClienteStatus" class="form-select form-select-lg" style="border: 2px solid #000; border-radius: 0;">
-                                <option value="ATIVO">ATIVO</option>
-                                <option value="INATIVO">INATIVO</option>
-                            </select>
+                        <div class="d-flex justify-content-center gap-3 mt-5">
+                            <button type="button" class="btn btn-outline-secondary fw-bolder text-uppercase" data-bs-dismiss="modal"
+                                    style="font-size: 1.2rem; padding: 12px 40px; border-radius: 8px; border-width: 1.8px;">
+                                Cancelar
+                            </button>
+                            <button type="button" class="btn btn-orange fw-bolder text-uppercase text-white"
+                                    style="font-size: 1.2rem; padding: 12px 40px; border-radius: 8px; background-color: #ff9433; border: none;">
+                                Salvar Alterações
+                            </button>
                         </div>
-
-                        <div class="col-md-4">
-                            <label class="form-label fw-bold text-uppercase text-dark mb-1" style="font-size: 1.1rem;">Tipo :</label>
-                            <select id="editClienteTipo" class="form-select form-select-lg" style="border: 2px solid #000; border-radius: 0;" onchange="alternarCampoDocumento('edit')">
-                                <option selected disabled value="">Selecione</option>
-                                <option value="CPF">Pessoa Física</option>
-                                <option value="CNPJ">Pessoa Jurídica</option>
-                            </select>
-                        </div>
-
-                        <div class="col-md-8" id="divEditDocumento" style="display: none;">
-                            <label id="labelEditDocumento" class="form-label fw-bold text-uppercase text-dark mb-1" style="font-size: 1.1rem;">Documento :</label>
-                            <input type="text" id="inputEditDocumento" class="form-control form-control-lg"
-                                   style="border: 2px solid #000; border-radius: 0; box-shadow: none;">
-                        </div>
-
-                        <div class="col-md-6">
-                            <label class="form-label fw-bold text-uppercase text-dark mb-1" style="font-size: 1.1rem;">Email :</label>
-                            <input type="email" id="editClienteEmail" class="form-control form-control-lg"
-                                   style="border: 2px solid #000; border-radius: 0; box-shadow: none;">
-                        </div>
-
-                        <div class="col-md-6">
-                            <label class="form-label fw-bold text-uppercase text-dark mb-1" style="font-size: 1.1rem;">Telefone :</label>
-                            <input type="text" id="editClienteTelefone" class="form-control form-control-lg"
-                                   style="border: 2px solid #000; border-radius: 0; box-shadow: none;">
-                        </div>
-                    </div>
-
-                    <div class="d-flex justify-content-center gap-3 mt-5">
-                        <button type="button" class="btn btn-outline-secondary fw-bolder text-uppercase" data-bs-dismiss="modal"
-                                style="font-size: 1.2rem; padding: 12px 40px; border-radius: 0; border-width: 2px;">
-                            Cancelar
-                        </button>
-                        <button type="button" class="btn btn-orange fw-bolder text-uppercase text-white"
-                                style="font-size: 1.2rem; padding: 12px 40px; border-radius: 0; background-color: #ff9433; border: none;">
-                            Salvar Alterações
-                        </button>
-                    </div>
-                </form>
+                    </form>
+                </div>
             </div>
         </div>
     </div>
