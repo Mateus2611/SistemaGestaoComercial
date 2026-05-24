@@ -107,7 +107,7 @@
                     <td th:text="${cliente.telefone != null ? cliente.telefone : 'N/A'}">(11) 90000-0000</td>
                     <td>
                         <span class="badge"
-                              th:classappend="${cliente.status != null and cliente.status.name() == 'ATIVO' ? 'badge-ativo' : 'badge-inativo'}"
+                              th:classappend="${cliente.status != null and cliente.status.name() == 'ATIVO' ? 'badge-verde' : 'badge-vermelho'}"
                               th:text="${cliente.status}">ATIVO</span>
                     </td>
                     <td class="text-end">
@@ -129,7 +129,7 @@
                     <td>123.456.789-00</td>
                     <td>maria.oliveira@empresa.com</td>
                     <td>(11) 98888-7777</td>
-                    <td><span class="badge badge-ativo">ATIVO</span></td>
+                    <td><span class="badge badge-verde">ATIVO</span></td>
                     <td class="text-end">
                         <button class="btn btn-sm btn-outline-secondary me-2" title="Editar"
                                 data-bs-toggle="modal" data-bs-target="#modalEditarCliente"
@@ -149,7 +149,7 @@
                     <td>12.345.678/0001-99</td>
                     <td>contato@alfa.com.br</td>
                     <td>(21) 3333-4444</td>
-                    <td><span class="badge badge-inativo">INATIVO</span></td>
+                    <td><span class="badge badge-vermelho">INATIVO</span></td>
                     <td class="text-end">
                         <button class="btn btn-sm btn-outline-secondary me-2" title="Editar"
                                 data-bs-toggle="modal" data-bs-target="#modalEditarCliente"
