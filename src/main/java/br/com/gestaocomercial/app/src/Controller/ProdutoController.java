@@ -4,6 +4,7 @@ import br.com.gestaocomercial.app.src.Model.Produto;
 import br.com.gestaocomercial.app.src.Service.ProdutoService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 
 import java.util.PrimitiveIterator;
@@ -14,7 +15,11 @@ public class ProdutoController {
     @Autowired
     private ProdutoService _produtoService;
 
-    @RequestMapping("/produto")
+    @GetMapping("/produto")
+    public String produto() {
+        return "produto";
+    }
+
     public Iterable<Produto> get() { return _produtoService.BuscaGeral(); }
 
     public Produto getById(Integer id) { return _produtoService.BuscaPorId(id); }

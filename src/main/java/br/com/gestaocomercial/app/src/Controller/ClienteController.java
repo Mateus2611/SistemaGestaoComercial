@@ -21,6 +21,10 @@ public class ClienteController {
     private ClienteService _clienteService;
 
     @RequestMapping("/cliente")
+    public String cliente() {
+        return "cliente";
+    }
+
     public Iterable<Cliente> get() { return _clienteService.BuscaGeral(); }
 
     @RequestMapping("/cliente/{id}")

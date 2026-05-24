@@ -16,6 +16,10 @@ public class OrcamentoController {
     private OrcamentoService _orcamentoService;
 
     @RequestMapping("/orcamento")
+    public String orcamento() {
+        return "orcamento";
+    }
+
     public Iterable<OrcamentoResponse> get() { return _orcamentoService.BuscaGeral(); }
 
     public OrcamentoResponse getById(Integer id) { return _orcamentoService.BuscaPorId(id); }

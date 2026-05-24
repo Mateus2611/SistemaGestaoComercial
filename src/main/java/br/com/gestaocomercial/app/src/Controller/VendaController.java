@@ -15,6 +15,10 @@ public class VendaController {
     private VendaService _vendaService;
 
     @RequestMapping("/venda")
+    public String venda() {
+        return "venda";
+    }
+
     public Iterable<Venda> get() {
         return _vendaService.BuscaGeral();
     }
