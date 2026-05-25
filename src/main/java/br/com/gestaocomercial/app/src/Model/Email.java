@@ -50,4 +50,9 @@ public class Email {
     public void setEndereco(String endereco) {
         Endereco = endereco;
     }
+
+    @Override
+    public String toString() {
+        return this.Endereco;
+    }
 }
