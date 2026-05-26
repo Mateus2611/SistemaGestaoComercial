@@ -6,7 +6,7 @@ import java.math.BigDecimal;
 import java.util.List;
 
 @Entity
-@Table(name = "produto")
+@Table(name = "Produto")
 public class Produto {
 
     public Produto() {
@@ -24,15 +24,13 @@ public class Produto {
     }
 
     @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "Id")
     private Integer Id;
     @Column(name = "Nome")
     private String Nome;
     @Column(name = "Valor")
     private BigDecimal Valor;
-    @OneToMany(orphanRemoval = true)
-    @JoinColumn(name = "Id_Produto")
-    private List<OrcamentoProduto> OrcamentoProduto;
 
     public Integer getId() {
         return Id;
@@ -56,13 +54,5 @@ public class Produto {
 
     public void setValor(BigDecimal valor) {
         Valor = valor;
-    }
-
-    public List<OrcamentoProduto> getOrcamentoProduto() {
-        return OrcamentoProduto;
-    }
-
-    public void setOrcamentoProduto(List<OrcamentoProduto> orcamentoProduto) {
-        OrcamentoProduto = orcamentoProduto;
     }
 }

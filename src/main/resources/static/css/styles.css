@@ -153,3 +153,13 @@ body > .d-flex {
     font-weight: 800;
     padding: 0.4em 0.6em;
 }
+
+input::-webkit-outer-spin-button,
+input::-webkit-inner-spin-button {
+    -webkit-appearance: none;
+    margin: 0;
+}
+
+input[type=number] {
+    -moz-appearance: textfield;
+}
