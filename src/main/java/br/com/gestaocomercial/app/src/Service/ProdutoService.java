@@ -5,6 +5,10 @@ import br.com.gestaocomercial.app.src.Repository.IProdutoRepository;
 import org.hibernate.dialect.lock.OptimisticEntityLockException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.OptimisticLockingFailureException;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
 @Service
@@ -24,9 +28,11 @@ public class ProdutoService {
         }
     }
 
-    public Iterable<Produto> BuscaGeral() {
+    public Page<Produto> BuscaGeral(Integer pagina) {
         try {
-            return _produtoRepository.findAll();
+            Pageable pageable = PageRequest.of(pagina - 1, 15, Sort.by("id").descending());
+
+            return _produtoRepository.findAll(pageable);
         } catch (RuntimeException e) {
             throw new RuntimeException(e.getMessage());
         }

@@ -153,6 +153,42 @@
                 </tr>
                 </tbody>
             </table>
+
+            <div th:if="${totalPaginas > 1}" class="d-flex justify-content-between align-items-center mt-4 px-2">
+                <div class="text-muted fw-bold" style="font-size: 0.95rem;">
+                    Exibindo página <span th:text="${paginaAtual}">1</span> de <span th:text="${totalPaginas}">5</span>
+                    (Total de <span th:text="${totalItens}">75</span> produtos)
+                </div>
+
+                <nav aria-label="Navegação de páginas">
+                    <ul class="pagination mb-0">
+
+                        <li class="page-item" th:classappend="${paginaAtual == 1} ? 'disabled'">
+                            <a class="page-link" th:href="@{/produto(page=${paginaAtual - 1})}" aria-label="Anterior" style="color: #000000; box-shadow: none;">
+                                <span aria-hidden="true">&laquo;</span>
+                            </a>
+                        </li>
+
+                        <li class="page-item" th:each="i : ${#numbers.sequence(1, totalPaginas)}"
+                            th:classappend="${paginaAtual == i} ? 'active'">
+
+                            <a class="page-link fw-bold"
+                               th:href="@{/produto(page=${i})}"
+                               th:text="${i}"
+                               th:style="${paginaAtual == i} ? 'background-color: #ff7e12; border-color: #000000; color: #000000;' : 'color: #000000; box-shadow: none;'">
+                                1
+                            </a>
+                        </li>
+
+                        <li class="page-item" th:classappend="${paginaAtual == totalPaginas} ? 'disabled'">
+                            <a class="page-link" th:href="@{/produto(page=${paginaAtual + 1})}" aria-label="Próximo" style="color: #000000; box-shadow: none;">
+                                <span aria-hidden="true">&raquo;</span>
+                            </a>
+                        </li>
+
+                    </ul>
+                </nav>
+            </div>
         </div>
 
         <div class="modal fade" id="modalConfirmarExclusao" tabindex="-1" aria-hidden="true">

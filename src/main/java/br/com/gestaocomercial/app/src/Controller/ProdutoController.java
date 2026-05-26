@@ -3,6 +3,7 @@ package br.com.gestaocomercial.app.src.Controller;
 import br.com.gestaocomercial.app.src.Model.Produto;
 import br.com.gestaocomercial.app.src.Service.ProdutoService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
@@ -19,7 +20,7 @@ public class ProdutoController {
     private ProdutoService _produtoService;
 
     @GetMapping
-    public ModelAndView produto() { return carregarTelaBase(null); }
+    public ModelAndView produto(@RequestParam(value = "page", defaultValue = "1") Integer page) { return carregarTelaBase(null, page); }
 
     @GetMapping("/{id}")
     public ModelAndView getById(@PathVariable("id") Integer id, RedirectAttributes redirectAttributes) {
@@ -31,16 +32,23 @@ public class ProdutoController {
 
             return new ModelAndView("redirect:/produto");
         }
-        return carregarTelaBase(id);
+
+        return carregarTelaBase(id, 1);
     }
 
-    private ModelAndView carregarTelaBase(Integer idNovo) {
+    private ModelAndView carregarTelaBase(Integer idNovo, Integer page) {
         ModelAndView mv = new ModelAndView("produto");
-        mv.addObject("produtos", _produtoService.BuscaGeral());
+        Page<Produto> produtos = _produtoService.BuscaGeral(page);
+
+        mv.addObject("produtos", produtos.getContent());
+
+        mv.addObject("paginaAtual", page);
+        mv.addObject("totalPaginas", produtos.getTotalPages());
+        mv.addObject("totalItens", produtos.getTotalElements());
+
         mv.addObject("novoProduto", new Produto());
 
         if (idNovo != null) {
-            // Como o método público já validou, aqui o produto nunca será null
             Produto produto = _produtoService.BuscaPorId(idNovo);
             mv.addObject("produto", produto);
             mv.addObject("mostrarDropdown", true);
