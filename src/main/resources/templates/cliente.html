@@ -27,6 +27,11 @@
 <div class="d-flex">
 
     <div class="sidebar-custom d-flex flex-column flex-shrink-0">
+
+        <div class="sidebar-logo d-flex justify-content-center align-items-center py-3 mb-2 w-100">
+            <img th:src="@{/images/acrillogo.svg}" src="../static/images/acrillogo.svg" alt="Logo AcrillService" class="img-fluid" style="max-height: 120px; max-width: 120px; object-fit: contain;">
+        </div>
+
         <a th:href="@{/}" class="nav-link-custom text-uppercase">
             <i class="bi bi-house-door-fill"></i>
             <span>Início</span>
@@ -59,7 +64,7 @@
 
     <div class="main-content flex-grow-1 p-5">
 
-        <h1 class="page-title mb-4">CLIENTES</h1>
+        <h1 class="page-title mb-2">CLIENTES</h1>
 
         <div class="d-flex align-items-center gap-3 mb-4 flex-wrap">
             <div class="search-container">
@@ -81,7 +86,7 @@
                     <th>ID</th>
                     <th>Nome</th>
                     <th>CPF/CNPJ</th>
-                    <th>Email</th>
+                    <th>Email Principal</th>
                     <th>Telefone</th>
                     <th>Status</th>
                     <th class="text-end">Ações</th>
@@ -95,7 +100,7 @@
                     th:attr="data-id=${cliente.id},
                              data-nome=${cliente.nome},
                              data-documento=${cliente.documento != null ? cliente.documento : 'N/A'},
-                             data-email=${cliente.email != null ? cliente.email : 'N/A'},
+                             data-emails=${cliente.emails != null ? #strings.listJoin(cliente.emails, ',') : ''},
                              data-telefone=${cliente.telefone != null ? cliente.telefone : 'N/A'},
                              data-status=${cliente.status != null ? cliente.status.name() : ''},
                              data-tipo=${cliente.tipo != null ? cliente.tipo.name() : ''}">
@@ -103,7 +108,7 @@
                     <td th:text="${cliente.id}">1</td>
                     <td th:text="${cliente.nome}">João da Silva</td>
                     <td th:text="${cliente.documento != null ? cliente.documento : 'N/A'}">000.000.000-00</td>
-                    <td th:text="${cliente.email != null ? cliente.email : 'N/A'}">joao@email.com</td>
+                    <td th:text="${cliente.emails != null and !cliente.emails.isEmpty() ? cliente.emails[0].endereco : 'N/A'}">joao@email.com</td>
                     <td th:text="${cliente.telefone != null ? cliente.telefone : 'N/A'}">(11) 90000-0000</td>
                     <td>
                         <span class="badge"
@@ -113,7 +118,7 @@
                     <td class="text-end">
                         <button class="btn btn-sm btn-outline-secondary me-2" title="Editar"
                                 data-bs-toggle="modal" data-bs-target="#modalEditarCliente"
-                                th:attr="data-id=${cliente.id}, data-nome=${cliente.nome}, data-email=${cliente.email}, data-telefone=${cliente.telefone}, data-status=${cliente.status}">
+                                th:attr="data-id=${cliente.id}, data-nome=${cliente.nome}, data-emails=${cliente.emails != null ? #strings.listJoin(cliente.emails, ',') : ''}, data-telefone=${cliente.telefone}, data-status=${cliente.status}">
                             <i class="bi bi-pencil-fill"></i>
                         </button>
                         <button class="btn btn-sm btn-outline-danger" title="Excluir">
@@ -123,7 +128,7 @@
                 </tr>
 
                 <tr class="tr-clicavel" onclick="abrirModalDetalhes(this)"
-                    data-id="2" data-nome="Maria Oliveira" data-documento="123.456.789-00" data-email="maria.oliveira@empresa.com" data-telefone="(11) 98888-7777" data-status="ATIVO" data-tipo="CPF">
+                    data-id="2" data-nome="Maria Oliveira" data-documento="123.456.789-00" data-emails="maria.oliveira@empresa.com,maria.pessoal@email.com" data-telefone="(11) 98888-7777" data-status="ATIVO" data-tipo="CPF">
                     <td>2</td>
                     <td>Maria Oliveira</td>
                     <td>123.456.789-00</td>
@@ -133,7 +138,7 @@
                     <td class="text-end">
                         <button class="btn btn-sm btn-outline-secondary me-2" title="Editar"
                                 data-bs-toggle="modal" data-bs-target="#modalEditarCliente"
-                                data-id="2" data-nome="Maria Oliveira" data-email="maria.oliveira@empresa.com" data-telefone="(11) 98888-7777" data-status="ATIVO">
+                                data-id="2" data-nome="Maria Oliveira" data-emails="maria.oliveira@empresa.com,maria.pessoal@email.com" data-telefone="(11) 98888-7777" data-status="ATIVO">
                             <i class="bi bi-pencil-fill"></i>
                         </button>
                         <button class="btn btn-sm btn-outline-danger" title="Excluir">
@@ -143,7 +148,7 @@
                 </tr>
 
                 <tr class="tr-clicavel" onclick="abrirModalDetalhes(this)"
-                    data-id="3" data-nome="Construtora Alfa Ltda" data-documento="12.345.678/0001-99" data-email="contato@alfa.com.br" data-telefone="(21) 3333-4444" data-status="INATIVO" data-tipo="CNPJ">
+                    data-id="3" data-nome="Construtora Alfa Ltda" data-documento="12.345.678/0001-99" data-emails="contato@alfa.com.br" data-telefone="(21) 3333-4444" data-status="INATIVO" data-tipo="CNPJ">
                     <td>3</td>
                     <td>Construtora Alfa Ltda</td>
                     <td>12.345.678/0001-99</td>
@@ -153,7 +158,7 @@
                     <td class="text-end">
                         <button class="btn btn-sm btn-outline-secondary me-2" title="Editar"
                                 data-bs-toggle="modal" data-bs-target="#modalEditarCliente"
-                                data-id="3" data-nome="Construtora Alfa Ltda" data-email="contato@alfa.com.br" data-telefone="(21) 3333-4444" data-status="INATIVO">
+                                data-id="3" data-nome="Construtora Alfa Ltda" data-emails="contato@alfa.com.br" data-telefone="(21) 3333-4444" data-status="INATIVO">
                             <i class="bi bi-pencil-fill"></i>
                         </button>
                         <button class="btn btn-sm btn-outline-danger" title="Excluir">
@@ -168,18 +173,13 @@
     </div>
 </div>
 
-
 <div class="modal fade" id="modalDetalhesCliente" tabindex="-1" aria-hidden="true">
     <div class="modal-dialog modal-dialog-centered modal-lg">
-
         <div class="modal-content shadow-lg border-0" style="border-radius: 16px; padding: 6px; background-color: #ffffff;">
-
             <div style="border: 1.8px solid #14213d; border-radius: 12px; height: 100%;">
-
                 <div class="modal-header border-0 pb-0">
                     <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                 </div>
-
                 <div class="modal-body px-5 pb-5 pt-2 text-center">
                     <h1 class="page-title text-uppercase mb-3" style="line-height: 1.1;">
                         Detalhes<br>Cliente
@@ -189,39 +189,39 @@
                     <div class="text-start px-md-4">
                         <div class="row g-4">
                             <div class="col-md-8">
-                                <label class="form-label fw-bold text-uppercase text-dark mb-1" style="font-size: 1.1rem;">Nome Completo / Razão Social :</label>
+                                <label class="form-label fw-bold text-uppercase text-dark mb-1" style="font-size: 1.1rem;">Nome Completo / Razão Social</label>
                                 <input type="text" id="detalheClienteNome" class="form-control form-control-lg fw-bold" readonly
                                        style="border: 1.8px solid #ccc; border-radius: 8px; background-color: #f8f9fa;">
                             </div>
 
                             <div class="col-md-4">
-                                <label class="form-label fw-bold text-uppercase text-dark mb-1" style="font-size: 1.1rem;">Status :</label>
+                                <label class="form-label fw-bold text-uppercase text-dark mb-1" style="font-size: 1.1rem;">Status</label>
                                 <input type="text" id="detalheClienteStatus" class="form-control form-control-lg fw-bold" readonly
                                        style="border: 1.8px solid #ccc; border-radius: 8px; background-color: #f8f9fa;">
                             </div>
 
                             <div class="col-md-6">
-                                <label class="form-label fw-bold text-uppercase text-dark mb-1" style="font-size: 1.1rem;">Tipo :</label>
+                                <label class="form-label fw-bold text-uppercase text-dark mb-1" style="font-size: 1.1rem;">Tipo</label>
                                 <input type="text" id="detalheClienteTipo" class="form-control form-control-lg" readonly
                                        style="border: 1.8px solid #ccc; border-radius: 8px; background-color: #f8f9fa;">
                             </div>
 
                             <div class="col-md-6">
-                                <label class="form-label fw-bold text-uppercase text-dark mb-1" style="font-size: 1.1rem;">Documento :</label>
+                                <label class="form-label fw-bold text-uppercase text-dark mb-1" style="font-size: 1.1rem;">Documento</label>
                                 <input type="text" id="detalheClienteDocumento" class="form-control form-control-lg" readonly
                                        style="border: 1.8px solid #ccc; border-radius: 8px; background-color: #f8f9fa;">
                             </div>
 
                             <div class="col-md-6">
-                                <label class="form-label fw-bold text-uppercase text-dark mb-1" style="font-size: 1.1rem;">Email :</label>
-                                <input type="email" id="detalheClienteEmail" class="form-control form-control-lg" readonly
+                                <label class="form-label fw-bold text-uppercase text-dark mb-1" style="font-size: 1.1rem;">Telefone</label>
+                                <input type="text" id="detalheClienteTelefone" class="form-control form-control-lg" readonly
                                        style="border: 1.8px solid #ccc; border-radius: 8px; background-color: #f8f9fa;">
                             </div>
 
                             <div class="col-md-6">
-                                <label class="form-label fw-bold text-uppercase text-dark mb-1" style="font-size: 1.1rem;">Telefone :</label>
-                                <input type="text" id="detalheClienteTelefone" class="form-control form-control-lg" readonly
-                                       style="border: 1.8px solid #ccc; border-radius: 8px; background-color: #f8f9fa;">
+                                <label class="form-label fw-bold text-uppercase text-dark mb-1" style="font-size: 1.1rem;">Emails</label>
+                                <div id="detalheClienteEmails" class="p-2" style="border: 1.8px solid #ccc; border-radius: 8px; background-color: #f8f9fa; min-height: 48px; text-align: left;">
+                                </div>
                             </div>
                         </div>
 
@@ -233,25 +233,18 @@
                         </div>
                     </div>
                 </div>
-
             </div>
-
         </div>
     </div>
 </div>
 
-
 <div th:fragment="modalCriar" class="modal fade" id="modalCriarCliente" tabindex="-1" aria-hidden="true">
     <div class="modal-dialog modal-dialog-centered modal-lg">
-
         <div class="modal-content shadow-lg border-0" style="border-radius: 16px; padding: 6px; background-color: #ffffff;">
-
             <div style="border: 1.8px solid #14213d; border-radius: 12px; height: 100%;">
-
                 <div class="modal-header border-0 pb-0">
                     <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                 </div>
-
                 <div class="modal-body px-5 pb-5 pt-2 text-center">
                     <h1 class="page-title text-uppercase mb-3" style="line-height: 1.1;">
                         Criar<br>Cliente
@@ -261,14 +254,14 @@
                     <form class="text-start px-md-4">
                         <div class="row g-4">
                             <div class="col-md-12">
-                                <label class="form-label fw-bold text-uppercase text-dark mb-1" style="font-size: 1.1rem;">Nome Completo / Razão Social :</label>
-                                <input type="text" class="form-control form-control-lg"
+                                <label class="form-label fw-bold text-uppercase text-dark mb-1" style="font-size: 1.1rem;">Nome Completo / Razão Social</label>
+                                <input type="text" class="form-control form-control-lg" name="nome"
                                        style="border: 1.8px solid #000; border-radius: 8px; box-shadow: none;">
                             </div>
 
                             <div class="col-md-4">
-                                <label class="form-label fw-bold text-uppercase text-dark mb-1" style="font-size: 1.1rem;">Tipo :</label>
-                                <select id="criarClienteTipo" class="form-select form-select-lg" style="border: 1.8px solid #000; border-radius: 8px;" onchange="alternarCampoDocumento('criar')">
+                                <label class="form-label fw-bold text-uppercase text-dark mb-1" style="font-size: 1.1rem;">Tipo</label>
+                                <select id="criarClienteTipo" name="tipo" class="form-select form-select-lg" style="border: 1.8px solid #000; border-radius: 8px;" onchange="alternarCampoDocumento('criar')">
                                     <option selected disabled value="">Selecione</option>
                                     <option value="CPF">Pessoa Física</option>
                                     <option value="CNPJ">Pessoa Jurídica</option>
@@ -276,21 +269,27 @@
                             </div>
 
                             <div class="col-md-8" id="divCriarDocumento" style="display: none;">
-                                <label id="labelCriarDocumento" class="form-label fw-bold text-uppercase text-dark mb-1" style="font-size: 1.1rem;">Documento :</label>
-                                <input type="text" id="inputCriarDocumento" class="form-control form-control-lg"
+                                <label id="labelCriarDocumento" class="form-label fw-bold text-uppercase text-dark mb-1" style="font-size: 1.1rem;">Documento</label>
+                                <input type="text" id="inputCriarDocumento" name="documento" class="form-control form-control-lg"
                                        style="border: 1.8px solid #000; border-radius: 8px; box-shadow: none;">
                             </div>
 
-                            <div class="col-md-6">
-                                <label class="form-label fw-bold text-uppercase text-dark mb-1" style="font-size: 1.1rem;">Email :</label>
-                                <input type="email" class="form-control form-control-lg"
+                            <div class="col-md-12">
+                                <label class="form-label fw-bold text-uppercase text-dark mb-1" style="font-size: 1.1rem;">Telefone</label>
+                                <input type="text" class="form-control form-control-lg" name="telefone"
                                        style="border: 1.8px solid #000; border-radius: 8px; box-shadow: none;">
                             </div>
 
-                            <div class="col-md-6">
-                                <label class="form-label fw-bold text-uppercase text-dark mb-1" style="font-size: 1.1rem;">Telefone :</label>
-                                <input type="text" class="form-control form-control-lg"
-                                       style="border: 1.8px solid #000; border-radius: 8px; box-shadow: none;">
+                            <div class="col-md-12">
+                                <label class="form-label fw-bold text-uppercase text-dark mb-1" style="font-size: 1.1rem;">Emails</label>
+                                <div id="containerCriarEmails" class="d-flex flex-column gap-2 mb-2">
+                                    <div class="d-flex gap-2 email-input-group">
+                                        <input type="email" name="emails" class="form-control form-control-lg" placeholder="email@exemplo.com"
+                                               style="border: 1.8px solid #000; border-radius: 8px; box-shadow: none;">
+                                        <button type="button" class="btn btn-outline-danger fw-bold" onclick="removerCampoEmail(this)" style="border-radius: 8px;"><i class="bi bi-trash-fill"></i></button>
+                                    </div>
+                                </div>
+                                <button type="button" class="btn btn-sm btn-dark fw-bold" onclick="adicionarCampoEmail('criar')" style="border-radius: 8px;">+ Adicionar Email</button>
                             </div>
                         </div>
 
@@ -306,8 +305,8 @@
                         </div>
                     </form>
                 </div>
-
-            </div> </div>
+            </div>
+        </div>
     </div>
 </div>
 
@@ -325,26 +324,26 @@
                     <hr class="mx-auto mb-5" style="width: 60%; border-top: 1px solid #000; opacity: 1;">
 
                     <form class="text-start px-md-4">
-                        <input type="hidden" id="editClienteId" name="Id">
+                        <input type="hidden" id="editClienteId" name="id">
 
                         <div class="row g-4">
                             <div class="col-md-8">
-                                <label class="form-label fw-bold text-uppercase text-dark mb-1" style="font-size: 1.1rem;">Nome Completo / Razão Social :</label>
-                                <input type="text" id="editClienteNome" class="form-control form-control-lg"
+                                <label class="form-label fw-bold text-uppercase text-dark mb-1" style="font-size: 1.1rem;">Nome Completo / Razão Social</label>
+                                <input type="text" id="editClienteNome" name="nome" class="form-control form-control-lg"
                                        style="border: 1.8px solid #000; border-radius: 8px; box-shadow: none;">
                             </div>
 
                             <div class="col-md-4">
-                                <label class="form-label fw-bold text-uppercase text-dark mb-1" style="font-size: 1.1rem;">Status :</label>
-                                <select id="editClienteStatus" class="form-select form-select-lg" style="border: 1.8px solid #000; border-radius: 8px;">
+                                <label class="form-label fw-bold text-uppercase text-dark mb-1" style="font-size: 1.1rem;">Status</label>
+                                <select id="editClienteStatus" name="status" class="form-select form-select-lg" style="border: 1.8px solid #000; border-radius: 8px;">
                                     <option value="ATIVO">ATIVO</option>
                                     <option value="INATIVO">INATIVO</option>
                                 </select>
                             </div>
 
                             <div class="col-md-4">
-                                <label class="form-label fw-bold text-uppercase text-dark mb-1" style="font-size: 1.1rem;">Tipo :</label>
-                                <select id="editClienteTipo" class="form-select form-select-lg" style="border: 1.8px solid #000; border-radius: 8px;" onchange="alternarCampoDocumento('edit')">
+                                <label class="form-label fw-bold text-uppercase text-dark mb-1" style="font-size: 1.1rem;">Tipo</label>
+                                <select id="editClienteTipo" name="tipo" class="form-select form-select-lg" style="border: 1.8px solid #000; border-radius: 8px;" onchange="alternarCampoDocumento('edit')">
                                     <option selected disabled value="">Selecione</option>
                                     <option value="CPF">Pessoa Física</option>
                                     <option value="CNPJ">Pessoa Jurídica</option>
@@ -352,21 +351,22 @@
                             </div>
 
                             <div class="col-md-8" id="divEditDocumento" style="display: none;">
-                                <label id="labelEditDocumento" class="form-label fw-bold text-uppercase text-dark mb-1" style="font-size: 1.1rem;">Documento :</label>
-                                <input type="text" id="inputEditDocumento" class="form-control form-control-lg"
+                                <label id="labelEditDocumento" class="form-label fw-bold text-uppercase text-dark mb-1" style="font-size: 1.1rem;">Documento</label>
+                                <input type="text" id="inputEditDocumento" name="documento" class="form-control form-control-lg"
                                        style="border: 1.8px solid #000; border-radius: 8px; box-shadow: none;">
                             </div>
 
-                            <div class="col-md-6">
-                                <label class="form-label fw-bold text-uppercase text-dark mb-1" style="font-size: 1.1rem;">Email :</label>
-                                <input type="email" id="editClienteEmail" class="form-control form-control-lg"
+                            <div class="col-md-12">
+                                <label class="form-label fw-bold text-uppercase text-dark mb-1" style="font-size: 1.1rem;">Telefone</label>
+                                <input type="text" id="editClienteTelefone" name="telefone" class="form-control form-control-lg"
                                        style="border: 1.8px solid #000; border-radius: 8px; box-shadow: none;">
                             </div>
 
-                            <div class="col-md-6">
-                                <label class="form-label fw-bold text-uppercase text-dark mb-1" style="font-size: 1.1rem;">Telefone :</label>
-                                <input type="text" id="editClienteTelefone" class="form-control form-control-lg"
-                                       style="border: 1.8px solid #000; border-radius: 8px; box-shadow: none;">
+                            <div class="col-md-12">
+                                <label class="form-label fw-bold text-uppercase text-dark mb-1" style="font-size: 1.1rem;">Emails</label>
+                                <div id="containerEditEmails" class="d-flex flex-column gap-2 mb-2">
+                                </div>
+                                <button type="button" class="btn btn-sm btn-dark fw-bold" onclick="adicionarCampoEmail('edit')" style="border-radius: 8px;">+ Adicionar Email</button>
                             </div>
                         </div>
 
@@ -388,41 +388,61 @@
 </div>
 
 <script>
-    // ==========================================
-    // SCRIPT PARA ABRIR MODAL DE DETALHES NO CLICK SIMPLES
-    // ==========================================
+    function adicionarCampoEmail(modalTipo, valor = '') {
+        const containerId = modalTipo === 'criar' ? 'containerCriarEmails' : 'containerEditEmails';
+        const container = document.getElementById(containerId);
+
+        const div = document.createElement('div');
+        div.className = 'd-flex gap-2 email-input-group';
+        div.innerHTML = `
+            <input type="email" name="emails" class="form-control form-control-lg" value="${valor}" placeholder="email@exemplo.com"
+                   style="border: 1.8px solid #000; border-radius: 8px; box-shadow: none;">
+            <button type="button" class="btn btn-outline-danger fw-bold" onclick="removerCampoEmail(this)" style="border-radius: 8px;">
+                <i class="bi bi-trash-fill"></i>
+            </button>
+        `;
+        container.appendChild(div);
+    }
+
+    function removerCampoEmail(button) {
+        const group = button.closest('.email-input-group');
+        if (group) group.remove();
+    }
+
     function abrirModalDetalhes(row) {
-        // Pega os dados dos atributos data-* da tag <tr>
         const nome = row.getAttribute('data-nome');
         const documento = row.getAttribute('data-documento');
-        const email = row.getAttribute('data-email');
+        const emailsStr = row.getAttribute('data-emails'); // String separada por vírgula
         const telefone = row.getAttribute('data-telefone');
         const status = row.getAttribute('data-status');
         const tipo = row.getAttribute('data-tipo');
 
-        // Preenche os campos do modal de detalhes
         document.getElementById('detalheClienteNome').value = nome || '';
         document.getElementById('detalheClienteDocumento').value = documento || '';
-        document.getElementById('detalheClienteEmail').value = email || '';
         document.getElementById('detalheClienteTelefone').value = telefone || '';
         document.getElementById('detalheClienteStatus').value = status || '';
 
-        let tipoDisplay = '';
-        if(tipo === 'CPF') tipoDisplay = 'Pessoa Física';
-        else if(tipo === 'CNPJ') tipoDisplay = 'Pessoa Jurídica';
-        else tipoDisplay = tipo || 'N/A';
-
+        let tipoDisplay = tipo === 'CPF' ? 'Pessoa Física' : (tipo === 'CNPJ' ? 'Pessoa Jurídica' : (tipo || 'N/A'));
         document.getElementById('detalheClienteTipo').value = tipoDisplay;
 
-        // Exibe o modal
+        const emailsDiv = document.getElementById('detalheClienteEmails');
+        emailsDiv.innerHTML = ''; // limpa o conteúdo anterior
+        if (emailsStr && emailsStr.trim() !== "") {
+            const emailsArray = emailsStr.split(',');
+            emailsArray.forEach(email => {
+                const span = document.createElement('span');
+                span.className = 'd-block mb-1';
+                span.innerText = email.trim();
+                emailsDiv.appendChild(span);
+            });
+        } else {
+            emailsDiv.innerHTML = '<span class="text-muted">Nenhum email cadastrado</span>';
+        }
+
         const modal = new bootstrap.Modal(document.getElementById('modalDetalhesCliente'));
         modal.show();
     }
 
-
-    // ==========================================
-    // SCRIPT DOS CAMPOS CPF / CNPJ (DINÂMICO)
-    // ==========================================
     function alternarCampoDocumento(modalTipo) {
         let selectTipo, divDocumento, labelDocumento, inputDocumento;
 
@@ -457,12 +477,13 @@
         document.getElementById('criarClienteTipo').selectedIndex = 0;
         document.getElementById('divCriarDocumento').style.display = 'none';
         document.getElementById('inputCriarDocumento').value = '';
+
+        // Reseta os campos de e-mail para ter apenas um vazio
+        const container = document.getElementById('containerCriarEmails');
+        container.innerHTML = '';
+        adicionarCampoEmail('criar');
     });
 
-
-    // ==========================================
-    // SCRIPT DO MODAL DE EDITAR CLIENTE
-    // ==========================================
     document.addEventListener('DOMContentLoaded', function () {
         const modalEditar = document.getElementById('modalEditarCliente');
 
@@ -474,33 +495,39 @@
 
                 const id = button.getAttribute('data-id');
                 const nome = button.getAttribute('data-nome');
-                const email = button.getAttribute('data-email');
+                const emailsStr = button.getAttribute('data-emails');
                 const telefone = button.getAttribute('data-telefone');
                 const status = button.getAttribute('data-status');
 
                 document.getElementById('editClienteId').value = id;
                 document.getElementById('editClienteNome').value = nome;
-                document.getElementById('editClienteEmail').value = email;
                 document.getElementById('editClienteTelefone').value = telefone;
 
                 if (status) {
                     document.getElementById('editClienteStatus').value = status;
                 }
+
+                // Popula os e-mails dinamicamente
+                const container = document.getElementById('containerEditEmails');
+                container.innerHTML = '';
+                if (emailsStr && emailsStr.trim() !== "") {
+                    const emailsArray = emailsStr.split(',');
+                    emailsArray.forEach(email => {
+                        adicionarCampoEmail('edit', email.trim());
+                    });
+                } else {
+                    adicionarCampoEmail('edit');
+                }
             });
         }
     });
 
-    // Impede que o clique na linha aconteça quando clicar especificamente nos botões de Editar/Deletar
-    // (Alterado de 'dblclick' para 'click')
     document.querySelectorAll('.table-custom button').forEach(button => {
         button.addEventListener('click', function (e) {
             e.stopPropagation();
         });
     });
 
-    // ==========================================
-    // SCRIPT DE ORDENAÇÃO DA TABELA
-    // ==========================================
     let ordemCrescente = false;
 
     function ordenarTabela() {
