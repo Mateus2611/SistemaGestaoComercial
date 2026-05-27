@@ -39,12 +39,12 @@ public class ClienteService {
                 throw new RuntimeException("Endereço de email vazio. Preencha a informação");
 
             endereco = _enderecoRepository.save(endereco);
-            cliente.setIdEndereco(endereco.getId());
+            cliente.getEndereco().setId(endereco.getId());
             cliente = _clienteRepository.save(cliente);
             cliente.setEndereco(endereco);
 
             for (Email email : emails) {
-                email.setIdCliente(cliente.getId());
+                email.getCliente().setId(cliente.getId());
                 cliente.setEmails(Collections.singletonList(_emailRepository.save(email)));
             }
 
@@ -60,7 +60,7 @@ public class ClienteService {
             Iterable<Cliente> clientes = _clienteRepository.findAll();
 
             clientes.forEach(c -> {
-                c.setEndereco(_enderecoRepository.findById(c.getIdEndereco()).get());
+                c.setEndereco(_enderecoRepository.findById(c.getEndereco().getId()).get());
                 c.setEmails(_emailRepository.findAllById(c.getId()));
             });
 
@@ -74,7 +74,7 @@ public class ClienteService {
         try {
             Cliente cliente = _clienteRepository.findById(id).get();
 
-            cliente.setEndereco(_enderecoRepository.findById(cliente.getIdEndereco()).get());
+            cliente.setEndereco(_enderecoRepository.findById(cliente.getEndereco().getId()).get());
             cliente.setEmails(_emailRepository.findAllById(cliente.getId()));
 
             return cliente;
@@ -92,9 +92,9 @@ public class ClienteService {
         if (clienteDTO.Endereco != null) {
             Endereco endereco = _enderecoRepository.save(clienteDTO.Endereco);
 
-            _enderecoRepository.deleteById(cliente.getIdEndereco());
+            _enderecoRepository.deleteById(cliente.getEndereco().getId());
 
-            cliente.setIdEndereco(endereco.getId());
+            cliente.getEndereco().setId(endereco.getId());
         };
 
         return _clienteRepository.save(cliente);
@@ -135,7 +135,7 @@ public class ClienteService {
             List<Email> novosEmails = new ArrayList<Email>();
 
             for (Email email : emails) {
-                email.setIdCliente(idCliente);
+                email.getCliente().setId(idCliente);
                 novosEmails.add(_emailRepository.save(email));
             }
 

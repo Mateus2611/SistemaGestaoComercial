@@ -6,6 +6,10 @@ import br.com.gestaocomercial.app.src.Model.Venda;
 import br.com.gestaocomercial.app.src.Repository.IOrcamentoRepository;
 import br.com.gestaocomercial.app.src.Repository.IVendaRepository;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
 @Service
@@ -26,7 +30,7 @@ public class VendaService {
 
         try {
             orcamento = _orcamentoRepository.save(orcamento);
-            venda.setIdOrcamento(orcamento.getId());
+            venda.getOrcamento().setId(orcamento.getId());
             venda = _vendaRepository.save(venda);
             venda.setOrcamento(orcamento);
 
@@ -36,15 +40,11 @@ public class VendaService {
         }
     }
 
-    public Iterable<Venda> BuscaGeral() {
+    public Page<Venda> BuscaGeral(Integer pagina) {
         try {
-            Iterable<Venda> vendas = _vendaRepository.findAll();
+            Pageable pageable = PageRequest.of(pagina - 1, 15, Sort.by("id").descending());
 
-            for (Venda venda : vendas) {
-                venda.setOrcamento(_orcamentoRepository.findById(venda.getId()).get());
-            }
-
-            return vendas;
+            return _vendaRepository.findAll(pageable);
         } catch (RuntimeException ex) {
             throw new RuntimeException(ex.getMessage());
         }
@@ -54,7 +54,7 @@ public class VendaService {
         try {
             Venda venda = _vendaRepository.findById(id).get();
 
-            venda.setOrcamento(_orcamentoRepository.findById(venda.getIdOrcamento()).get());
+            venda.setOrcamento(_orcamentoRepository.findById(venda.getOrcamento().getId()).get());
 
             return venda;
         } catch (RuntimeException ex) {
@@ -70,9 +70,9 @@ public class VendaService {
         if (vendaDTO.orcamento != null) {
             Orcamento orcamento = _orcamentoRepository.save(vendaDTO.orcamento);
 
-            _orcamentoRepository.deleteById(venda.getIdOrcamento());
+            _orcamentoRepository.deleteById(venda.getOrcamento().getId());
 
-            venda.setIdOrcamento(orcamento.getId());
+            venda.getOrcamento().setId(orcamento.getId());
         }
 
         return _vendaRepository.save(venda);

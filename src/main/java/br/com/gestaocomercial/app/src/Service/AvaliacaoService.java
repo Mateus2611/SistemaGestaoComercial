@@ -5,6 +5,10 @@ import br.com.gestaocomercial.app.src.Model.Venda;
 import br.com.gestaocomercial.app.src.Repository.IAvaliacaoRepository;
 import br.com.gestaocomercial.app.src.Repository.IVendaRepository;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
 @Service
@@ -24,9 +28,9 @@ public class AvaliacaoService {
 
         try {
             venda = _vendaRepository.save(venda);
-            avaliacao.setIdVenda(venda);
+            avaliacao.getVenda().setId(venda.getId());
             avaliacao = _avaliacaoRepository.save(avaliacao);
-            avaliacao.setIdVenda(venda);
+            avaliacao.getVenda().setId(venda.getId());
 
             return avaliacao;
         } catch (RuntimeException ex) {
@@ -38,7 +42,7 @@ public class AvaliacaoService {
         try {
             Avaliacao avaliacao = _avaliacaoRepository.findById(id).get();
 
-            avaliacao.setIdVenda(_vendaRepository.findById(avaliacao.getIdVenda()).get());
+            avaliacao.getVenda().setId(_vendaRepository.findById(avaliacao.getVenda().getId()).get().getId());
 
             return avaliacao;
         } catch (RuntimeException ex) {
@@ -46,15 +50,11 @@ public class AvaliacaoService {
         }
     }
 
-    public Iterable<Avaliacao> BuscaGeral() {
+    public Page<Avaliacao> BuscaGeral(Integer pagina) {
         try {
-            Iterable<Avaliacao> avalicoes = _avaliacaoRepository.findAll();
+            Pageable pageable = PageRequest.of(pagina - 1, 15, Sort.by("id").descending());
 
-            for (Avaliacao avaliacao : avalicoes) {
-                avaliacao.setIdVenda(_vendaRepository.findById(avaliacao.getId()).get());
-            }
-
-            return avalicoes;
+            return _avaliacaoRepository.findAll(pageable);
         } catch (RuntimeException ex) {
             throw new RuntimeException(ex.getMessage()) {
             };

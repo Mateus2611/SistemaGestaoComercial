@@ -1,15 +1,12 @@
 package br.com.gestaocomercial.app.src.Model;
 
 
-import jakarta.persistence.Column;
-import jakarta.persistence.Entity;
-import jakarta.persistence.Id;
-import jakarta.persistence.Table;
+import jakarta.persistence.*;
 
 import java.sql.Date;
 
 @Entity
-@Table(name = "avaliacao")
+@Table(name = "Avaliacao")
 public class Avaliacao {
 
     public Avaliacao() {
@@ -18,7 +15,7 @@ public class Avaliacao {
     public Avaliacao(Integer id, Integer idVenda, Float nota,
                      Date dataCriacao, String descricao, String titulo) {
         Id = id;
-        IdVenda = idVenda;
+        this.Venda.setId(idVenda);
         Nota = nota;
         DataCriacao = dataCriacao;
         Descricao = descricao;
@@ -31,14 +28,15 @@ public class Avaliacao {
         Descricao = descricao;
         DataCriacao = dataCriacao;
         Nota = nota;
-        IdVenda = idVenda;
+        this.Venda.setId(idVenda);
     }
 
     @Id
     @Column(name = "Id")
     private Integer Id;
-    @Column(name = "Id_Venda")
-    private Integer IdVenda;
+    @OneToOne
+    @JoinColumn(name = "Id_Venda")
+    private Venda Venda;
     @Column(name = "Titulo")
     private String Titulo;
     @Column(name = "Descricao")
@@ -54,6 +52,14 @@ public class Avaliacao {
 
     public void setId(Integer id) {
         Id = id;
+    }
+
+    public Venda getVenda() {
+        return Venda;
+    }
+
+    public void setVenda(Venda venda) {
+        Venda = venda;
     }
 
     public String getTitulo() {
@@ -88,11 +94,15 @@ public class Avaliacao {
         Nota = nota;
     }
 
-    public Integer getIdVenda() {
-        return IdVenda;
-    }
-
-    public void setIdVenda(Venda idVenda) {
-        IdVenda = idVenda.getId();
+    @Override
+    public String toString() {
+        return "Avaliacao{" +
+                "Id=" + Id +
+                ", Venda=" + Venda.toString() +
+                ", Titulo='" + Titulo + '\'' +
+                ", Descricao='" + Descricao + '\'' +
+                ", DataCriacao=" + DataCriacao +
+                ", Nota=" + Nota +
+                '}';
     }
 }

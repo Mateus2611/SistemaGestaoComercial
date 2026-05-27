@@ -82,8 +82,8 @@
             <table class="table table-custom table-hover">
                 <thead>
                 <tr>
-                    <th>ID</th>
-                    <th>Venda</th>
+                    <th>Código</th>
+                    <th>Código Venda</th>
                     <th>Título</th>
                     <th>Data</th>
                     <th>Nota</th>
@@ -95,26 +95,26 @@
                     class="tr-clicavel"
                     onclick="abrirModalDetalhes(this)"
                     th:attr="data-id=${avaliacao.id},
-                             data-venda=${avaliacao.idVenda},
+                             data-venda=${avaliacao.venda.id},
                              data-titulo=${avaliacao.titulo},
                              data-data=${#dates.format(avaliacao.dataCriacao, 'dd/MM/yyyy')},
                              data-descricao=${avaliacao.descricao},
                              data-nota=${avaliacao.nota}">
 
-                    <td th:text="${avaliacao.id}">1</td>
-                    <td th:text="${'#' + avaliacao.idVenda}">#102</td>
-                    <td th:text="${avaliacao.titulo}">Ótimo Atendimento</td>
-                    <td th:text="${#dates.format(avaliacao.dataCriacao, 'dd/MM/yyyy')}">23/05/2026</td>
+                    <td th:text="${avaliacao.id}"></td>
+                    <td th:text="${avaliacao.venda.id}"></td>
+                    <td th:text="${avaliacao.titulo}"></td>
+                    <td th:text="${#dates.format(avaliacao.dataCriacao, 'dd/MM/yyyy')}"></td>
                     <td>
                         <span class="badge"
                               th:classappend="${avaliacao.nota <= 1 ? 'badge-vermelho' : (avaliacao.nota <= 3 ? 'badge-amarelo' : 'badge-verde')}"
-                              th:text="${#numbers.formatDecimal(avaliacao.nota, 1, 0) + ' / 5'}">5 / 5</span>
+                              th:text="${#numbers.formatDecimal(avaliacao.nota, 1, 0) + ' / 5'}"></span>
                     </td>
                     <td class="text-end">
                         <button class="btn btn-sm btn-outline-secondary me-2" title="Editar"
                                 data-bs-toggle="modal" data-bs-target="#modalEditarAvaliacao"
                                 th:attr="data-id=${avaliacao.id},
-                                         data-venda=${avaliacao.idVenda},
+                                         data-venda=${avaliacao.venda.id},
                                          data-titulo=${avaliacao.titulo},
                                          data-descricao=${avaliacao.descricao},
                                          data-nota=${avaliacao.nota}">
@@ -125,57 +125,43 @@
                         </button>
                     </td>
                 </tr>
-
-                <tr class="tr-clicavel" onclick="abrirModalDetalhes(this)"
-                    data-id="1" data-venda="101" data-titulo="Entrega Rápida" data-data="15/05/2026" data-descricao="Os produtos chegaram antes do prazo." data-nota="5">
-                    <td>1</td>
-                    <td>#101</td>
-                    <td>Entrega Rápida</td>
-                    <td>15/05/2026</td>
-                    <td><span class="badge badge-verde">5 / 5</span></td>
-                    <td class="text-end">
-                        <button class="btn btn-sm btn-outline-secondary me-2" title="Editar"
-                                data-bs-toggle="modal" data-bs-target="#modalEditarAvaliacao"
-                                data-id="1" data-venda="101" data-titulo="Entrega Rápida" data-descricao="Os produtos chegaram antes do prazo." data-nota="5">
-                            <i class="bi bi-pencil-fill"></i>
-                        </button>
-                        <button class="btn btn-sm btn-outline-danger" title="Excluir"><i class="bi bi-trash-fill"></i></button>
-                    </td>
-                </tr>
-                <tr class="tr-clicavel" onclick="abrirModalDetalhes(this)"
-                    data-id="2" data-venda="105" data-titulo="Produto veio com defeito" data-data="18/05/2026" data-descricao="A caixa de ferramentas estava quebrada." data-nota="2">
-                    <td>2</td>
-                    <td>#105</td>
-                    <td>Produto veio com defeito</td>
-                    <td>18/05/2026</td>
-                    <td><span class="badge badge-amarelo">2 / 5</span></td>
-                    <td class="text-end">
-                        <button class="btn btn-sm btn-outline-secondary me-2" title="Editar"
-                                data-bs-toggle="modal" data-bs-target="#modalEditarAvaliacao"
-                                data-id="2" data-venda="105" data-titulo="Produto veio com defeito" data-descricao="A caixa de ferramentas estava quebrada." data-nota="2">
-                            <i class="bi bi-pencil-fill"></i>
-                        </button>
-                        <button class="btn btn-sm btn-outline-danger" title="Excluir"><i class="bi bi-trash-fill"></i></button>
-                    </td>
-                </tr>
-                <tr class="tr-clicavel" onclick="abrirModalDetalhes(this)"
-                    data-id="3" data-venda="110" data-titulo="Péssima experiência" data-data="20/05/2026" data-descricao="Atendimento ruim." data-nota="1">
-                    <td>3</td>
-                    <td>#110</td>
-                    <td>Péssima experiência</td>
-                    <td>20/05/2026</td>
-                    <td><span class="badge badge-vermelho">1 / 5</span></td>
-                    <td class="text-end">
-                        <button class="btn btn-sm btn-outline-secondary me-2" title="Editar"
-                                data-bs-toggle="modal" data-bs-target="#modalEditarAvaliacao"
-                                data-id="3" data-venda="110" data-titulo="Péssima experiência" data-descricao="Atendimento ruim." data-nota="1">
-                            <i class="bi bi-pencil-fill"></i>
-                        </button>
-                        <button class="btn btn-sm btn-outline-danger" title="Excluir"><i class="bi bi-trash-fill"></i></button>
-                    </td>
-                </tr>
                 </tbody>
             </table>
+
+            <div th:if="${totalPaginas > 1}" class="d-flex justify-content-between align-items-center mt-4 px-2">
+                <div class="text-muted fw-bold" style="font-size: 0.95rem;">
+                    Exibindo página <span th:text="${paginaAtual}">1</span> de <span th:text="${totalPaginas}">5</span>
+                    (Total de <span th:text="${totalItens}">75</span> avaliações)
+                </div>
+
+                <nav aria-label="Navegação de páginas">
+                    <ul class="pagination mb-0">
+
+                        <li class="page-item" th:classappend="${paginaAtual == 1} ? 'disabled'">
+                            <a class="page-link" th:href="@{/avaliacao(page=${paginaAtual - 1})}" aria-label="Anterior" style="color: #000000; box-shadow: none;">
+                                <span aria-hidden="true">&laquo;</span>
+                            </a>
+                        </li>
+
+                        <li class="page-item" th:each="i : ${#numbers.sequence(1, totalPaginas)}"
+                            th:classappend="${paginaAtual == i} ? 'active'">
+                            <a class="page-link fw-bold"
+                               th:href="@{/avaliacao(page=${i})}"
+                               th:text="${i}"
+                               th:style="${paginaAtual == i} ? 'background-color: #ff7e12; border-color: #000000; color: #000000;' : 'color: #000000; box-shadow: none;'">
+                                1
+                            </a>
+                        </li>
+
+                        <li class="page-item" th:classappend="${paginaAtual == totalPaginas} ? 'disabled'">
+                            <a class="page-link" th:href="@{/avaliacao(page=${paginaAtual + 1})}" aria-label="Próximo" style="color: #000000; box-shadow: none;">
+                                <span aria-hidden="true">&raquo;</span>
+                            </a>
+                        </li>
+
+                    </ul>
+                </nav>
+            </div>
         </div>
 
     </div>
@@ -389,7 +375,7 @@
         }
 
         document.getElementById('detalheAvaliacaoTitulo').value = titulo || '';
-        document.getElementById('detalheAvaliacaoVenda').value = venda ? 'Venda #' + venda : '';
+        document.getElementById('detalheAvaliacaoVenda').value = venda ? + venda : '';
         document.getElementById('detalheAvaliacaoNota').value = notaStr;
         document.getElementById('detalheAvaliacaoData').value = data || '';
         document.getElementById('detalheAvaliacaoDescricao').value = descricao || '';
