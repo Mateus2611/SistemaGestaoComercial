@@ -7,7 +7,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 @Entity
-@Table(name = "cliente")
+@Table(name = "Cliente")
 public class Cliente {
 
     public Cliente() {
@@ -19,7 +19,7 @@ public class Cliente {
         Id = id;
         Nome = nome;
         Emails = emails;
-        IdEndereco = idEndereco;
+        this.Endereco.setId(idEndereco);
         DataCadastro = dataCadastro;
         DataInativacao = dataInativacao;
         Tipo = tipo;
@@ -31,7 +31,7 @@ public class Cliente {
                    TipoCliente tipo, StatusCliente status) {
         Id = id;
         Nome = nome;
-        IdEndereco = idEndereco;
+        this.Endereco.setId(idEndereco);
         DataCadastro = dataCadastro;
         DataInativacao = dataInativacao;
         Tipo = tipo;
@@ -51,17 +51,18 @@ public class Cliente {
     @OneToMany(orphanRemoval = true)
     @JoinColumn(name = "Id_Cliente")
     private List<Email> Emails;
-    @Column(name = "Id_Endereco")
-    private Integer IdEndereco;
     @OneToOne
+    @JoinColumn(name = "Id_Endereco")
     private Endereco Endereco;
     @Column(name = "Data_Cadastro")
     private Date DataCadastro;
     @Column(name = "Data_Inativacao")
     private Date DataInativacao;
     @Column(name = "Tipo")
+    @Enumerated(EnumType.STRING)
     private TipoCliente Tipo;
     @Column(name = "Status_Cliente")
+    @Enumerated(EnumType.STRING)
     private StatusCliente Status;
 
     public Integer getId() {
@@ -78,14 +79,6 @@ public class Cliente {
 
     public void setEmails(List<Email> emails) {
         Emails = emails;
-    }
-
-    public Integer getIdEndereco() {
-        return IdEndereco;
-    }
-
-    public void setIdEndereco(Integer idEndereco) {
-        IdEndereco = idEndereco;
     }
 
     public void setDataCadastro(Date dataCadastro) {

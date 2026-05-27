@@ -62,7 +62,7 @@ public class OrcamentoService {
 
             orcamentoCriado.setCliente(cliente);
 
-            return new OrcamentoResponse(orcamentoCriado.getId(), orcamentoCriado.getIdCliente(), cliente, produtos, orcamentoCriado.getDataCriacao(), orcamentoCriado.getDataValidade(), orcamentoCriado.getValor(), orcamentoCriado.getStatus(), orcamentoCriado.getDesconto());
+            return new OrcamentoResponse(orcamentoCriado.getId(), orcamentoCriado.getCliente().getId(), cliente, produtos, orcamentoCriado.getDataCriacao(), orcamentoCriado.getDataValidade(), orcamentoCriado.getValor(), orcamentoCriado.getStatus(), orcamentoCriado.getDesconto());
         } catch (RuntimeException e) {
             throw new RuntimeException(e.getMessage());
         }
@@ -77,14 +77,14 @@ public class OrcamentoService {
             orcamentos.forEach( o -> {
                 List<Produto> produtos = new ArrayList<>();
 
-                o.setCliente(_clienteRepository.findById(o.getIdCliente()).get());
+                o.setCliente(_clienteRepository.findById(o.getCliente().getId()).get());
                 _orcamentoProdutoRepository.findAllById(o.getId()).forEach(op -> produtos.add(
                         _produtoRepository.findById(op.getIdProduto()).get()));
 
                 responses.add(
                         new OrcamentoResponse(
                                 o.getId(),
-                                o.getIdCliente(),
+                                o.getCliente().getId(),
                                 o.getCliente(),
                                 produtos,
                                 o.getDataCriacao(),
@@ -104,7 +104,7 @@ public class OrcamentoService {
     public OrcamentoResponse BuscaPorId(Integer id) {
         try {
             Orcamento orcamento = _orcamentoRepository.findById(id).get();
-            orcamento.setCliente(_clienteRepository.findById(orcamento.getIdCliente()).get());
+            orcamento.setCliente(_clienteRepository.findById(orcamento.getCliente().getId()).get());
             List<Produto> produtos = new ArrayList<>();
 
             _orcamentoProdutoRepository.findAllById(orcamento.getId()).forEach(op -> produtos.add(
@@ -112,7 +112,7 @@ public class OrcamentoService {
 
             return new OrcamentoResponse(
                     orcamento.getId(),
-                    orcamento.getIdCliente(),
+                    orcamento.getCliente().getId(),
                     orcamento.getCliente(),
                     produtos,
                     orcamento.getDataCriacao(),

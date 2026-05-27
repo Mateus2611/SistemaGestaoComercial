@@ -83,8 +83,8 @@
             <table class="table table-custom table-hover" id="tabelaVendas">
                 <thead>
                 <tr>
-                    <th>ID</th>
-                    <th>ID Orçamento</th>
+                    <th>Código</th>
+                    <th>Código Orçamento</th>
                     <th>Nome do Cliente</th>
                     <th>Data de Criação</th>
                     <th>Prazo Pagamento</th>
@@ -96,11 +96,12 @@
                 </thead>
                 <tbody>
 
+                <td>
                 <tr th:each="venda : ${vendas}"
                     class="tr-clicavel"
                     onclick="abrirModalDetalhes(this)"
                     th:attr="data-id=${venda.id},
-                             data-orcamento=${venda.idOrcamento},
+                             data-orcamento=${venda.orcamento.id},
                              data-cliente=${venda.orcamento.cliente.nome},
                              data-criacao=${venda.dataCriacao != null ? #dates.format(venda.dataCriacao, 'dd/MM/yyyy') : '-'},
                              data-prazo=${venda.prazoPagamento != null ? #dates.format(venda.prazoPagamento, 'dd/MM/yyyy') : '-'},
@@ -108,91 +109,66 @@
                              data-valor=${venda.orcamento != null ? venda.orcamento.valor : 0},
                              data-status=${venda.statusPagamento != null ? venda.statusPagamento.name() : ''}">
 
-                    <td th:text="${venda.id}">1</td>
-                    <td th:text="${venda.idOrcamento}">5</td>
-                    <td th:text="${venda.orcamento.cliente.nome}">Gerson Silva Campos</td>
-                    <td th:text="${venda.dataCriacao != null ? #dates.format(venda.dataCriacao, 'dd/MM/yyyy') : 'N/A'}">
-                        20/05/2026
-                    </td>
-                    <td th:text="${venda.prazoPagamento != null ? #dates.format(venda.prazoPagamento, 'dd/MM/yyyy') : 'N/A'}">
-                        20/06/2026
-                    </td>
-                    <td th:text="${venda.dataConclusao != null ? #dates.format(venda.dataConclusao, 'dd/MM/yyyy') : '-'}">
-                        -
-                    </td>
-                    <td th:text="${venda.orcamento != null ? #numbers.formatDecimal(venda.orcamento.valor, 1, 'POINT', 2, 'COMMA') : '0,00'}">
-                        1.500,00
-                    </td>
-                    <td>
-                        <span class="badge"
+                    <td th:text="${venda.id}"></td>
+                    <td th:text="${venda.orcamento.id}"></td>
+                    <td th:text="${venda.orcamento.cliente.nome}"></td>
+                    <td th:text="${venda.dataCriacao != null ? #dates.format(venda.dataCriacao, 'dd/MM/yyyy') : 'N/A'}"></td>
+                    <td th:text="${venda.prazoPagamento != null ? #dates.format(venda.prazoPagamento, 'dd/MM/yyyy') : 'N/A'}"></td>
+                    <td th:text="${venda.dataConclusao != null ? #dates.format(venda.dataConclusao, 'dd/MM/yyyy') : '-'}"></td>
+                    <td th:text="${venda.orcamento != null ? #numbers.formatDecimal(venda.orcamento.valor, 1, 'POINT', 2, 'COMMA') : '0,00'}"></td>
+                    <span class="badge"
                               th:classappend="${venda.statusPagamento != null and venda.statusPagamento.name() == 'APROVADO' ? 'badge-verde' : (venda.statusPagamento != null and venda.statusPagamento.name() == 'PENDENTE' ? 'badge-amarelo' : 'badge-vermelho')}"
-                              th:text="${venda.statusPagamento}">PENDENTE</span>
+                              th:text="${venda.statusPagamento}"></span>
                     </td>
                     <td class="text-end">
                         <button class="btn btn-sm btn-outline-secondary me-2"
                                 data-bs-toggle="modal" data-bs-target="#modalEditarVenda"
                                 th:attr="data-id=${venda.id},
-                                         data-orcamento=${venda.idOrcamento},
+                                         data-orcamento=${venda.orcamento.id},
                                          data-prazopagamento=${venda.prazoPagamento != null ? #dates.format(venda.prazoPagamento, 'yyyy-MM-dd') : ''},
                                          data-status=${venda.statusPagamento != null ? venda.statusPagamento.name() : ''}"
                                 title="Editar">
                             <i class="bi bi-pencil-fill"></i>
                         </button>
-                        <button class="btn btn-sm btn-outline-danger" title="Excluir">
-                            <i class="bi bi-trash-fill"></i>
-                        </button>
                     </td>
                 </tr>
-
-                <tr class="tr-clicavel" onclick="abrirModalDetalhes(this)"
-                    data-id="101" data-orcamento="205" data-cliente="José Matos" data-criacao="15/05/2026"
-                    data-prazo="15/06/2026" data-conclusao="16/05/2026" data-valor="4500.00" data-status="APROVADO">
-                    <td>101</td>
-                    <td>205</td>
-                    <td>José Matos</td>
-                    <td>15/05/2026</td>
-                    <td>15/06/2026</td>
-                    <td>16/05/2026</td>
-                    <td>4.500,00</td>
-                    <td><span class="badge badge-verde">APROVADO</span></td>
-                    <td class="text-end">
-                        <button class="btn btn-sm btn-outline-secondary me-2"
-                                data-bs-toggle="modal" data-bs-target="#modalEditarVenda"
-                                data-id="101" data-orcamento="205" data-prazopagamento="2026-06-15"
-                                data-status="APROVADO" title="Editar">
-                            <i class="bi bi-pencil-fill"></i>
-                        </button>
-                        <button class="btn btn-sm btn-outline-danger" title="Excluir">
-                            <i class="bi bi-trash-fill"></i>
-                        </button>
-                    </td>
-                </tr>
-                <tr class="tr-clicavel" onclick="abrirModalDetalhes(this)"
-                    data-id="102" data-orcamento="208" data-cliente="Maria Oliveira" data-criacao="21/05/2026"
-                    data-prazo="21/06/2026" data-conclusao="-" data-valor="850.50" data-status="PENDENTE">
-                    <td>102</td>
-                    <td>208</td>
-                    <td>Maria Oliveira</td>
-                    <td>21/05/2026</td>
-                    <td>21/06/2026</td>
-                    <td>-</td>
-                    <td>850,50</td>
-                    <td><span class="badge badge-amarelo">PENDENTE</span></td>
-                    <td class="text-end">
-                        <button class="btn btn-sm btn-outline-secondary me-2"
-                                data-bs-toggle="modal" data-bs-target="#modalEditarVenda"
-                                data-id="102" data-orcamento="208" data-prazopagamento="2026-06-21"
-                                data-status="PENDENTE" title="Editar">
-                            <i class="bi bi-pencil-fill"></i>
-                        </button>
-                        <button class="btn btn-sm btn-outline-danger" title="Excluir">
-                            <i class="bi bi-trash-fill"></i>
-                        </button>
-                    </td>
-                </tr>
-
                 </tbody>
             </table>
+
+            <div th:if="${totalPaginas > 1}" class="d-flex justify-content-between align-items-center mt-4 px-2">
+                <div class="text-muted fw-bold" style="font-size: 0.95rem;">
+                    Exibindo página <span th:text="${paginaAtual}">1</span> de <span th:text="${totalPaginas}">5</span>
+                    (Total de <span th:text="${totalItens}">75</span> vendas)
+                </div>
+
+                <nav aria-label="Navegação de páginas">
+                    <ul class="pagination mb-0">
+
+                        <li class="page-item" th:classappend="${paginaAtual == 1} ? 'disabled'">
+                            <a class="page-link" th:href="@{/venda(page=${paginaAtual - 1})}" aria-label="Anterior" style="color: #000000; box-shadow: none;">
+                                <span aria-hidden="true">&laquo;</span>
+                            </a>
+                        </li>
+
+                        <li class="page-item" th:each="i : ${#numbers.sequence(1, totalPaginas)}"
+                            th:classappend="${paginaAtual == i} ? 'active'">
+                            <a class="page-link fw-bold"
+                               th:href="@{/venda(page=${i})}"
+                               th:text="${i}"
+                               th:style="${paginaAtual == i} ? 'background-color: #ff7e12; border-color: #000000; color: #000000;' : 'color: #000000; box-shadow: none;'">
+                                1
+                            </a>
+                        </li>
+
+                        <li class="page-item" th:classappend="${paginaAtual == totalPaginas} ? 'disabled'">
+                            <a class="page-link" th:href="@{/venda(page=${paginaAtual + 1})}" aria-label="Próximo" style="color: #000000; box-shadow: none;">
+                                <span aria-hidden="true">&raquo;</span>
+                            </a>
+                        </li>
+
+                    </ul>
+                </nav>
+            </div>
         </div>
     </div>
 </div>
@@ -232,7 +208,7 @@
                             <div class="col-md-3">
                                 <label class="form-label fw-bold text-uppercase text-dark mb-1"
                                        style="font-size: 1.1rem;">Status</label>
-                                <input type="text" id="detalheVendaStatus" class="form-control form-control-lg fw-bold"
+                                <input type="text" id="detalheVendaStatus" class="form-control form-control-xl fw-bold"
                                        readonly
                                        style="border: 1.8px solid #ccc; border-radius: 8px; background-color: #f8f9fa;">
                             </div>
@@ -264,7 +240,8 @@
                                 <label class="form-label fw-bold text-uppercase text-dark mb-1"
                                        style="font-size: 1.1rem;">Valor Total</label>
                                 <input type="text" id="detalheVendaValorTotal"
-                                       class="form-control form-control-lg fw-bold text-success" readonly
+                                       class="form-control form-control-lg fw-bold text-success"
+                                       readonly
                                        style="border: 1.8px solid #ccc; border-radius: 8px; background-color: #f8f9fa;">
                             </div>
                         </div>
@@ -297,7 +274,7 @@
                     </h1>
                     <hr class="mx-auto mb-4" style="width: 45%; border-top: 1px solid #000; opacity: 1;">
 
-                    <form class="text-start px-md-4">
+                    <form th:object="${novaVenda}" method="POST" class="text-start px-md-4">
                         <div class="row g-4">
                             <div class="col-md-7">
                                 <label class="form-label fw-bold text-uppercase text-dark mb-1d"
@@ -416,7 +393,7 @@
         }
 
         document.getElementById('detalheVendaCliente').value = cliente || '';
-        document.getElementById('detalheVendaOrcamento').value = orcamento ? 'Orçamento #' + orcamento : '';
+        document.getElementById('detalheVendaOrcamento').value = orcamento ? orcamento : '';
         document.getElementById('detalheVendaCriacao').value = criacao || '';
         document.getElementById('detalheVendaPrazo').value = prazo || '';
         document.getElementById('detalheVendaConclusao').value = conclusao || '';
@@ -427,9 +404,6 @@
         modal.show();
     }
 
-    // ==========================================
-    // SCRIPT DO MODAL DE EDITAR VENDA
-    // ==========================================
     document.addEventListener('DOMContentLoaded', function () {
         const modalEditar = document.getElementById('modalEditarVenda');
 
@@ -454,16 +428,12 @@
         }
     });
 
-    // Impede que o clique nos botões de Editar/Deletar dispare a linha inteira e abra os detalhes
     document.querySelectorAll('.table-custom button').forEach(button => {
         button.addEventListener('click', function (e) {
             e.stopPropagation();
         });
     });
 
-    // ==========================================
-    // SCRIPT DE ORDENAÇÃO DA TABELA
-    // ==========================================
     let ordemCrescente = false;
 
     function ordenarTabela() {

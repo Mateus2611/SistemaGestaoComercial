@@ -24,9 +24,9 @@ public class AvaliacaoService {
 
         try {
             venda = _vendaRepository.save(venda);
-            avaliacao.setIdVenda(venda);
+            avaliacao.getVenda().setId(venda.getId());
             avaliacao = _avaliacaoRepository.save(avaliacao);
-            avaliacao.setIdVenda(venda);
+            avaliacao.getVenda().setId(venda.getId());
 
             return avaliacao;
         } catch (RuntimeException ex) {
@@ -38,7 +38,7 @@ public class AvaliacaoService {
         try {
             Avaliacao avaliacao = _avaliacaoRepository.findById(id).get();
 
-            avaliacao.setIdVenda(_vendaRepository.findById(avaliacao.getIdVenda()).get());
+            avaliacao.getVenda().setId(_vendaRepository.findById(avaliacao.getVenda().getId()).get().getId());
 
             return avaliacao;
         } catch (RuntimeException ex) {
@@ -51,7 +51,7 @@ public class AvaliacaoService {
             Iterable<Avaliacao> avalicoes = _avaliacaoRepository.findAll();
 
             for (Avaliacao avaliacao : avalicoes) {
-                avaliacao.setIdVenda(_vendaRepository.findById(avaliacao.getId()).get());
+                avaliacao.getVenda().setId(_vendaRepository.findById(avaliacao.getId()).get().getId());
             }
 
             return avalicoes;

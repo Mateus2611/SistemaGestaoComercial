@@ -3,7 +3,7 @@ package br.com.gestaocomercial.app.src.Model;
 import jakarta.persistence.*;
 
 @Entity
-@Table(name = "email")
+@Table(name = "Email")
 public class Email {
 
     public Email() {
@@ -15,15 +15,16 @@ public class Email {
 
     public Email(Integer id, Integer idCliente, String endereco) {
         Id = id;
-        IdCliente = idCliente;
+        this.Cliente.setId(idCliente);
         Endereco = endereco;
     }
 
     @Id
     @Column(name = "Id")
     private Integer Id;
-    @Column(name = "Id_Cliente")
-    private Integer IdCliente;
+    @OneToOne
+    @JoinColumn(name = "Id_Cliente")
+    private Cliente Cliente;
     @Column(name = "Endereco")
     private String Endereco;
 
@@ -35,12 +36,12 @@ public class Email {
         Id = id;
     }
 
-    public Integer getIdCliente() {
-        return IdCliente;
+    public Cliente getCliente() {
+        return Cliente;
     }
 
-    public void setIdCliente(Integer idCliente) {
-        IdCliente = idCliente;
+    public void setCliente(Cliente cliente) {
+        Cliente = cliente;
     }
 
     public String getEndereco() {

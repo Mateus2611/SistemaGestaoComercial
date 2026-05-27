@@ -8,14 +8,14 @@ import java.text.SimpleDateFormat;
 import java.util.List;
 
 @Entity
-@Table(name = "orcamento")
+@Table(name = "Orcamento")
 public class Orcamento {
 
     public Orcamento() {
     }
 
     public Orcamento(Integer idCliente, Date dataCriacao, Date dataValidade, StatusOrcamento status, BigDecimal desconto) {
-        IdCliente = idCliente;
+        this.Cliente.setId(idCliente);
         DataCriacao = dataCriacao;
         DataValidade = dataValidade;
         Status = status;
@@ -25,9 +25,8 @@ public class Orcamento {
     @Id
     @Column(name = "Id")
     private Integer Id;
-    @Column(name = "Id_Cliente")
-    private Integer IdCliente;
     @OneToOne
+    @JoinColumn(name = "Id_Cliente")
     private Cliente Cliente;
     @OneToMany(orphanRemoval = true)
     @JoinColumn(name = "Id_Orcamento")
@@ -39,6 +38,7 @@ public class Orcamento {
     @Column(name = "Valor")
     private BigDecimal Valor;
     @Column(name = "Status_Orcamento")
+    @Enumerated(EnumType.STRING)
     private StatusOrcamento Status;
     @Column(name = "Desconto")
     private BigDecimal Desconto;
@@ -50,14 +50,6 @@ public class Orcamento {
 
     public void setId(Integer id) {
         Id = id;
-    }
-
-    public Integer getIdCliente() {
-        return IdCliente;
-    }
-
-    public void setIdCliente(Integer idCliente) {
-        IdCliente = idCliente;
     }
 
     public Cliente getCliente() {

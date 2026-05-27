@@ -3,7 +3,7 @@ package br.com.gestaocomercial.app.src.Model;
 import jakarta.persistence.*;
 
 @Entity
-@Table(name = "orcamento_produto")
+@Table(name = "Orcamento_Produto")
 @IdClass(OrcamentoProdutoId.class)
 public class OrcamentoProduto {
 
