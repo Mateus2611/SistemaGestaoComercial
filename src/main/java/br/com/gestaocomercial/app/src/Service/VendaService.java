@@ -44,13 +44,7 @@ public class VendaService {
         try {
             Pageable pageable = PageRequest.of(pagina - 1, 15, Sort.by("id").descending());
 
-            Page<Venda> vendas = _vendaRepository.findAll(pageable);
-
-            for (Venda venda : vendas.getContent()) {
-                venda.setOrcamento(_orcamentoRepository.findById(venda.getId()).get());
-            }
-
-            return vendas;
+            return _vendaRepository.findAll(pageable);
         } catch (RuntimeException ex) {
             throw new RuntimeException(ex.getMessage());
         }

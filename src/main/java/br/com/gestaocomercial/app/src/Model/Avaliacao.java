@@ -93,4 +93,16 @@ public class Avaliacao {
     public void setNota(Float nota) {
         Nota = nota;
     }
+
+    @Override
+    public String toString() {
+        return "Avaliacao{" +
+                "Id=" + Id +
+                ", Venda=" + Venda.toString() +
+                ", Titulo='" + Titulo + '\'' +
+                ", Descricao='" + Descricao + '\'' +
+                ", DataCriacao=" + DataCriacao +
+                ", Nota=" + Nota +
+                '}';
+    }
 }
