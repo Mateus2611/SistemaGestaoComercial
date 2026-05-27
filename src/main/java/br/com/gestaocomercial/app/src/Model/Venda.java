@@ -79,6 +79,18 @@ public class Venda {
         StatusPagamento = StatusPagamento.valueOf(statusPagamento);
     }
 
+    @Override
+    public String toString() {
+        return "Venda{" +
+                "Id=" + Id +
+                ", Orcamento=" + Orcamento +
+                ", DataCriacao=" + DataCriacao +
+                ", PrazoPagamento=" + PrazoPagamento +
+                ", DataConclusao=" + DataConclusao +
+                ", StatusPagamento=" + StatusPagamento +
+                '}';
+    }
+
     public enum StatusPagamento {
         APROVADO,
         CANCELADO,
