@@ -16,6 +16,7 @@ public class Venda {
     }
 
     @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "Id")
     private Integer Id;
     @OneToOne

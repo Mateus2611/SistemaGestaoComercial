@@ -20,12 +20,13 @@ public class Email {
     }
 
     @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "Id")
     private Integer Id;
     @OneToOne
     @JoinColumn(name = "Id_Cliente")
     private Cliente Cliente;
-    @Column(name = "Endereco")
+    @Column(name = "Endereco", nullable = false)
     private String Endereco;
 
     public Integer getId() {

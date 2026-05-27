@@ -8,6 +8,10 @@ import br.com.gestaocomercial.app.src.Repository.IClienteRepository;
 import br.com.gestaocomercial.app.src.Repository.IEmailRepository;
 import br.com.gestaocomercial.app.src.Repository.IEnderecoRepository;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
 import java.sql.Date;
@@ -27,44 +31,31 @@ public class ClienteService {
     @Autowired
     private IClienteRepository _clienteRepository;
 
-    public Cliente Criar(Cliente cliente, Endereco endereco, List<Email> emails) {
+    public Cliente Criar(Cliente cliente) {
 
         try {
 
             if (cliente == null)
                 throw new RuntimeException("Dados do cliente vazio. Preencha as informações");
-            if (endereco == null)
+            if (cliente.getEndereco() == null)
                 throw new RuntimeException("Dados de endereço vazio. Preencha as informações");
-            if (emails== null)
+            if (cliente.getEmails() == null)
                 throw new RuntimeException("Endereço de email vazio. Preencha a informação");
 
-            endereco = _enderecoRepository.save(endereco);
-            cliente.getEndereco().setId(endereco.getId());
-            cliente = _clienteRepository.save(cliente);
-            cliente.setEndereco(endereco);
-
-            for (Email email : emails) {
-                email.getCliente().setId(cliente.getId());
-                cliente.setEmails(Collections.singletonList(_emailRepository.save(email)));
-            }
-
-            return cliente;
+            cliente.setDataCadastro(Date.valueOf(LocalDate.now()));
+            cliente.setStatus(Cliente.StatusCliente.ATIVO);
+            return _clienteRepository.save(cliente);
 
         } catch (RuntimeException ex) {
             throw new RuntimeException(ex.getMessage());
         }
     }
 
-    public Iterable<Cliente> BuscaGeral() {
+    public Page<Cliente> BuscaGeral(Integer pagina) {
         try {
-            Iterable<Cliente> clientes = _clienteRepository.findAll();
+            Pageable pageable = PageRequest.of(pagina - 1, 15, Sort.by("id").descending());
 
-            clientes.forEach(c -> {
-                c.setEndereco(_enderecoRepository.findById(c.getEndereco().getId()).get());
-                c.setEmails(_emailRepository.findAllById(c.getId()));
-            });
-
-            return clientes;
+            return _clienteRepository.findAll(pageable);
         } catch (RuntimeException ex) {
             throw new RuntimeException(ex.getMessage());
         }
@@ -72,30 +63,56 @@ public class ClienteService {
 
     public Cliente BuscaPorId(Integer id) {
         try {
-            Cliente cliente = _clienteRepository.findById(id).get();
-
-            cliente.setEndereco(_enderecoRepository.findById(cliente.getEndereco().getId()).get());
-            cliente.setEmails(_emailRepository.findAllById(cliente.getId()));
-
-            return cliente;
+            return _clienteRepository.findById(id).get();
         } catch (RuntimeException ex) {
             throw new RuntimeException(ex.getMessage());
         }
     }
 
-    public Cliente Atualizar(UpdateClienteDTO clienteDTO) {
-        Cliente cliente = _clienteRepository.findById(clienteDTO.id).get();
+    public Cliente Atualizar(Cliente clienteUpdate) {
+        Cliente cliente = _clienteRepository.findById(clienteUpdate.getId()).get();
 
-        if (clienteDTO.Nome != null) cliente.setNome(clienteDTO.Nome);
-        if (clienteDTO.Tipo != null) cliente.setTipo(Cliente.TipoCliente.valueOf(clienteDTO.Tipo));
+        if (clienteUpdate.getNome() != null && clienteUpdate.getNome() != cliente.getNome()) cliente.setNome(clienteUpdate.getNome());
+        if (clienteUpdate.getTipo() != null && clienteUpdate.getTipo() != cliente.getTipo()) cliente.setTipo(clienteUpdate.getTipo());
 
-        if (clienteDTO.Endereco != null) {
-            Endereco endereco = _enderecoRepository.save(clienteDTO.Endereco);
+        if (clienteUpdate.getStatus() != null && clienteUpdate.getStatus() != cliente.getStatus()) {
+            if (clienteUpdate.getStatus() == Cliente.StatusCliente.ATIVO) cliente.setStatus(clienteUpdate.getStatus());
+            else {
+                cliente.setStatus(clienteUpdate.getStatus());
+                cliente.setDataInativacao(Date.valueOf(LocalDate.now()));
+            }
+        }
 
-            _enderecoRepository.deleteById(cliente.getEndereco().getId());
+        if (clienteUpdate.getEndereco() != null) {
 
-            cliente.getEndereco().setId(endereco.getId());
-        };
+            Endereco enviaEnd = clienteUpdate.getEndereco();
+            Endereco bancoEnd = cliente.getEndereco();
+
+            if (enviaEnd.getLogradouro() != null && !enviaEnd.getLogradouro().trim().isEmpty()
+                    && !enviaEnd.getLogradouro().equals(bancoEnd.getLogradouro())) {
+                bancoEnd.setLogradouro(enviaEnd.getLogradouro().trim());
+            }
+
+            if (enviaEnd.getBairro() != null && !enviaEnd.getBairro().trim().isEmpty()
+                    && !enviaEnd.getBairro().equals(bancoEnd.getBairro())) {
+                bancoEnd.setBairro(enviaEnd.getBairro().trim());
+            }
+
+            if (enviaEnd.getCidade() != null && !enviaEnd.getCidade().trim().isEmpty()
+                    && !enviaEnd.getCidade().equals(bancoEnd.getCidade())) {
+                bancoEnd.setCidade(enviaEnd.getCidade().trim());
+            }
+
+            if (enviaEnd.getEstado() != null && !enviaEnd.getEstado().trim().isEmpty()
+                    && !enviaEnd.getEstado().equals(bancoEnd.getEstado())) {
+                bancoEnd.setEstado(enviaEnd.getEstado().trim());
+            }
+
+            if (enviaEnd.getCep() != null && !enviaEnd.getCep().trim().isEmpty()
+                    && !enviaEnd.getCep().equals(bancoEnd.getCep())) {
+                bancoEnd.setCep(enviaEnd.getCep().trim());
+            }
+        }
 
         return _clienteRepository.save(cliente);
     }

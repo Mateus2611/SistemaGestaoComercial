@@ -1,38 +1,107 @@
 package br.com.gestaocomercial.app.src.Controller;
 
-import br.com.gestaocomercial.app.src.Model.Cliente;
+import br.com.gestaocomercial.app.src.Model.*;
 import br.com.gestaocomercial.app.src.Model.DTO.UpdateClienteDTO;
-import br.com.gestaocomercial.app.src.Model.Email;
-import br.com.gestaocomercial.app.src.Model.Endereco;
 import br.com.gestaocomercial.app.src.Service.ClienteService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Controller;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.*;
+import org.springframework.web.servlet.ModelAndView;
+import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
+import java.util.ArrayList;
 import java.util.List;
 
 @Controller
+@RequestMapping("/cliente")
 public class ClienteController {
 
     @Autowired
     private ClienteService _clienteService;
 
-    @RequestMapping("/cliente")
-    public String cliente() {
-        return "cliente";
+    @RequestMapping
+    public ModelAndView cliente(@RequestParam(name = "page", defaultValue = "1") Integer page) { return carregarTelaBase(null, page); }
+
+    @GetMapping("/{id}")
+    public ModelAndView getById(@PathVariable("id") Integer id, RedirectAttributes redirectAttributes) {
+
+        Cliente cliente = _clienteService.BuscaPorId(id);
+
+        if (cliente == null) {
+            redirectAttributes.addFlashAttribute("mensagemErro", "O cliente com o ID " + id + " não foi encontrado.");
+
+            return new ModelAndView("redirect:/cliente");
+        }
+
+        return carregarTelaBase(id, 1);
     }
 
-    public Iterable<Cliente> get() { return _clienteService.BuscaGeral(); }
+    private ModelAndView carregarTelaBase(Integer id, Integer page) {
+        ModelAndView mv = new ModelAndView("cliente");
+        Page<Cliente> clientes = _clienteService.BuscaGeral(page);
+        Cliente novoCliente = new Cliente();
+        novoCliente.setEndereco(new Endereco());
 
-    @RequestMapping("/cliente/{id}")
-    public Cliente getById(@Param("id") Integer id) { return _clienteService.BuscaPorId(id); }
+        List<Email> emailsIniciais = new ArrayList<>();
+        emailsIniciais.add(new Email());
+        novoCliente.setEmails(emailsIniciais);
 
-    public Cliente create(Cliente cliente, Endereco endereco, List<Email> emails) { return _clienteService.Criar(cliente, endereco, emails); }
+        mv.addObject("clientes", clientes.getContent());
 
-    public Cliente update(UpdateClienteDTO clienteDTO) { return _clienteService.Atualizar(clienteDTO); }
+        mv.addObject("paginaAtual", page);
+        mv.addObject("totalPaginas", clientes.getTotalPages());
+        mv.addObject("totalItens", clientes.getTotalElements());
+
+        mv.addObject("novoCliente", novoCliente);
+
+        if (id != null) {
+            Cliente cliente = _clienteService.BuscaPorId(id);
+            mv.addObject("cliente", cliente);
+            mv.addObject("mostrarDropdown", true);
+        }
+
+        return mv;
+    }
+
+    @PostMapping("/create")
+    public String create(@ModelAttribute("novoCliente") Cliente cliente) {
+
+        Cliente novoCliente = _clienteService.Criar(cliente);
+
+        return "redirect:/cliente/" + novoCliente.getId();
+    }
+
+    @PostMapping("/update/{id}")
+    public String update(@PathVariable("id") Integer id, @ModelAttribute("cliente") Cliente cliente, @RequestParam(value = "emailsInput", required = false) List<String> emails, RedirectAttributes redirectAttributes) {
+        cliente.setId(id);
+
+        List<Email> listaDeEmailsNovos = new ArrayList<>();
+
+        if (emails != null && !emails.isEmpty()) {
+            for (String emailTexto : emails) {
+                String emailLimpo = emailTexto.trim();
+                if (!emailLimpo.isEmpty()) {
+                    Email novoEmailObj = new Email();
+
+                    novoEmailObj.setEndereco(emailLimpo);
+
+                    novoEmailObj.setCliente(cliente);
+
+                    listaDeEmailsNovos.add(novoEmailObj);
+                }
+            }
+        }
+
+        cliente.setEmails(listaDeEmailsNovos);
+
+        _clienteService.Atualizar(cliente);
+
+        redirectAttributes.addFlashAttribute("mensagemSucesso", "Cliente atualizado com sucesso!");
+
+        return "redirect:/cliente/" + id;
+    }
 
     public Cliente disable(Integer id) { return _clienteService.InativarCliente(id); }
 
