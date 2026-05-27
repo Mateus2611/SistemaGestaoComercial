@@ -13,7 +13,6 @@
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.min.js"></script>
 
     <style>
-        /* Indica visualmente que a linha é interativa */
         .tr-clicavel {
             cursor: pointer;
             transition: background-color 0.2s;
@@ -24,8 +23,40 @@
     </style>
 </head>
 <body>
-
 <div class="d-flex">
+
+    <div th:if="${mensagemSucesso}"
+         class="alert alert-success alert-dismissible fade show shadow-lg border-0 position-fixed top-0 end-0 m-4"
+         role="alert"
+         style="border-radius: 10px; border-left: 5px solid #198754 !important; z-index: 1050; min-width: 300px;">
+
+        <div class="d-flex align-items-center pr-3">
+            <i class="bi bi-check-circle-fill me-2 fs-4"></i>
+            <span th:text="${mensagemSucesso}" class="fw-bold">Produto excluído com sucesso!</span>
+        </div>
+    </div>
+
+    <div th:if="${mensagemAlerta}"
+         class="alert alert-warning alert-dismissible fade show shadow-lg border-0 position-fixed top-0 end-0 m-4"
+         role="alert"
+         style="border-radius: 10px; border-left: 5px solid #dc8b35 !important; z-index: 1050; min-width: 320px; max-width: 500px;">
+
+        <div class="d-flex align-items-center">
+            <i class="bi bi-shield-fill-x me-2 fs-4 text-warning"></i>
+            <span th:text="${mensagemAlerta}" class="fw-bold text-dark" style="font-size: 0.95rem;">Não foi possível excluir produto, por que está vinculado a outros orçamentos.</span>
+        </div>
+    </div>
+
+    <div th:if="${mensagemErro}"
+         class="alert alert-danger fade show shadow-lg border-0 position-fixed top-0 end-0 m-4 text-dark"
+         role="alert"
+         style="border-radius: 10px; border-left: 5px solid #dc3535 !important; z-index: 1050; min-width: 320px; max-width: 500px;">
+
+        <div class="d-flex align-items-center">
+            <i class="bi bi-exclamation-triangle-fill me-2 fs-4 text-dark"></i>
+            <span th:text="${mensagemErro}" class="fw-bold text-dark" style="font-size: 0.95rem;">Aviso do sistema.</span>
+        </div>
+    </div>
 
     <div class="sidebar-custom d-flex flex-column flex-shrink-0">
 
@@ -37,7 +68,7 @@
             <i class="bi bi-house-door-fill"></i>
             <span>Início</span>
         </a>
-        <a th:href="@{produto}" class="nav-link-custom text-uppercase">
+        <a th:href="@{produto}" class="nav-link-custom active text-uppercase">
             <i class="bi bi-box-seam-fill"></i>
             <span>Produtos</span>
         </a>
@@ -53,7 +84,7 @@
             <i class="bi bi-people-fill"></i>
             <span>Clientes</span>
         </a>
-        <a th:href="@{avaliacao}" class="nav-link-custom active text-uppercase">
+        <a th:href="@{avaliacao}" class="nav-link-custom text-uppercase">
             <i class="bi bi-star-fill"></i>
             <span>Avaliações</span>
         </a>
@@ -68,10 +99,12 @@
         <h1 class="page-title mb-2">PRODUTOS</h1>
 
         <div class="d-flex align-items-center gap-3 mb-4 flex-wrap">
-            <div class="search-container">
-                <i class="bi bi-search"></i>
-                <input type="text" class="search-input" placeholder="Procurar produto">
-            </div>
+            <form onsubmit="return false;">
+                <div class="search-container">
+                    <i class="bi bi-search"></i>
+                    <input type="number" id="searchProdutoId" class="search-input" placeholder="Digite o ID do produto e aperte Enter">
+                </div>
+            </form>
 
             <button class="btn btn-orange text-uppercase" data-bs-toggle="modal" data-bs-target="#modalCriarProduto">
                 Cadastrar Produto
@@ -84,7 +117,7 @@
             <table class="table table-custom table-hover">
                 <thead>
                 <tr>
-                    <th>ID</th>
+                    <th>Código</th>
                     <th>Nome do Produto</th>
                     <th>Valor (R$)</th>
                     <th class="text-end">Ações</th>
@@ -97,77 +130,115 @@
                     onclick="abrirModalDetalhes(this)"
                     th:attr="data-id=${produto.id}, data-nome=${produto.nome}, data-valor=${produto.valor}">
 
-                    <td th:text="${produto.id}">1</td>
-                    <td th:text="${produto.nome}">Produto Exemplo</td>
-                    <td th:text="${#numbers.formatDecimal(produto.valor, 1, 'POINT', 2, 'COMMA')}">99,90</td>
+                    <td th:text="${produto.id}"></td>
+                    <td th:text="${produto.nome}"></td>
+                    <td th:text="${#numbers.formatDecimal(produto.valor, 1, 'POINT', 2, 'COMMA')}"></td>
                     <td class="text-end">
-                        <button class="btn btn-sm btn-outline-secondary me-2" title="Editar"
-                                data-bs-toggle="modal" data-bs-target="#modalEditarProduto"
-                                th:attr="data-id=${produto.id}, data-nome=${produto.nome}, data-valor=${produto.valor}">
-                            <i class="bi bi-pencil-fill"></i>
-                        </button>
-                        <button class="btn btn-sm btn-outline-danger" title="Excluir">
-                            <i class="bi bi-trash-fill"></i>
-                        </button>
-                    </td>
-                </tr>
+                        <div class="d-flex justify-content-end align-items-center">
 
-                <tr class="tr-clicavel" onclick="abrirModalDetalhes(this)" data-id="2" data-nome="Caixa de Ferramentas" data-valor="150.00">
-                    <td>2</td>
-                    <td>Caixa de Ferramentas</td>
-                    <td>150,00</td>
-                    <td class="text-end">
-                        <button class="btn btn-sm btn-outline-secondary me-2" title="Editar"
-                                data-bs-toggle="modal" data-bs-target="#modalEditarProduto"
-                                data-id="2" data-nome="Caixa de Ferramentas" data-valor="150.00">
-                            <i class="bi bi-pencil-fill"></i>
-                        </button>
-                        <button class="btn btn-sm btn-outline-danger" title="Excluir">
-                            <i class="bi bi-trash-fill"></i>
-                        </button>
-                    </td>
-                </tr>
-                <tr class="tr-clicavel" onclick="abrirModalDetalhes(this)" data-id="3" data-nome="Furadeira de Impacto" data-valor="320.50">
-                    <td>3</td>
-                    <td>Furadeira de Impacto</td>
-                    <td>320,50</td>
-                    <td class="text-end">
-                        <button class="btn btn-sm btn-outline-secondary me-2" title="Editar"
-                                data-bs-toggle="modal" data-bs-target="#modalEditarProduto"
-                                data-id="3" data-nome="Furadeira de Impacto" data-valor="320.50">
-                            <i class="bi bi-pencil-fill"></i>
-                        </button>
-                        <button class="btn btn-sm btn-outline-danger" title="Excluir">
-                            <i class="bi bi-trash-fill"></i>
-                        </button>
-                    </td>
-                </tr>
-                <tr class="tr-clicavel" onclick="abrirModalDetalhes(this)" data-id="4" data-nome="Parafusos (Pacote 100x)" data-valor="15.90">
-                    <td>4</td>
-                    <td>Parafusos (Pacote 100x)</td>
-                    <td>15,90</td>
-                    <td class="text-end">
-                        <button class="btn btn-sm btn-outline-secondary me-2" title="Editar"
-                                data-bs-toggle="modal" data-bs-target="#modalEditarProduto"
-                                data-id="4" data-nome="Parafusos (Pacote 100x)" data-valor="15.90">
-                            <i class="bi bi-pencil-fill"></i>
-                        </button>
-                        <button class="btn btn-sm btn-outline-danger" title="Excluir">
-                            <i class="bi bi-trash-fill"></i>
-                        </button>
+                            <button type="button" class="btn btn-sm btn-outline-secondary me-2" title="Editar"
+                                    data-bs-toggle="modal" data-bs-target="#modalEditarProduto"
+                                    th:attr="data-id=${produto.id}, data-nome=${produto.nome}, data-valor=${produto.valor}">
+                                <i class="bi bi-pencil-fill"></i>
+                            </button>
+
+                            <button type="button" class="btn btn-sm btn-outline-danger" title="Excluir"
+                                    data-bs-toggle="modal" data-bs-target="#modalConfirmarExclusao"
+                                    th:attr="data-id=${produto.id}, data-nome=${produto.nome}">
+                                <i class="bi bi-trash-fill"></i>
+                            </button>
+
+                        </div>
                     </td>
                 </tr>
                 </tbody>
             </table>
+
+            <div th:if="${totalPaginas > 1}" class="d-flex justify-content-between align-items-center mt-4 px-2">
+                <div class="text-muted fw-bold" style="font-size: 0.95rem;">
+                    Exibindo página <span th:text="${paginaAtual}">1</span> de <span th:text="${totalPaginas}">5</span>
+                    (Total de <span th:text="${totalItens}">75</span> produtos)
+                </div>
+
+                <nav aria-label="Navegação de páginas">
+                    <ul class="pagination mb-0">
+
+                        <li class="page-item" th:classappend="${paginaAtual == 1} ? 'disabled'">
+                            <a class="page-link" th:href="@{/produto(page=${paginaAtual - 1})}" aria-label="Anterior" style="color: #000000; box-shadow: none;">
+                                <span aria-hidden="true">&laquo;</span>
+                            </a>
+                        </li>
+
+                        <li class="page-item" th:each="i : ${#numbers.sequence(1, totalPaginas)}"
+                            th:classappend="${paginaAtual == i} ? 'active'">
+
+                            <a class="page-link fw-bold"
+                               th:href="@{/produto(page=${i})}"
+                               th:text="${i}"
+                               th:style="${paginaAtual == i} ? 'background-color: #ff7e12; border-color: #000000; color: #000000;' : 'color: #000000; box-shadow: none;'">
+                                1
+                            </a>
+                        </li>
+
+                        <li class="page-item" th:classappend="${paginaAtual == totalPaginas} ? 'disabled'">
+                            <a class="page-link" th:href="@{/produto(page=${paginaAtual + 1})}" aria-label="Próximo" style="color: #000000; box-shadow: none;">
+                                <span aria-hidden="true">&raquo;</span>
+                            </a>
+                        </li>
+
+                    </ul>
+                </nav>
+            </div>
+        </div>
+
+        <div class="modal fade" id="modalConfirmarExclusao" tabindex="-1" aria-hidden="true">
+            <div class="modal-dialog modal-dialog-centered">
+                <div class="modal-content shadow-lg border-0" style="border-radius: 16px; padding: 6px; background-color: #ffffff;">
+                    <div style="border: 1.6px solid #14213d; border-radius: 12px; height: 100%;">
+
+                        <div class="modal-header border-0 pb-0">
+                            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                        </div>
+
+                        <div class="modal-body px-4 pb-4 pt-2 text-center">
+                            <div class="text-danger mb-0" style="line-height: 1.2; margin-top: -20px">
+                                <i class="bi bi-exclamation-triangle-fill" style="font-size: 4rem;"></i>
+                            </div>
+
+                            <h2 class="text-uppercase fw-bold text-dark mb-3" style="font-size: 1.8rem; line-height: 1.1;">
+                                Confirmar<br>Exclusão
+                            </h2>
+
+                            <p class="text-muted mb-4" style="font-size: 1.05rem;">
+                                <strong id="nomeProdutoExcluir" class="text-dark">Você tem certeza que deseja excluir o produto?</strong>
+                            </p>
+
+                            <form id="formExcluirProduto" th:action="@{/produto/delete/0}" th:method="DELETE">
+                                <div class="d-flex justify-content-center gap-3">
+                                    <button type="button" class="btn btn-outline-secondary fw-bold text-uppercase py-2 px-4" data-bs-dismiss="modal" style="border-radius: 8px;">
+                                        Cancelar
+                                    </button>
+
+                                    <button type="submit" class="btn fw-bold text-uppercase text-white py-2 px-4"
+                                            style="background-color: #ff7e12; border: none; border-radius: 8px;">
+                                        Excluir
+                                    </button>
+                                </div>
+                            </form>
+                        </div>
+
+                    </div>
+                </div>
+            </div>
         </div>
 
     </div>
 </div>
 
 <div class="modal fade" id="modalDetalhesProduto" tabindex="-1" aria-hidden="true">
-    <div class="modal-dialog modal-dialog-centered modal-lg">
+    <div class="modal-dialog modal-dialog-centered modal-xl">
         <div class="modal-content shadow-lg border-0" style="border-radius: 16px; padding: 6px; background-color: #ffffff;">
-            <div style="border: 1.8px solid #14213d; border-radius: 12px; height: 100%;">
+            <div style="border: 1.6px solid #14213d; border-radius: 12px; height: 100%;">
                 <div class="modal-header border-0 pb-0">
                     <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                 </div>
@@ -177,18 +248,27 @@
                     </h1>
                     <hr class="mx-auto mb-5" style="width: 60%; border-top: 1px solid #000; opacity: 1;">
 
-                    <div class="text-start px-md-4">
+                    <div class="text-start px-md-3">
                         <div class="row g-4">
-                            <div class="col-md-7">
-                                <label class="form-label fw-bold text-uppercase text-dark mb-1" style="font-size: 1.1rem;">Nome do Produto</label>
-                                <input type="text" id="detalheProdutoNome" class="form-control form-control-lg fw-bold" readonly
-                                       style="border: 1.8px solid #ccc; border-radius: 8px; background-color: #f8f9fa;">
+                            <div class="col-md-2">
+                                <label class="form-label fw-bold text-uppercase text-dark mb-1" style="font-size: 1.1rem;">Código :</label>
+                                <input type="text" id="detalheProdutoCodigo" class="form-control form-control-lg fw-bold" disabled
+                                       th:value="${produto?.id}"
+                                       style="border: 1.6px solid #ccc; border-radius: 8px; background-color: #f8f9fa;">
                             </div>
 
-                            <div class="col-md-5">
-                                <label class="form-label fw-bold text-uppercase text-dark mb-1" style="font-size: 1.1rem;">Valor (R$)</label>
-                                <input type="text" id="detalheProdutoValor" class="form-control form-control-lg fw-bold" readonly
-                                       style="border: 1.8px solid #ccc; border-radius: 8px; background-color: #f8f9fa;">
+                            <div class="col-md-7">
+                                <label class="form-label fw-bold text-uppercase text-dark mb-1" style="font-size: 1.1rem;">Nome do Produto :</label>
+                                <input type="text" id="detalheProdutoNome" class="form-control form-control-lg fw-bold" disabled
+                                       th:value="${produto?.nome}"
+                                       style="border: 1.6px solid #ccc; border-radius: 8px; background-color: #f8f9fa;">
+                            </div>
+
+                            <div class="col-md-3">
+                                <label class="form-label fw-bold text-uppercase text-dark mb-1" style="font-size: 1.1rem;">Valor (R$) :</label>
+                                <input type="text" id="detalheProdutoValor" class="form-control form-control-lg fw-bold" disabled
+                                       th:value="${produto?.valor}"
+                                       style="border: 1.6px solid #ccc; border-radius: 8px; background-color: #f8f9fa;">
                             </div>
                         </div>
 
@@ -208,7 +288,7 @@
 <div th:fragment="modalCriar" class="modal fade" id="modalCriarProduto" tabindex="-1" aria-hidden="true">
     <div class="modal-dialog modal-dialog-centered modal-lg">
         <div class="modal-content shadow-lg border-0" style="border-radius: 16px; padding: 6px; background-color: #ffffff;">
-            <div style="border: 1.8px solid #14213d; border-radius: 12px; height: 100%;">
+            <div style="border: 1.6px solid #14213d; border-radius: 12px; height: 100%;">
                 <div class="modal-header border-0 pb-0">
                     <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                 </div>
@@ -218,18 +298,18 @@
                     </h1>
                     <hr class="mx-auto mb-5" style="width: 60%; border-top: 1px solid #000; opacity: 1;">
 
-                    <form class="text-start px-md-4">
+                    <form th:action="@{/produto/create}" th:object="${novoProduto}" method="POST" class="text-start px-md-4">
                         <div class="row g-4">
                             <div class="col-md-7">
-                                <label class="form-label fw-bold text-uppercase text-dark mb-1" style="font-size: 1.1rem;">Nome do Produto</label>
-                                <input type="text" class="form-control form-control-lg"
-                                       style="border: 1.8px solid #000; border-radius: 8px; box-shadow: none;">
+                                <label class="form-label fw-bold text-uppercase text-dark mb-1" style="font-size: 1.1rem;">Nome do Produto :</label>
+                                <input type="text" th:field="*{nome}" class="form-control form-control-lg"
+                                       style="border: 1.6px solid #000; border-radius: 8px; box-shadow: none;">
                             </div>
 
                             <div class="col-md-5">
-                                <label class="form-label fw-bold text-uppercase text-dark mb-1" style="font-size: 1.1rem;">Valor (R$)</label>
-                                <input type="number" step="0.01" class="form-control form-control-lg"
-                                       style="border: 1.8px solid #000; border-radius: 8px; box-shadow: none;">
+                                <label class="form-label fw-bold text-uppercase text-dark mb-1" style="font-size: 1.1rem;">Valor (R$):</label>
+                                <input type="number" min="0" step="any" th:field="*{valor}" class="form-control form-control-lg"
+                                       style="border: 1.6px solid #000; border-radius: 8px; box-shadow: none;">
                             </div>
                         </div>
 
@@ -238,7 +318,7 @@
                                     style="font-size: 1.2rem; padding: 12px 40px; border-radius: 8px; border-width: 1.8px;">
                                 Cancelar
                             </button>
-                            <button type="button" class="btn btn-orange fw-bolder text-uppercase text-white"
+                            <button type="submit" class="btn btn-orange fw-bolder text-uppercase text-white"
                                     style="font-size: 1.2rem; padding: 12px 40px; border-radius: 8px; background-color: #ff9433; border: none;">
                                 Salvar
                             </button>
@@ -253,7 +333,7 @@
 <div th:fragment="modalEditar" class="modal fade" id="modalEditarProduto" tabindex="-1" aria-hidden="true">
     <div class="modal-dialog modal-dialog-centered modal-lg">
         <div class="modal-content shadow-lg border-0" style="border-radius: 16px; padding: 6px; background-color: #ffffff;">
-            <div style="border: 1.8px solid #14213d; border-radius: 12px; height: 100%;">
+            <div style="border: 1.6px solid #14213d; border-radius: 12px; height: 100%;">
                 <div class="modal-header border-0 pb-0">
                     <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                 </div>
@@ -263,20 +343,21 @@
                     </h1>
                     <hr class="mx-auto mb-5" style="width: 60%; border-top: 1px solid #000; opacity: 1;">
 
-                    <form class="text-start px-md-4">
-                        <input type="hidden" id="editProdutoId">
+                    <form id="formEditarProduto" method="POST" class="text-start px-md-4">
+
+                        <input type="hidden" id="editProdutoId" name="id">
 
                         <div class="row g-4">
                             <div class="col-md-7">
-                                <label class="form-label fw-bold text-uppercase text-dark mb-1" style="font-size: 1.1rem;">Nome do Produto</label>
-                                <input type="text" id="editProdutoNome" class="form-control form-control-lg"
-                                       style="border: 1.8px solid #000; border-radius: 8px; box-shadow: none;">
+                                <label class="form-label fw-bold text-uppercase text-dark mb-1" style="font-size: 1.1rem;">Nome do Produto :</label>
+                                <input type="text" id="editProdutoNome" name="nome" class="form-control form-control-lg" required
+                                       style="border: 1.6px solid #000; border-radius: 8px; box-shadow: none;">
                             </div>
 
                             <div class="col-md-5">
-                                <label class="form-label fw-bold text-uppercase text-dark mb-1" style="font-size: 1.1rem;">Valor (R$)</label>
-                                <input type="number" step="0.01" id="editProdutoValor" class="form-control form-control-lg"
-                                       style="border: 1.8px solid #000; border-radius: 8px; box-shadow: none;">
+                                <label class="form-label fw-bold text-uppercase text-dark mb-1" style="font-size: 1.1rem;">Valor (R$):</label>
+                                <input type="number" min="0" step="any" id="editProdutoValor" name="valor" class="form-control form-control-lg" required
+                                       style="border: 1.6px solid #000; border-radius: 8px; box-shadow: none;">
                             </div>
                         </div>
 
@@ -285,9 +366,9 @@
                                     style="font-size: 1.2rem; padding: 12px 40px; border-radius: 8px; border-width: 1.8px;">
                                 Cancelar
                             </button>
-                            <button type="button" class="btn btn-orange fw-bolder text-uppercase text-white"
+                            <button type="submit" class="btn btn-orange fw-bolder text-uppercase text-white"
                                     style="font-size: 1.2rem; padding: 12px 40px; border-radius: 8px; background-color: #ff9433; border: none;">
-                                Salvar Alterações
+                                Salvar
                             </button>
                         </div>
                     </form>
@@ -299,6 +380,7 @@
 
 <script>
     function abrirModalDetalhes(row) {
+        const id = row.getAttribute('data-id');
         const nome = row.getAttribute('data-nome');
         let valor = row.getAttribute('data-valor');
 
@@ -306,45 +388,85 @@
             valor = parseFloat(valor).toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' });
         }
 
+        document.getElementById('detalheProdutoCodigo').value = id || '';
         document.getElementById('detalheProdutoNome').value = nome || '';
         document.getElementById('detalheProdutoValor').value = valor || '';
+
+        if (id) history.pushState(null, '', '/produto/' + id);
 
         const modal = new bootstrap.Modal(document.getElementById('modalDetalhesProduto'));
         modal.show();
     }
 
-    // ==========================================
-    // SCRIPT DO MODAL DE EDITAR PRODUTO
-    // ==========================================
-    document.addEventListener('DOMContentLoaded', function () {
-        const modalEditar = document.getElementById('modalEditarProduto');
+    document.addEventListener("DOMContentLoaded", function() {
 
-        if (modalEditar) {
-            modalEditar.addEventListener('show.bs.modal', function (event) {
-                const button = event.relatedTarget;
-                if(!button) return;
+        const modalDetalhes = document.getElementById('modalDetalhesProduto');
+        if (modalDetalhes) {
+            modalDetalhes.addEventListener('hidden.bs.modal', function () {
+                history.pushState(null, '', '/produtos');
+            });
+        }
 
-                const id = button.getAttribute('data-id');
-                const nome = button.getAttribute('data-nome');
-                const valor = button.getAttribute('data-valor');
+        const alertas = document.querySelectorAll('.alert');
+        alertas.forEach(function(alerta) {
+            setTimeout(function() {
+                const bsAlert = new bootstrap.Alert(alerta);
+                bsAlert.close();
+            }, 5000);
+        });
 
-                document.getElementById('editProdutoId').value = id;
-                document.getElementById('editProdutoNome').value = nome;
-                document.getElementById('editProdutoValor').value = valor;
+        const inputBusca = document.getElementById('searchProdutoId');
+        if (inputBusca) {
+            inputBusca.addEventListener('keydown', function(event) {
+                if (event.key === 'Enter' || event.keyCode === 13) {
+                    event.preventDefault();
+
+                    const idProduto = inputBusca.value.trim();
+
+                    if (idProduto && parseInt(idProduto) > 0) {
+                        window.location.href = '/produto/' + idProduto;
+                    }
+                }
+            });
+        }
+
+        const modalExclusao = document.getElementById('modalConfirmarExclusao');
+        if (modalExclusao) {
+            modalExclusao.addEventListener('show.bs.modal', function (event) {
+                const botao = event.relatedTarget;
+                const id = botao.getAttribute('data-id');
+                const nome = botao.getAttribute('data-nome');
+
+                document.getElementById('nomeProdutoExcluir').textContent = nome;
+                document.getElementById('formExcluirProduto').action = '/produto/delete/' + id;
+            });
+        }
+
+        const modalEdicao = document.getElementById('modalEditarProduto');
+        if (modalEdicao) {
+            modalEdicao.addEventListener('show.bs.modal', function (event) {
+                const botao = event.relatedTarget;
+
+                const id = botao.getAttribute('data-id');
+                const nome = botao.getAttribute('data-nome');
+                const valor = botao.getAttribute('data-valor');
+
+                document.getElementById('editProdutoId').value = id || '';
+                document.getElementById('editProdutoNome').value = nome || '';
+                document.getElementById('editProdutoValor').value = valor || '';
+
+                const form = document.getElementById('formEditarProduto');
+                form.action = '/produto/update/' + id;
             });
         }
     });
 
-    // Impede que o clique na linha aconteça quando clicar nos botões de Editar/Deletar
     document.querySelectorAll('.table-custom button').forEach(button => {
         button.addEventListener('click', function (e) {
             e.stopPropagation();
         });
     });
 
-    // ==========================================
-    // SCRIPT DE ORDENAÇÃO DA TABELA
-    // ==========================================
     let ordemCrescente = false;
 
     function ordenarTabela() {
@@ -355,11 +477,7 @@
             const idA = parseInt(linhaA.cells[0].innerText.trim());
             const idB = parseInt(linhaB.cells[0].innerText.trim());
 
-            if (ordemCrescente) {
-                return idA - idB;
-            } else {
-                return idB - idA;
-            }
+            return ordemCrescente ? (idA - idB) : (idB - idA);
         });
 
         ordemCrescente = !ordemCrescente;
@@ -367,6 +485,19 @@
         tbody.innerHTML = '';
         linhas.forEach(linha => tbody.appendChild(linha));
     }
+</script>
+
+<script th:inline="javascript">
+    document.addEventListener("DOMContentLoaded", function () {
+        var deveMostrarModal = /*[[${mostrarDropdown}]]*/ false;
+
+        if (deveMostrarModal) {
+            var meuModalElemento = document.getElementById('modalDetalhesProduto');
+            var bootstrapModal = new bootstrap.Modal(meuModalElemento);
+
+            bootstrapModal.show();
+        }
+    });
 </script>
 
 </body>
