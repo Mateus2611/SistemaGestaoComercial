@@ -51,7 +51,7 @@ body > .d-flex {
 
 .nav-link-custom.active {
     background-color: #ff7e12;
-    border-bottom: 2.5px solid #14213d;
+    border-bottom: 3px solid #14213d;
     color: #ffffff;
 }
 
