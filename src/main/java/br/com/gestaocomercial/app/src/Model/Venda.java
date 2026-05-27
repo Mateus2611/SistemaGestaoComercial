@@ -5,22 +5,21 @@ import jakarta.persistence.*;
 import java.sql.Date;
 
 @Entity
-@Table(name = "venda")
+@Table(name = "Venda")
 public class Venda {
 
     public Venda() {
     }
 
     public Venda(Integer idOrcamento) {
-        IdOrcamento = idOrcamento;
+        this.Orcamento.setId(idOrcamento);
     }
 
     @Id
     @Column(name = "Id")
     private Integer Id;
-    @Column(name = "Id_Orcamento")
-    private Integer IdOrcamento;
     @OneToOne
+    @JoinColumn(name = "Id_Orcamento")
     private Orcamento Orcamento;
     @Column(name = "Data_Criacao")
     private Date DataCriacao;
@@ -29,6 +28,7 @@ public class Venda {
     @Column(name = "Data_Conclusao")
     private Date DataConclusao;
     @Column(name = "Status_Pagamento")
+    @Enumerated(EnumType.STRING)
     private StatusPagamento StatusPagamento;
 
     public Integer getId() {
@@ -37,14 +37,6 @@ public class Venda {
 
     public void setId(Integer id) {
         Id = id;
-    }
-
-    public Integer getIdOrcamento() {
-        return IdOrcamento;
-    }
-
-    public void setIdOrcamento(Integer idOrcamento) {
-        IdOrcamento = idOrcamento;
     }
 
     public Orcamento getOrcamento() {
