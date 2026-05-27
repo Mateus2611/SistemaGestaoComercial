@@ -67,6 +67,7 @@
         <h1 class="page-title mb-2">VENDAS</h1>
 
         <div class="d-flex align-items-center gap-3 mb-4 flex-wrap">
+
             <div class="search-container">
                 <i class="bi bi-search"></i>
                 <input type="text" class="search-input" placeholder="Procurar venda">
@@ -75,12 +76,14 @@
             <button class="btn btn-orange text-uppercase" data-bs-toggle="modal" data-bs-target="#modalCriarVenda">
                 Nova Venda
             </button>
-
             <button class="btn btn-orange text-uppercase ms-auto" onclick="ordenarTabela()">Ordenar</button>
         </div>
 
+
         <div class="table-responsive">
+
             <table class="table table-custom table-hover" id="tabelaVendas">
+
                 <thead>
                 <tr>
                     <th>Código</th>
@@ -94,9 +97,8 @@
                     <th class="text-end">Ações</th>
                 </tr>
                 </thead>
-                <tbody>
 
-                <td>
+                <tbody>
                 <tr th:each="venda : ${vendas}"
                     class="tr-clicavel"
                     onclick="abrirModalDetalhes(this)"
@@ -109,6 +111,7 @@
                              data-valor=${venda.orcamento != null ? venda.orcamento.valor : 0},
                              data-status=${venda.statusPagamento != null ? venda.statusPagamento.name() : ''}">
 
+
                     <td th:text="${venda.id}"></td>
                     <td th:text="${venda.orcamento.id}"></td>
                     <td th:text="${venda.orcamento.cliente.nome}"></td>
@@ -116,10 +119,13 @@
                     <td th:text="${venda.prazoPagamento != null ? #dates.format(venda.prazoPagamento, 'dd/MM/yyyy') : 'N/A'}"></td>
                     <td th:text="${venda.dataConclusao != null ? #dates.format(venda.dataConclusao, 'dd/MM/yyyy') : '-'}"></td>
                     <td th:text="${venda.orcamento != null ? #numbers.formatDecimal(venda.orcamento.valor, 1, 'POINT', 2, 'COMMA') : '0,00'}"></td>
-                    <span class="badge"
+
+                    <td>
+                        <span class="badge"
                               th:classappend="${venda.statusPagamento != null and venda.statusPagamento.name() == 'APROVADO' ? 'badge-verde' : (venda.statusPagamento != null and venda.statusPagamento.name() == 'PENDENTE' ? 'badge-amarelo' : 'badge-vermelho')}"
                               th:text="${venda.statusPagamento}"></span>
                     </td>
+
                     <td class="text-end">
                         <button class="btn btn-sm btn-outline-secondary me-2"
                                 data-bs-toggle="modal" data-bs-target="#modalEditarVenda"
