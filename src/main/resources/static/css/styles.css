@@ -116,6 +116,29 @@ body > .d-flex {
     font-size: 0.9rem;
 }
 
+.search-icon-btn {
+    background: #ff7e12;
+    border: none;
+    padding: 0;
+    margin: 0;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #14213d;
+    transition: color 0.2s ease;
+}
+
+.search-icon-btn:hover {
+    color: #ff7e12;
+}
+
+.search-container {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
 .table-custom {
     margin-top: 20px;
 }

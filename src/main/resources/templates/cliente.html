@@ -69,27 +69,27 @@
             <i class="bi bi-house-door-fill"></i>
             <span>Início</span>
         </a>
-        <a th:href="@{produto}" class="nav-link-custom text-uppercase">
+        <a th:href="@{/produto}" class="nav-link-custom text-uppercase">
             <i class="bi bi-box-seam-fill"></i>
             <span>Produtos</span>
         </a>
-        <a th:href="@{venda}" class="nav-link-custom text-uppercase">
+        <a th:href="@{/venda}" class="nav-link-custom text-uppercase">
             <i class="bi bi-cart-fill"></i>
             <span>Vendas</span>
         </a>
-        <a th:href="@{orcamento}" class="nav-link-custom text-uppercase">
+        <a th:href="@{/orcamento}" class="nav-link-custom text-uppercase">
             <i class="bi bi-file-earmark-text-fill"></i>
             <span>Orçamentos</span>
         </a>
-        <a th:href="@{cliente}" class="nav-link-custom active text-uppercase">
+        <a th:href="@{/cliente}" class="nav-link-custom active text-uppercase">
             <i class="bi bi-people-fill"></i>
             <span>Clientes</span>
         </a>
-        <a th:href="@{avaliacao}" class="nav-link-custom text-uppercase">
+        <a th:href="@{/avaliacao}" class="nav-link-custom text-uppercase">
             <i class="bi bi-star-fill"></i>
             <span>Avaliações</span>
         </a>
-        <a th:href="@{sobre}" class="nav-link-custom mt-auto text-uppercase no-hover">
+        <a th:href="@{/sobre}" class="nav-link-custom mt-auto text-uppercase no-hover">
             <i class="bi bi-info-circle-fill"></i>
             <span>Sobre</span>
         </a>
@@ -115,12 +115,20 @@
                 <input type="hidden" id="bancoClienteCidade" th:value="${cliente.endereco != null ? cliente.endereco.cidade : ''}">
                 <input type="hidden" id="bancoClienteEstado" th:value="${cliente.endereco != null ? cliente.endereco.estado : ''}">
                 <input type="hidden" id="bancoClienteCep" th:value="${cliente.endereco != null ? cliente.endereco.cep : ''}">
+                <input type="hidden" id="flagFiltroId" th:value="${filtroPorIdAtivo ? 'true' : 'false'}">
             </div>
 
-            <form onsubmit="return false;">
-                <div class="search-container">
-                    <i class="bi bi-search"></i>
-                    <input type="number" id="searchClienteId" class="search-input" placeholder="Digite o ID do Cliente e aperte Enter">
+            <form onsubmit="return false;" style="margin: 0; padding: 0;">
+                <div class="d-flex align-items-center">
+
+                    <button type="button" id="btnSearchCliente" class="btn fw-bold" onclick="realizarBuscaPorId()"
+                            style="background-color: #ff7e12 !important; color: #fff !important; border: 1.8px solid #ff9433 !important; border-radius: 8px; border-top-right-radius: 0; border-bottom-right-radius: 0; padding: 10px 16px; height: 46px; display: flex; align-items: center; justify-content: center; cursor: pointer; transition: all 0.2s ease;">
+                        <i class="bi bi-search" style="font-size: 1.1rem;"></i>
+                    </button>
+
+                    <input type="number" id="searchClienteId" class="search-input" placeholder="Digite o ID do Cliente e aperte Enter"
+                           style="border: 1.8px solid #000; border-left: 1.8px; border-radius: 8px; border-top-left-radius: 0; border-bottom-left-radius: 0; padding: 10px 16px; box-shadow: none; outline: none;">
+
                 </div>
             </form>
 
@@ -192,8 +200,8 @@
                                 th:text="${cliente.status != null and cliente.status.name() == 'ATIVO' ? 'INATIVAR' : 'ATIVAR'}"
                                 th:attr="data-id=${cliente.id}, data-status=${cliente.status}"
                                 th:styleappend="${cliente.status != null and cliente.status.name() == 'INATIVO'
-                                ? 'background-color: #ff7e12; color: #ffffff; border: 1.8px solid #ff7e12; border-radius: 8px; padding: 5px 16px; font-size: 0.875rem;'
-                                : 'background-color: transparent; color: #ff7e12; border: 1.8px solid #ff7e12; border-radius: 8px; padding: 5px 16px; font-size: 0.875rem;'}"
+                                ? 'background-color: #ff7e12; color: #ffffff; border: 1.8px solid #ff7e12; border-radius: 8px; padding: 5px 16px; font-size: 0.875rem; width: 8em;'
+                                : 'background-color: transparent; color: #ff7e12; border: 1.8px solid #ff7e12; border-radius: 8px; padding: 5px 16px; font-size: 0.875rem; width: 8em;'}"
                                 onclick="alterarStatusCliente(this)">
                         </button>
                     </td>
@@ -234,6 +242,15 @@
 
                     </ul>
                 </nav>
+            </div>
+
+            <div th:if="${#ctx.containsVariable('clientes') and clientes.size() == 1 and #vars['javax.servlet.forward.request_uri'] != '/cliente'}" class="mb-3">
+                <a href="/cliente" class="btn btn-sm fw-bold text-uppercase d-inline-flex align-items-center gap-2"
+                   style="background-color: #14213d; color: #ffffff; border: 1.8px solid; border-radius: 8px; padding: 8px 16px; transition: all 0.2s ease;"
+                   onmouseenter="this.style.backgroundColor='transparent'; this.style.color='#14213d';"
+                   onmouseleave="this.style.backgroundColor='#14213d'; this.style.color='#ffffff';">
+                    <i class="bi bi-arrow-left"></i> Voltar
+                </a>
             </div>
         </div>
         </div>
@@ -374,7 +391,7 @@
                             <div class="col-md-4">
                                 <label class="form-label fw-bold text-uppercase text-dark mb-1" style="font-size: 1.1rem;">Tipo</label>
                                 <select id="criarClienteTipo" th:field="*{tipo}" class="form-select form-select-lg" style="border: 1.8px solid #000; border-radius: 8px;">
-                                    <option selected value="">Selecione</option>
+                                    <option value="" disabled hidden selected>Selecione</option>
                                     <option value="CPF">Pessoa Física</option>
                                     <option value="CNPJ">Pessoa Jurídica</option>
                                 </select>
@@ -447,7 +464,7 @@
                             <div class="col-md-4">
                                 <label class="form-label fw-bold text-uppercase text-dark mb-1" style="font-size: 1.1rem;">Tipo</label>
                                 <select id="editClienteTipo" name="tipo" class="form-select form-select-lg" style="border: 1.8px solid #000; border-radius: 8px;">
-                                    <option value="">Selecione</option>
+                                    <option value="" hidden disabled>Selecione</option>
                                     <option value="CPF">Pessoa Física</option>
                                     <option value="CNPJ">Pessoa Jurídica</option>
                                 </select>
@@ -615,6 +632,37 @@
         adicionarCampoEmail('criar');
     });
 
+    function realizarBuscaPorId() {
+        const inputId = document.getElementById('searchClienteId');
+        if (inputId && inputId.value.trim() !== "") {
+            window.location.href = '/cliente/' + inputId.value.trim();
+        }
+    }
+
+    const inputSearch = document.getElementById('searchClienteId');
+    if (inputSearch) {
+        inputSearch.addEventListener('keypress', function (event) {
+            if (event.key === 'Enter') {
+                event.preventDefault();
+                realizarBuscaPorId();
+            }
+        });
+    }
+
+    const btnSearch = document.getElementById('btnSearchCliente');
+    if (btnSearch) {
+
+        btnSearch.addEventListener('mouseenter', function() {
+            btnSearch.style.setProperty('background-color', 'transparent', 'important');
+            btnSearch.style.setProperty('color', '#ff7e12', 'important');
+        });
+
+        btnSearch.addEventListener('mouseleave', function() {
+            btnSearch.style.setProperty('background-color', '#ff7e12', 'important');
+            btnSearch.style.setProperty('color', '#fff', 'important');
+        });
+    }
+
     document.addEventListener('DOMContentLoaded', function () {
 
         const modalCriar = document.getElementById('modalCriarCliente');
@@ -651,8 +699,14 @@
                 if (status) {
                     document.getElementById('editClienteStatus').value = status;
                 }
-                if (tipo) {
-                    document.getElementById('editClienteTipo').value = tipo;
+
+                const selectTipo = document.getElementById('editClienteTipo');
+                if (selectTipo) {
+                    if (tipo && tipo.trim() !== "") {
+                        selectTipo.value = tipo;
+                    } else {
+                        selectTipo.value = "";
+                    }
                 }
 
                 document.getElementById('editClienteLogradouro').value = logradouro || '';
@@ -693,8 +747,16 @@
         const modalDetalhes = document.getElementById('modalDetalhesCliente');
         if (modalDetalhes) {
             modalDetalhes.addEventListener('hidden.bs.modal', function () {
+
+                const inputFlag = document.getElementById('flagFiltroId');
+                const isFiltroPorIdAtivo = inputFlag ? inputFlag.value === 'true' : false;
+
+                if (isFiltroPorIdAtivo) {
+                    return;
+                }
+
                 if (window.location.pathname !== '/cliente') {
-                    window.location.href = '/cliente';
+                    window.history.pushState({}, '', '/cliente');
                 }
             });
         }
@@ -706,21 +768,6 @@
                 bsAlert.close();
             }, 5000);
         });
-
-        const inputBusca = document.getElementById('searchClienteId');
-        if (inputBusca) {
-            inputBusca.addEventListener('keydown', function(event) {
-                if (event.key === 'Enter' || event.keyCode === 13) {
-                    event.preventDefault();
-
-                    const idCliente = inputBusca.value.trim();
-
-                    if (idCliente && parseInt(idCliente) > 0) {
-                        window.location.href = '/cliente/' + idCliente;
-                    }
-                }
-            });
-        }
     });
 
     document.querySelectorAll('.table-custom button').forEach(button => {

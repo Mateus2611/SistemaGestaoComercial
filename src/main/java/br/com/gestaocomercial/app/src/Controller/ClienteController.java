@@ -25,25 +25,29 @@ public class ClienteController {
     public ModelAndView cliente(@RequestParam(name = "page", defaultValue = "1") Integer page) { return carregarTelaBase(null, page); }
 
     @GetMapping("/{id}")
-    public ModelAndView getById(@PathVariable("id") Integer id) {
+    public ModelAndView getById(@PathVariable("id") Integer id, RedirectAttributes redirectAttributes) {
 
-        ModelAndView mv = new ModelAndView("cliente");
+        try {
+            ModelAndView mv = new ModelAndView("cliente");
 
-        Cliente clienteUnico = _clienteService.BuscaPorId(id);
+            Cliente clienteUnico = _clienteService.BuscaPorId(id);
 
-        List<Cliente> listaFiltrada = new ArrayList<>();
-        if (clienteUnico != null) {
+            List<Cliente> listaFiltrada = new ArrayList<>();
             listaFiltrada.add(clienteUnico);
+
+            mv.addObject("clientes", listaFiltrada);
+
+            Cliente novoCliente = new Cliente();
+            novoCliente.setEndereco(new Endereco());
+            novoCliente.setEmails(new ArrayList<>(List.of(new Email())));
+            mv.addObject("novoCliente", novoCliente);
+
+            return mv;
+        } catch (RuntimeException exception) {
+            redirectAttributes.addFlashAttribute("mensagemErro", "O cliente com o ID " + id + " não foi encontrado.");
+
+            return new ModelAndView("redirect:/cliente");
         }
-
-        mv.addObject("clientes", listaFiltrada);
-
-        Cliente novoCliente = new Cliente();
-        novoCliente.setEndereco(new Endereco());
-        novoCliente.setEmails(new ArrayList<>(List.of(new Email())));
-        mv.addObject("novoCliente", novoCliente);
-
-        return mv;
     }
 
     private ModelAndView carregarTelaBase(Integer id, Integer page) {
@@ -110,7 +114,7 @@ public class ClienteController {
 
         redirectAttributes.addFlashAttribute("mensagemSucesso", "Cliente INATIVADO com sucesso!");
 
-        return "redirect:/cliente/" + id;
+        return "redirect:/cliente";
     }
 
     @PostMapping("/activate/{id}")
@@ -119,7 +123,7 @@ public class ClienteController {
 
         redirectAttributes.addFlashAttribute("mensagemSucesso", "Cliente ATIVADO com sucesso!");
 
-        return "redirect:/cliente/" + id;
+        return "redirect:/cliente";
     }
 
 
