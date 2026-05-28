@@ -194,21 +194,20 @@
         <div class="modal fade" id="modalConfirmarExclusao" tabindex="-1" aria-hidden="true">
             <div class="modal-dialog modal-dialog-centered">
                 <div class="modal-content shadow-lg border-0" style="border-radius: 16px; padding: 6px; background-color: #ffffff;">
-                    <div style="border: 1.8px solid #14213d; border-radius: 12px; height: 100%;">
+                    <div style="border: 1.6px solid #14213d; border-radius: 12px; height: 100%;">
 
                         <div class="modal-header border-0 pb-0">
                             <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                         </div>
 
                         <div class="modal-body px-4 pb-4 pt-2 text-center">
-                            <div class="text-danger mb-3">
-                                <i class="bi bi-exclamation-triangle-fill" style="font-size: 3rem;"></i>
+                            <div class="text-danger mb-0" style="line-height: 1.2; margin-top: -20px">
+                                <i class="bi bi-exclamation-triangle-fill" style="font-size: 4rem;"></i>
                             </div>
 
                             <h2 class="text-uppercase fw-bold text-dark mb-3" style="font-size: 1.8rem; line-height: 1.1;">
                                 Confirmar<br>Exclusão
                             </h2>
-                            <hr class="mx-auto mb-4" style="width: 50%; border-top: 1px solid #000; opacity: 1;">
 
                             <p class="text-muted mb-4" style="font-size: 1.05rem;">
                                 <strong id="nomeProdutoExcluir" class="text-dark">Você tem certeza que deseja excluir o produto?</strong>
@@ -239,7 +238,7 @@
 <div class="modal fade" id="modalDetalhesProduto" tabindex="-1" aria-hidden="true">
     <div class="modal-dialog modal-dialog-centered modal-xl">
         <div class="modal-content shadow-lg border-0" style="border-radius: 16px; padding: 6px; background-color: #ffffff;">
-            <div style="border: 1.8px solid #14213d; border-radius: 12px; height: 100%;">
+            <div style="border: 1.6px solid #14213d; border-radius: 12px; height: 100%;">
                 <div class="modal-header border-0 pb-0">
                     <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                 </div>
@@ -255,21 +254,21 @@
                                 <label class="form-label fw-bold text-uppercase text-dark mb-1" style="font-size: 1.1rem;">Código :</label>
                                 <input type="text" id="detalheProdutoCodigo" class="form-control form-control-lg fw-bold" disabled
                                        th:value="${produto?.id}"
-                                       style="border: 1.8px solid #ccc; border-radius: 8px; background-color: #f8f9fa;">
+                                       style="border: 1.6px solid #ccc; border-radius: 8px; background-color: #f8f9fa;">
                             </div>
 
                             <div class="col-md-7">
                                 <label class="form-label fw-bold text-uppercase text-dark mb-1" style="font-size: 1.1rem;">Nome do Produto :</label>
                                 <input type="text" id="detalheProdutoNome" class="form-control form-control-lg fw-bold" disabled
                                        th:value="${produto?.nome}"
-                                       style="border: 1.8px solid #ccc; border-radius: 8px; background-color: #f8f9fa;">
+                                       style="border: 1.6px solid #ccc; border-radius: 8px; background-color: #f8f9fa;">
                             </div>
 
                             <div class="col-md-3">
                                 <label class="form-label fw-bold text-uppercase text-dark mb-1" style="font-size: 1.1rem;">Valor (R$) :</label>
                                 <input type="text" id="detalheProdutoValor" class="form-control form-control-lg fw-bold" disabled
                                        th:value="${produto?.valor}"
-                                       style="border: 1.8px solid #ccc; border-radius: 8px; background-color: #f8f9fa;">
+                                       style="border: 1.6px solid #ccc; border-radius: 8px; background-color: #f8f9fa;">
                             </div>
                         </div>
 
@@ -289,7 +288,7 @@
 <div th:fragment="modalCriar" class="modal fade" id="modalCriarProduto" tabindex="-1" aria-hidden="true">
     <div class="modal-dialog modal-dialog-centered modal-lg">
         <div class="modal-content shadow-lg border-0" style="border-radius: 16px; padding: 6px; background-color: #ffffff;">
-            <div style="border: 1.8px solid #14213d; border-radius: 12px; height: 100%;">
+            <div style="border: 1.6px solid #14213d; border-radius: 12px; height: 100%;">
                 <div class="modal-header border-0 pb-0">
                     <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                 </div>
@@ -304,13 +303,13 @@
                             <div class="col-md-7">
                                 <label class="form-label fw-bold text-uppercase text-dark mb-1" style="font-size: 1.1rem;">Nome do Produto :</label>
                                 <input type="text" th:field="*{nome}" class="form-control form-control-lg"
-                                       style="border: 1.8px solid #000; border-radius: 8px; box-shadow: none;">
+                                       style="border: 1.6px solid #000; border-radius: 8px; box-shadow: none;">
                             </div>
 
                             <div class="col-md-5">
                                 <label class="form-label fw-bold text-uppercase text-dark mb-1" style="font-size: 1.1rem;">Valor (R$):</label>
                                 <input type="number" min="0" step="any" th:field="*{valor}" class="form-control form-control-lg"
-                                       style="border: 1.8px solid #000; border-radius: 8px; box-shadow: none;">
+                                       style="border: 1.6px solid #000; border-radius: 8px; box-shadow: none;">
                             </div>
                         </div>
 
@@ -334,7 +333,7 @@
 <div th:fragment="modalEditar" class="modal fade" id="modalEditarProduto" tabindex="-1" aria-hidden="true">
     <div class="modal-dialog modal-dialog-centered modal-lg">
         <div class="modal-content shadow-lg border-0" style="border-radius: 16px; padding: 6px; background-color: #ffffff;">
-            <div style="border: 1.8px solid #14213d; border-radius: 12px; height: 100%;">
+            <div style="border: 1.6px solid #14213d; border-radius: 12px; height: 100%;">
                 <div class="modal-header border-0 pb-0">
                     <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                 </div>
@@ -352,13 +351,13 @@
                             <div class="col-md-7">
                                 <label class="form-label fw-bold text-uppercase text-dark mb-1" style="font-size: 1.1rem;">Nome do Produto :</label>
                                 <input type="text" id="editProdutoNome" name="nome" class="form-control form-control-lg" required
-                                       style="border: 1.8px solid #000; border-radius: 8px; box-shadow: none;">
+                                       style="border: 1.6px solid #000; border-radius: 8px; box-shadow: none;">
                             </div>
 
                             <div class="col-md-5">
                                 <label class="form-label fw-bold text-uppercase text-dark mb-1" style="font-size: 1.1rem;">Valor (R$):</label>
                                 <input type="number" min="0" step="any" id="editProdutoValor" name="valor" class="form-control form-control-lg" required
-                                       style="border: 1.8px solid #000; border-radius: 8px; box-shadow: none;">
+                                       style="border: 1.6px solid #000; border-radius: 8px; box-shadow: none;">
                             </div>
                         </div>
 
