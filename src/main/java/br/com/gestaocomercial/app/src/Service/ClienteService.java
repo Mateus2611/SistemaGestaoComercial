@@ -71,6 +71,7 @@ public class ClienteService {
 
     public Cliente Atualizar(Cliente clienteUpdate) {
         Cliente cliente = _clienteRepository.findById(clienteUpdate.getId()).get();
+        List<Email> emailsAtualizados = new ArrayList<>();
 
         if (clienteUpdate.getNome() != null && clienteUpdate.getNome() != cliente.getNome()) cliente.setNome(clienteUpdate.getNome());
         if (clienteUpdate.getTipo() != null && clienteUpdate.getTipo() != cliente.getTipo()) cliente.setTipo(clienteUpdate.getTipo());
@@ -82,6 +83,13 @@ public class ClienteService {
                 cliente.setDataInativacao(Date.valueOf(LocalDate.now()));
             }
         }
+
+        clienteUpdate.getEmails().forEach(eu -> {
+            if (!cliente.getEmails().contains(eu)) emailsAtualizados.add(eu);
+            if (cliente.getEmails().contains(eu)) emailsAtualizados.addAll(cliente.getEmails());
+        });
+
+        cliente.setEmails(emailsAtualizados);
 
         if (clienteUpdate.getEndereco() != null) {
 

@@ -49,7 +49,7 @@ public class Cliente {
     private Integer Id;
     @Column(name = "Nome")
     private String Nome;
-    @OneToMany(orphanRemoval = true, cascade = CascadeType.ALL)
+    @OneToMany(cascade = CascadeType.ALL)
     @JoinColumn(name = "Id_Cliente")
     private List<Email> Emails;
     @OneToOne(cascade = CascadeType.ALL)

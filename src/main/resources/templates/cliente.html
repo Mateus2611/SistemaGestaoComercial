@@ -26,6 +26,39 @@
 
 <div class="d-flex">
 
+    <div th:if="${mensagemSucesso}"
+         class="alert alert-success alert-dismissible fade show shadow-lg border-0 position-fixed top-0 end-0 m-4"
+         role="alert"
+         style="border-radius: 10px; border-left: 5px solid #198754 !important; z-index: 1050; min-width: 300px;">
+
+        <div class="d-flex align-items-center pr-3">
+            <i class="bi bi-check-circle-fill me-2 fs-4"></i>
+            <span th:text="${mensagemSucesso}" class="fw-bold">Produto excluído com sucesso!</span>
+        </div>
+    </div>
+
+    <div th:if="${mensagemAlerta}"
+         class="alert alert-warning alert-dismissible fade show shadow-lg border-0 position-fixed top-0 end-0 m-4"
+         role="alert"
+         style="border-radius: 10px; border-left: 5px solid #dc8b35 !important; z-index: 1050; min-width: 320px; max-width: 500px;">
+
+        <div class="d-flex align-items-center">
+            <i class="bi bi-shield-fill-x me-2 fs-4 text-warning"></i>
+            <span th:text="${mensagemAlerta}" class="fw-bold text-dark" style="font-size: 0.95rem;">Não foi possível excluir produto, por que está vinculado a outros orçamentos.</span>
+        </div>
+    </div>
+
+    <div th:if="${mensagemErro}"
+         class="alert alert-danger fade show shadow-lg border-0 position-fixed top-0 end-0 m-4 text-dark"
+         role="alert"
+         style="border-radius: 10px; border-left: 5px solid #dc3535 !important; z-index: 1050; min-width: 320px; max-width: 500px;">
+
+        <div class="d-flex align-items-center">
+            <i class="bi bi-exclamation-triangle-fill me-2 fs-4 text-dark"></i>
+            <span th:text="${mensagemErro}" class="fw-bold text-dark" style="font-size: 0.95rem;">Aviso do sistema.</span>
+        </div>
+    </div>
+
     <div class="sidebar-custom d-flex flex-column flex-shrink-0">
 
         <div class="sidebar-logo d-flex justify-content-center align-items-center py-3 mb-2 w-100">
@@ -141,7 +174,7 @@
                               th:classappend="${cliente.status != null and cliente.status.name() == 'ATIVO' ? 'badge-verde' : 'badge-vermelho'}"
                               th:text="${cliente.status}"></span>
                     </td>
-                    <td class="text-end">
+                    <td class="text-end ">
                         <button class="btn btn-sm btn-outline-secondary me-2" title="Editar"
                                 data-bs-toggle="modal" data-bs-target="#modalEditarCliente"
                                 th:attr="data-id=${cliente.id},
@@ -155,8 +188,13 @@
                                 data-endereco-estado=${cliente.endereco.estado}">
                             <i class="bi bi-pencil-fill"></i>
                         </button>
-                        <button class="btn btn-sm btn-outline-danger" title="Excluir">
-                            <i class="bi bi-trash-fill"></i>
+                        <button class="btn btn-sm fw-bold text-uppercase"
+                                th:text="${cliente.status != null and cliente.status.name() == 'ATIVO' ? 'INATIVAR' : 'ATIVAR'}"
+                                th:attr="data-id=${cliente.id}, data-status=${cliente.status}"
+                                th:styleappend="${cliente.status != null and cliente.status.name() == 'INATIVO'
+                                ? 'background-color: #ff7e12; color: #ffffff; border: 1.8px solid #ff7e12; border-radius: 8px; padding: 5px 16px; font-size: 0.875rem;'
+                                : 'background-color: transparent; color: #ff7e12; border: 1.8px solid #ff7e12; border-radius: 8px; padding: 5px 16px; font-size: 0.875rem;'}"
+                                onclick="alterarStatusCliente(this)">
                         </button>
                     </td>
                 </tr>
@@ -244,13 +282,13 @@
 
                             <div class="col-md-6">
                                 <label class="form-label fw-bold text-uppercase text-dark mb-1" style="font-size: 1.1rem;">Criado</label>
-                                <input type="text" id="detalheClienteCadastro" class="form-control form-control-lg" disabled
+                                <input type="date" id="detalheClienteCadastro" class="form-control form-control-lg" disabled
                                        style="border: 1.8px solid #ccc; border-radius: 8px; background-color: #f8f9fa;">
                             </div>
 
                             <div class="col-md-6">
                                 <label class="form-label fw-bold text-uppercase text-dark mb-1" style="font-size: 1.1rem;">Última Inativacao</label>
-                                <input type="text" id="detalheClienteInativacao" class="form-control form-control-lg" disabled
+                                <input type="date" id="detalheClienteInativacao" class="form-control form-control-lg" disabled
                                        style="border: 1.8px solid #ccc; border-radius: 8px; background-color: #f8f9fa;">
                             </div>
 
@@ -549,6 +587,26 @@
         modalInstance.show();
     }
 
+    function alterarStatusCliente(button) {
+        const idCliente = button.getAttribute('data-id');
+        const statusAtual = button.getAttribute('data-status');
+
+        if (!idCliente) return;
+
+        const urlAction = (statusAtual === 'ATIVO')
+            ? `/cliente/disable/${idCliente}`
+            : `/cliente/activate/${idCliente}`;
+
+        const formFantasma = document.createElement('form');
+        formFantasma.method = 'POST';
+        formFantasma.action = urlAction;
+
+        document.body.appendChild(formFantasma);
+        formFantasma.submit();
+
+        formFantasma.remove();
+    }
+
     document.getElementById('modalCriarCliente').addEventListener('hidden.bs.modal', function () {
         document.getElementById('criarClienteTipo').selectedIndex = 0;
 
@@ -627,69 +685,27 @@
                         adicionarCampoEmail('edit');
                     }
                 }
+
+                form.action = '/cliente/update/' + id;
             });
-        }
-
-        const inputConfigElement = document.getElementById('ConfigMostrarModal');
-        const deveMostrarModal = inputConfigElement ? inputConfigElement.value === 'true' : false;
-
-        if (deveMostrarModal) {
-            const id = document.getElementById('bancoClienteId')?.value;
-            const nome = document.getElementById('bancoClienteNome')?.value;
-            const status = document.getElementById('bancoClienteStatus')?.value;
-            const tipo = document.getElementById('bancoClienteTipo')?.value;
-            const emailsStr = document.getElementById('bancoClienteEmails')?.value;
-            const logradouro = document.getElementById('bancoClienteLogradouro')?.value;
-            const bairro = document.getElementById('bancoClienteBairro')?.value;
-            const cidade = document.getElementById('bancoClienteCidade')?.value;
-            const estado = document.getElementById('bancoClienteEstado')?.value;
-            const cep = document.getElementById('bancoClienteCep')?.value;
-
-            document.getElementById('detalheClienteId').value = id || '';
-            document.getElementById('detalheClienteNome').value = nome || '';
-            document.getElementById('detalheClienteStatus').value = status || '';
-            document.getElementById('detalheClienteEndereco').value = `${logradouro || ''}, ${bairro || ''}, ${cidade || ''} - ${estado || ''}, CEP: ${cep || ''}`;
-
-            let tipoDisplay = tipo === 'CPF' ? 'Pessoa Física' : (tipo === 'CNPJ' ? 'Pessoa Jurídica' : (tipo || 'N/A'));
-            document.getElementById('detalheClienteTipo').value = tipoDisplay;
-
-            const emailsDiv = document.getElementById('detalheClienteEmails');
-            if (emailsDiv) {
-                emailsDiv.innerHTML = '';
-                if (emailsStr && emailsStr.trim() !== "" && emailsStr !== "null") {
-                    const stringLimpa = emailsStr.replace(/[\[\]]/g, '');
-                    const emailsArray = stringLimpa.split(',');
-                    emailsArray.forEach(email => {
-                        const emailLimpo = email.trim();
-                        if (emailLimpo !== "") {
-                            const span = document.createElement('span');
-                            span.className = 'd-block mb-1';
-                            span.innerText = emailLimpo;
-                            emailsDiv.appendChild(span);
-                        }
-                    });
-                } else {
-                    emailsDiv.innerHTML = '<span class="text-muted">Nenhum email cadastrado</span>';
-                }
-            }
-
-            if (id) {
-                history.pushState(null, '', '/cliente/' + id);
-            }
-
-            const meuModalElemento = document.getElementById('modalDetalhesCliente');
-            if (meuModalElemento) {
-                const bootstrapModal = bootstrap.Modal.getOrCreateInstance(meuModalElemento);
-                bootstrapModal.show();
-            }
         }
 
         const modalDetalhes = document.getElementById('modalDetalhesCliente');
         if (modalDetalhes) {
             modalDetalhes.addEventListener('hidden.bs.modal', function () {
-                history.pushState(null, '', '/cliente');
+                if (window.location.pathname !== '/cliente') {
+                    window.location.href = '/cliente';
+                }
             });
         }
+
+        const alertas = document.querySelectorAll('.alert');
+        alertas.forEach(function(alerta) {
+            setTimeout(function() {
+                const bsAlert = new bootstrap.Alert(alerta);
+                bsAlert.close();
+            }, 5000);
+        });
 
         const inputBusca = document.getElementById('searchClienteId');
         if (inputBusca) {

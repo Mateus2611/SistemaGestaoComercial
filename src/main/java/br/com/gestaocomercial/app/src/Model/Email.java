@@ -13,9 +13,8 @@ public class Email {
         Endereco = endereco;
     }
 
-    public Email(Integer id, Integer idCliente, String endereco) {
-        Id = id;
-        this.Cliente.setId(idCliente);
+    public Email(Cliente cliente, String endereco) {
+        Cliente = cliente;
         Endereco = endereco;
     }
 
@@ -23,7 +22,7 @@ public class Email {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "Id")
     private Integer Id;
-    @OneToOne
+    @OneToOne(orphanRemoval = true)
     @JoinColumn(name = "Id_Cliente")
     private Cliente Cliente;
     @Column(name = "Endereco", nullable = false)
