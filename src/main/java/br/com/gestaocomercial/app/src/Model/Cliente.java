@@ -44,15 +44,16 @@ public class Cliente {
     }
 
     @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "Id")
     private Integer Id;
     @Column(name = "Nome")
     private String Nome;
-    @OneToMany(orphanRemoval = true)
+    @OneToMany(cascade = CascadeType.ALL)
     @JoinColumn(name = "Id_Cliente")
     private List<Email> Emails;
-    @OneToOne
-    @JoinColumn(name = "Id_Endereco")
+    @OneToOne(cascade = CascadeType.ALL)
+    @JoinColumn(name = "Id_Endereco", referencedColumnName = "Id")
     private Endereco Endereco;
     @Column(name = "Data_Cadastro")
     private Date DataCadastro;

@@ -26,6 +26,39 @@
 
 <div class="d-flex">
 
+    <div th:if="${mensagemSucesso}"
+         class="alert alert-success alert-dismissible fade show shadow-lg border-0 position-fixed top-0 end-0 m-4"
+         role="alert"
+         style="border-radius: 10px; border-left: 5px solid #198754 !important; z-index: 1050; min-width: 300px;">
+
+        <div class="d-flex align-items-center pr-3">
+            <i class="bi bi-check-circle-fill me-2 fs-4"></i>
+            <span th:text="${mensagemSucesso}" class="fw-bold">Produto excluído com sucesso!</span>
+        </div>
+    </div>
+
+    <div th:if="${mensagemAlerta}"
+         class="alert alert-warning alert-dismissible fade show shadow-lg border-0 position-fixed top-0 end-0 m-4"
+         role="alert"
+         style="border-radius: 10px; border-left: 5px solid #dc8b35 !important; z-index: 1050; min-width: 320px; max-width: 500px;">
+
+        <div class="d-flex align-items-center">
+            <i class="bi bi-shield-fill-x me-2 fs-4 text-warning"></i>
+            <span th:text="${mensagemAlerta}" class="fw-bold text-dark" style="font-size: 0.95rem;">Não foi possível excluir produto, por que está vinculado a outros orçamentos.</span>
+        </div>
+    </div>
+
+    <div th:if="${mensagemErro}"
+         class="alert alert-danger fade show shadow-lg border-0 position-fixed top-0 end-0 m-4 text-dark"
+         role="alert"
+         style="border-radius: 10px; border-left: 5px solid #dc3535 !important; z-index: 1050; min-width: 320px; max-width: 500px;">
+
+        <div class="d-flex align-items-center">
+            <i class="bi bi-exclamation-triangle-fill me-2 fs-4 text-dark"></i>
+            <span th:text="${mensagemErro}" class="fw-bold text-dark" style="font-size: 0.95rem;">Aviso do sistema.</span>
+        </div>
+    </div>
+
     <div class="sidebar-custom d-flex flex-column flex-shrink-0">
 
         <div class="sidebar-logo d-flex justify-content-center align-items-center py-3 mb-2 w-100">
@@ -36,27 +69,27 @@
             <i class="bi bi-house-door-fill"></i>
             <span>Início</span>
         </a>
-        <a th:href="@{produto}" class="nav-link-custom text-uppercase">
+        <a th:href="@{/produto}" class="nav-link-custom text-uppercase">
             <i class="bi bi-box-seam-fill"></i>
             <span>Produtos</span>
         </a>
-        <a th:href="@{venda}" class="nav-link-custom text-uppercase">
+        <a th:href="@{/venda}" class="nav-link-custom text-uppercase">
             <i class="bi bi-cart-fill"></i>
             <span>Vendas</span>
         </a>
-        <a th:href="@{orcamento}" class="nav-link-custom text-uppercase">
+        <a th:href="@{/orcamento}" class="nav-link-custom text-uppercase">
             <i class="bi bi-file-earmark-text-fill"></i>
             <span>Orçamentos</span>
         </a>
-        <a th:href="@{cliente}" class="nav-link-custom active text-uppercase">
+        <a th:href="@{/cliente}" class="nav-link-custom active text-uppercase">
             <i class="bi bi-people-fill"></i>
             <span>Clientes</span>
         </a>
-        <a th:href="@{avaliacao}" class="nav-link-custom text-uppercase">
+        <a th:href="@{/avaliacao}" class="nav-link-custom text-uppercase">
             <i class="bi bi-star-fill"></i>
             <span>Avaliações</span>
         </a>
-        <a th:href="@{sobre}" class="nav-link-custom mt-auto text-uppercase no-hover">
+        <a th:href="@{/sobre}" class="nav-link-custom mt-auto text-uppercase no-hover">
             <i class="bi bi-info-circle-fill"></i>
             <span>Sobre</span>
         </a>
@@ -67,10 +100,37 @@
         <h1 class="page-title mb-2">CLIENTES</h1>
 
         <div class="d-flex align-items-center gap-3 mb-4 flex-wrap">
-            <div class="search-container">
-                <i class="bi bi-search"></i>
-                <input type="text" class="search-input" placeholder="Procurar cliente">
+
+            <div th:if="${cliente != null}">
+                <input type="hidden" id="ConfigMostrarModal" value="true">
+                <input type="hidden" id="bancoClienteId" th:value="${cliente.id}">
+                <input type="hidden" id="bancoClienteNome" th:value="${cliente.nome}">
+                <input type="hidden" id="bancoClienteStatus" th:value="${cliente.status}">
+                <input type="hidden" id="bancoClienteTipo" th:value="${cliente.tipo}">
+                <input type="hidden" id="bancoClienteEmails" th:value="${cliente.emails}">
+                <input type="hidden" id="bancoClienteCriacao" th:value="${cliente.dataCadastro}">
+                <input type="hidden" id="bancoClienteInativacao" th:value="${cliente.dataInativacao}">
+                <input type="hidden" id="bancoClienteLogradouro" th:value="${cliente.endereco != null ? cliente.endereco.logradouro : ''}">
+                <input type="hidden" id="bancoClienteBairro" th:value="${cliente.endereco != null ? cliente.endereco.bairro : ''}">
+                <input type="hidden" id="bancoClienteCidade" th:value="${cliente.endereco != null ? cliente.endereco.cidade : ''}">
+                <input type="hidden" id="bancoClienteEstado" th:value="${cliente.endereco != null ? cliente.endereco.estado : ''}">
+                <input type="hidden" id="bancoClienteCep" th:value="${cliente.endereco != null ? cliente.endereco.cep : ''}">
+                <input type="hidden" id="flagFiltroId" th:value="${filtroPorIdAtivo ? 'true' : 'false'}">
             </div>
+
+            <form onsubmit="return false;" style="margin: 0; padding: 0;">
+                <div class="d-flex align-items-center">
+
+                    <button type="button" id="btnSearchCliente" class="btn fw-bold" onclick="realizarBuscaPorId()"
+                            style="background-color: #ff7e12 !important; color: #fff !important; border: 1.8px solid #ff9433 !important; border-radius: 8px; border-top-right-radius: 0; border-bottom-right-radius: 0; padding: 10px 16px; height: 46px; display: flex; align-items: center; justify-content: center; cursor: pointer; transition: all 0.2s ease;">
+                        <i class="bi bi-search" style="font-size: 1.1rem;"></i>
+                    </button>
+
+                    <input type="number" id="searchClienteId" class="search-input" placeholder="Digite o ID do Cliente e aperte Enter"
+                           style="border: 1.8px solid #000; border-left: 1.8px; border-radius: 8px; border-top-left-radius: 0; border-bottom-left-radius: 0; padding: 10px 16px; box-shadow: none; outline: none;">
+
+                </div>
+            </form>
 
             <button class="btn btn-orange text-uppercase" data-bs-toggle="modal" data-bs-target="#modalCriarCliente">
                 Cadastrar Cliente
@@ -83,11 +143,12 @@
             <table class="table table-custom table-hover">
                 <thead>
                 <tr>
-                    <th>ID</th>
+                    <th>Código</th>
                     <th>Nome</th>
                     <th>CPF/CNPJ</th>
-                    <th>Email Principal</th>
-                    <th>Telefone</th>
+                    <th>Endereço</th>
+                    <th>Criação</th>
+                    <th>Última Inativação</th>
                     <th>Status</th>
                     <th class="text-end">Ações</th>
                 </tr>
@@ -99,75 +160,99 @@
                     onclick="abrirModalDetalhes(this)"
                     th:attr="data-id=${cliente.id},
                              data-nome=${cliente.nome},
-                             data-documento=${cliente.documento != null ? cliente.documento : 'N/A'},
-                             data-emails=${cliente.emails != null ? #strings.listJoin(cliente.emails, ',') : ''},
-                             data-telefone=${cliente.telefone != null ? cliente.telefone : 'N/A'},
                              data-status=${cliente.status != null ? cliente.status.name() : ''},
-                             data-tipo=${cliente.tipo != null ? cliente.tipo.name() : ''}">
+                             data-cadastro=${cliente.dataCadastro},
+                             data-inativacao=${cliente.dataInativacao},
+                             data-emails=${cliente.emails},
+                             data-tipo=${cliente.tipo != null ? cliente.tipo.name() : ''},
+                             data-endereco-logradouro=${cliente.endereco.logradouro},
+                             data-endereco-bairro=${cliente.endereco.bairro},
+                             data-endereco-cep=${cliente.endereco.cep},
+                             data-endereco-cidade=${cliente.endereco.cidade},
+                             data-endereco-estado=${cliente.endereco.estado}">
 
-                    <td th:text="${cliente.id}">1</td>
-                    <td th:text="${cliente.nome}">João da Silva</td>
-                    <td th:text="${cliente.documento != null ? cliente.documento : 'N/A'}">000.000.000-00</td>
-                    <td th:text="${cliente.emails != null and !cliente.emails.isEmpty() ? cliente.emails[0].endereco : 'N/A'}">joao@email.com</td>
-                    <td th:text="${cliente.telefone != null ? cliente.telefone : 'N/A'}">(11) 90000-0000</td>
+                    <td th:text="${cliente.id}"></td>
+                    <td th:text="${cliente.nome}"></td>
+                    <td th:text="${cliente.tipo != null ? cliente.tipo : 'N/A'}"></td>
+                    <td th:text="|${cliente.endereco.logradouro}, ${cliente.endereco.bairro}, ${cliente.endereco.cidade}|"></td>
+                    <td th:text="${cliente.dataCadastro}"></td>
+                    <td th:text="${cliente.dataInativacao}"></td>
                     <td>
                         <span class="badge"
                               th:classappend="${cliente.status != null and cliente.status.name() == 'ATIVO' ? 'badge-verde' : 'badge-vermelho'}"
-                              th:text="${cliente.status}">ATIVO</span>
+                              th:text="${cliente.status}"></span>
                     </td>
-                    <td class="text-end">
+                    <td class="text-end ">
                         <button class="btn btn-sm btn-outline-secondary me-2" title="Editar"
                                 data-bs-toggle="modal" data-bs-target="#modalEditarCliente"
-                                th:attr="data-id=${cliente.id}, data-nome=${cliente.nome}, data-emails=${cliente.emails != null ? #strings.listJoin(cliente.emails, ',') : ''}, data-telefone=${cliente.telefone}, data-status=${cliente.status}">
+                                th:attr="data-id=${cliente.id},
+                                data-nome=${cliente.nome},
+                                data-emails=${cliente.emails != null ? #strings.listJoin(cliente.emails, ',') : ''},
+                                data-status=${cliente.status},
+                                data-endereco-logradouro=${cliente.endereco.logradouro},
+                                data-endereco-bairro=${cliente.endereco.bairro},
+                                data-endereco-cep=${cliente.endereco.cep},
+                                data-endereco-cidade=${cliente.endereco.cidade},
+                                data-endereco-estado=${cliente.endereco.estado}">
                             <i class="bi bi-pencil-fill"></i>
                         </button>
-                        <button class="btn btn-sm btn-outline-danger" title="Excluir">
-                            <i class="bi bi-trash-fill"></i>
-                        </button>
-                    </td>
-                </tr>
-
-                <tr class="tr-clicavel" onclick="abrirModalDetalhes(this)"
-                    data-id="2" data-nome="Maria Oliveira" data-documento="123.456.789-00" data-emails="maria.oliveira@empresa.com,maria.pessoal@email.com" data-telefone="(11) 98888-7777" data-status="ATIVO" data-tipo="CPF">
-                    <td>2</td>
-                    <td>Maria Oliveira</td>
-                    <td>123.456.789-00</td>
-                    <td>maria.oliveira@empresa.com</td>
-                    <td>(11) 98888-7777</td>
-                    <td><span class="badge badge-verde">ATIVO</span></td>
-                    <td class="text-end">
-                        <button class="btn btn-sm btn-outline-secondary me-2" title="Editar"
-                                data-bs-toggle="modal" data-bs-target="#modalEditarCliente"
-                                data-id="2" data-nome="Maria Oliveira" data-emails="maria.oliveira@empresa.com,maria.pessoal@email.com" data-telefone="(11) 98888-7777" data-status="ATIVO">
-                            <i class="bi bi-pencil-fill"></i>
-                        </button>
-                        <button class="btn btn-sm btn-outline-danger" title="Excluir">
-                            <i class="bi bi-trash-fill"></i>
-                        </button>
-                    </td>
-                </tr>
-
-                <tr class="tr-clicavel" onclick="abrirModalDetalhes(this)"
-                    data-id="3" data-nome="Construtora Alfa Ltda" data-documento="12.345.678/0001-99" data-emails="contato@alfa.com.br" data-telefone="(21) 3333-4444" data-status="INATIVO" data-tipo="CNPJ">
-                    <td>3</td>
-                    <td>Construtora Alfa Ltda</td>
-                    <td>12.345.678/0001-99</td>
-                    <td>contato@alfa.com.br</td>
-                    <td>(21) 3333-4444</td>
-                    <td><span class="badge badge-vermelho">INATIVO</span></td>
-                    <td class="text-end">
-                        <button class="btn btn-sm btn-outline-secondary me-2" title="Editar"
-                                data-bs-toggle="modal" data-bs-target="#modalEditarCliente"
-                                data-id="3" data-nome="Construtora Alfa Ltda" data-emails="contato@alfa.com.br" data-telefone="(21) 3333-4444" data-status="INATIVO">
-                            <i class="bi bi-pencil-fill"></i>
-                        </button>
-                        <button class="btn btn-sm btn-outline-danger" title="Excluir">
-                            <i class="bi bi-trash-fill"></i>
+                        <button class="btn btn-sm fw-bold text-uppercase"
+                                th:text="${cliente.status != null and cliente.status.name() == 'ATIVO' ? 'INATIVAR' : 'ATIVAR'}"
+                                th:attr="data-id=${cliente.id}, data-status=${cliente.status}"
+                                th:styleappend="${cliente.status != null and cliente.status.name() == 'INATIVO'
+                                ? 'background-color: #ff7e12; color: #ffffff; border: 1.8px solid #ff7e12; border-radius: 8px; padding: 5px 16px; font-size: 0.875rem; width: 8em;'
+                                : 'background-color: transparent; color: #ff7e12; border: 1.8px solid #ff7e12; border-radius: 8px; padding: 5px 16px; font-size: 0.875rem; width: 8em;'}"
+                                onclick="alterarStatusCliente(this)">
                         </button>
                     </td>
                 </tr>
                 </tbody>
             </table>
+
+            <div th:if="${totalPaginas > 1}" class="d-flex justify-content-between align-items-center mt-4 px-2">
+                <div class="text-muted fw-bold" style="font-size: 0.95rem;">
+                    Exibindo página <span th:text="${paginaAtual}">1</span> de <span th:text="${totalPaginas}">5</span>
+                    (Total de <span th:text="${totalItens}">75</span> clientes)
+                </div>
+
+                <nav aria-label="Navegação de páginas">
+                    <ul class="pagination mb-0">
+
+                        <li class="page-item" th:classappend="${paginaAtual == 1} ? 'disabled'">
+                            <a class="page-link" th:href="@{/cliente(page=${paginaAtual - 1})}" aria-label="Anterior" style="color: #000000; box-shadow: none;">
+                                <span aria-hidden="true">&laquo;</span>
+                            </a>
+                        </li>
+
+                        <li class="page-item" th:each="i : ${#numbers.sequence(1, totalPaginas)}"
+                            th:classappend="${paginaAtual == i} ? 'active'">
+                            <a class="page-link fw-bold"
+                               th:href="@{/cliente(page=${i})}"
+                               th:text="${i}"
+                               th:style="${paginaAtual == i} ? 'background-color: #ff7e12; border-color: #000000; color: #000000;' : 'color: #000000; box-shadow: none;'">
+                                1
+                            </a>
+                        </li>
+
+                        <li class="page-item" th:classappend="${paginaAtual == totalPaginas} ? 'disabled'">
+                            <a class="page-link" th:href="@{/cliente(page=${paginaAtual + 1})}" aria-label="Próximo" style="color: #000000; box-shadow: none;">
+                                <span aria-hidden="true">&raquo;</span>
+                            </a>
+                        </li>
+
+                    </ul>
+                </nav>
+            </div>
+
+            <div th:if="${#ctx.containsVariable('clientes') and clientes.size() == 1 and #vars['javax.servlet.forward.request_uri'] != '/cliente'}" class="mb-3">
+                <a href="/cliente" class="btn btn-sm fw-bold text-uppercase d-inline-flex align-items-center gap-2"
+                   style="background-color: #14213d; color: #ffffff; border: 1.8px solid; border-radius: 8px; padding: 8px 16px; transition: all 0.2s ease;"
+                   onmouseenter="this.style.backgroundColor='transparent'; this.style.color='#14213d';"
+                   onmouseleave="this.style.backgroundColor='#14213d'; this.style.color='#ffffff';">
+                    <i class="bi bi-arrow-left"></i> Voltar
+                </a>
+            </div>
+        </div>
         </div>
 
     </div>
@@ -188,40 +273,53 @@
 
                     <div class="text-start px-md-4">
                         <div class="row g-4">
+                            <div class="col-md-3">
+                                <label class="form-label fw-bold text-uppercase text-dark mb-1" style="font-size: 1.1rem;">Código</label>
+                                <input type="text" id="detalheClienteId" class="form-control form-control-lg fw-bold" disabled
+                                       style="border: 1.8px solid #ccc; border-radius: 8px; background-color: #f8f9fa;">
+                            </div>
+
                             <div class="col-md-8">
                                 <label class="form-label fw-bold text-uppercase text-dark mb-1" style="font-size: 1.1rem;">Nome Completo / Razão Social</label>
-                                <input type="text" id="detalheClienteNome" class="form-control form-control-lg fw-bold" readonly
-                                       style="border: 1.6px solid #ccc; border-radius: 8px; background-color: #f8f9fa;">
+                                <input type="text" id="detalheClienteNome" class="form-control form-control-lg fw-bold" disabled
+                                       style="border: 1.8px solid #ccc; border-radius: 8px; background-color: #f8f9fa;">
                             </div>
 
                             <div class="col-md-4">
                                 <label class="form-label fw-bold text-uppercase text-dark mb-1" style="font-size: 1.1rem;">Status</label>
-                                <input type="text" id="detalheClienteStatus" class="form-control form-control-lg fw-bold" readonly
-                                       style="border: 1.6px solid #ccc; border-radius: 8px; background-color: #f8f9fa;">
+                                <input type="text" id="detalheClienteStatus" class="form-control form-control-lg fw-bold" disabled
+                                       style="border: 1.8px solid #ccc; border-radius: 8px; background-color: #f8f9fa;">
                             </div>
 
                             <div class="col-md-6">
                                 <label class="form-label fw-bold text-uppercase text-dark mb-1" style="font-size: 1.1rem;">Tipo</label>
-                                <input type="text" id="detalheClienteTipo" class="form-control form-control-lg" readonly
-                                       style="border: 1.6px solid #ccc; border-radius: 8px; background-color: #f8f9fa;">
+                                <input type="text" id="detalheClienteTipo" class="form-control form-control-lg" disabled
+                                       style="border: 1.8px solid #ccc; border-radius: 8px; background-color: #f8f9fa;">
                             </div>
 
                             <div class="col-md-6">
-                                <label class="form-label fw-bold text-uppercase text-dark mb-1" style="font-size: 1.1rem;">Documento</label>
-                                <input type="text" id="detalheClienteDocumento" class="form-control form-control-lg" readonly
-                                       style="border: 1.6px solid #ccc; border-radius: 8px; background-color: #f8f9fa;">
+                                <label class="form-label fw-bold text-uppercase text-dark mb-1" style="font-size: 1.1rem;">Criado</label>
+                                <input type="date" id="detalheClienteCadastro" class="form-control form-control-lg" disabled
+                                       style="border: 1.8px solid #ccc; border-radius: 8px; background-color: #f8f9fa;">
                             </div>
 
                             <div class="col-md-6">
-                                <label class="form-label fw-bold text-uppercase text-dark mb-1" style="font-size: 1.1rem;">Telefone</label>
-                                <input type="text" id="detalheClienteTelefone" class="form-control form-control-lg" readonly
-                                       style="border: 1.6px solid #ccc; border-radius: 8px; background-color: #f8f9fa;">
+                                <label class="form-label fw-bold text-uppercase text-dark mb-1" style="font-size: 1.1rem;">Última Inativacao</label>
+                                <input type="date" id="detalheClienteInativacao" class="form-control form-control-lg" disabled
+                                       style="border: 1.8px solid #ccc; border-radius: 8px; background-color: #f8f9fa;">
                             </div>
 
                             <div class="col-md-6">
                                 <label class="form-label fw-bold text-uppercase text-dark mb-1" style="font-size: 1.1rem;">Emails</label>
-                                <div id="detalheClienteEmails" class="p-2" style="border: 1.6px solid #ccc; border-radius: 8px; background-color: #f8f9fa; min-height: 48px; text-align: left;">
+                                <div id="detalheClienteEmails" class="p-2" style="border: 1.8px solid #ccc; border-radius: 8px; background-color: #f8f9fa; min-height: 48px; text-align: left;">
+
                                 </div>
+                            </div>
+
+                            <div class="col-md-12">
+                                <label class="form-label fw-bold text-uppercase text-dark mb-1" style="font-size: 1.1rem;">Endereco</label>
+                                <input type="text" id="detalheClienteEndereco" class="form-control form-control-lg" disabled
+                                       style="border: 1.8px solid #ccc; border-radius: 8px; background-color: #f8f9fa;">
                             </div>
                         </div>
 
@@ -251,39 +349,65 @@
                     </h1>
                     <hr class="mx-auto mb-5" style="width: 60%; border-top: 1px solid #000; opacity: 1;">
 
-                    <form class="text-start px-md-4">
+                    <form th:action="@{/cliente/create}" th:object="${novoCliente}" method="POST" class="text-start px-md-4">
                         <div class="row g-4">
+
                             <div class="col-md-12">
                                 <label class="form-label fw-bold text-uppercase text-dark mb-1" style="font-size: 1.1rem;">Nome Completo / Razão Social</label>
+                                <input type="text" th:field="*{nome}" class="form-control form-control-lg"
+                                       style="border: 1.8px solid #000; border-radius: 8px; box-shadow: none;">
+                            </div>
+
+                            <div class="col-md-6">
+                                <label class="form-label fw-bold text-uppercase text-dark mb-1" style="font-size: 1.1rem;">Logradouro e Número</label>
+                                <input type="text" th:field="*{endereco.logradouro}" class="form-control form-control-lg"
+                                       style="border: 1.8px solid #000; border-radius: 8px; box-shadow: none;">
+                            </div>
+
+                            <div class="col-md-6">
+                                <label class="form-label fw-bold text-uppercase text-dark mb-1" style="font-size: 1.1rem;">Bairro</label>
+                                <input type="text" th:field="*{endereco.bairro}" class="form-control form-control-lg"
+                                       style="border: 1.8px solid #000; border-radius: 8px; box-shadow: none;">
+                            </div>
+
+                            <div class="col-md-4">
+                                <label class="form-label fw-bold text-uppercase text-dark mb-1" style="font-size: 1.1rem;">Cidade</label>
+                                <input type="text" th:field="*{endereco.cidade}" class="form-control form-control-lg"
+                                       style="border: 1.8px solid #000; border-radius: 8px; box-shadow: none;">
+                            </div>
+
+                            <div class="col-md-4">
+                                <label class="form-label fw-bold text-uppercase text-dark mb-1" style="font-size: 1.1rem;">Estado</label>
+                                <input type="text" th:field="*{endereco.estado}" class="form-control form-control-lg"
+                                       style="border: 1.8px solid #000; border-radius: 8px; box-shadow: none;">
+                            </div>
+
+                            <div class="col-md-4">
+                                <label class="form-label fw-bold text-uppercase text-dark mb-1" style="font-size: 1.1rem;">CEP</label>
+                                <input type="text" th:field="*{endereco.cep}" class="form-control form-control-lg"
+                                       style="border: 1.8px solid #000; border-radius: 8px; box-shadow: none;">
                                 <input type="text" class="form-control form-control-lg" name="nome"
                                        style="border: 1.6px solid #000; border-radius: 8px; box-shadow: none;">
                             </div>
 
                             <div class="col-md-4">
                                 <label class="form-label fw-bold text-uppercase text-dark mb-1" style="font-size: 1.1rem;">Tipo</label>
-                                <select id="criarClienteTipo" name="tipo" class="form-select form-select-lg" style="border: 1.6px solid #000; border-radius: 8px;" onchange="alternarCampoDocumento('criar')">
-                                    <option selected disabled value="">Selecione</option>
+                                <select id="criarClienteTipo" th:field="*{tipo}" class="form-select form-select-lg" style="border: 1.8px solid #000; border-radius: 8px;">
+                                    <option value="" disabled hidden selected>Selecione</option>
                                     <option value="CPF">Pessoa Física</option>
                                     <option value="CNPJ">Pessoa Jurídica</option>
                                 </select>
-                            </div>
-
-                            <div class="col-md-8" id="divCriarDocumento" style="display: none;">
-                                <label id="labelCriarDocumento" class="form-label fw-bold text-uppercase text-dark mb-1" style="font-size: 1.1rem;">Documento</label>
-                                <input type="text" id="inputCriarDocumento" name="documento" class="form-control form-control-lg"
-                                       style="border: 1.6px solid #000; border-radius: 8px; box-shadow: none;">
-                            </div>
-
-                            <div class="col-md-12">
-                                <label class="form-label fw-bold text-uppercase text-dark mb-1" style="font-size: 1.1rem;">Telefone</label>
-                                <input type="text" class="form-control form-control-lg" name="telefone"
-                                       style="border: 1.6px solid #000; border-radius: 8px; box-shadow: none;">
                             </div>
 
                             <div class="col-md-12">
                                 <label class="form-label fw-bold text-uppercase text-dark mb-1" style="font-size: 1.1rem;">Emails</label>
                                 <div id="containerCriarEmails" class="d-flex flex-column gap-2 mb-2">
                                     <div class="d-flex gap-2 email-input-group">
+                                        <input type="email" th:field="*{emails[0].endereco}" class="form-control form-control-lg" placeholder="email@exemplo.com"
+                                               style="border: 1.8px solid #000; border-radius: 8px; box-shadow: none;">
+                                        <button type="button" class="btn btn-outline-danger fw-bold" onclick="removerCampoEmail(this)" style="border-radius: 8px;">
+                                            <i class="bi bi-trash-fill"></i>
+                                        </button>
                                         <input type="email" name="emails" class="form-control form-control-lg" placeholder="email@exemplo.com"
                                                style="border: 1.6px solid #000; border-radius: 8px; box-shadow: none;">
                                         <button type="button" class="btn btn-outline-danger fw-bold" onclick="removerCampoEmail(this)" style="border-radius: 8px;"><i class="bi bi-trash-fill"></i></button>
@@ -298,7 +422,7 @@
                                     style="font-size: 1.2rem; padding: 12px 40px; border-radius: 8px; border-width: 1.8px;">
                                 Cancelar
                             </button>
-                            <button type="button" class="btn btn-orange fw-bolder text-uppercase text-white"
+                            <button type="submit" class="btn btn-orange fw-bolder text-uppercase text-white"
                                     style="font-size: 1.2rem; padding: 12px 40px; border-radius: 8px; background-color: #ff9433; border: none;">
                                 Salvar
                             </button>
@@ -323,7 +447,8 @@
                     </h1>
                     <hr class="mx-auto mb-5" style="width: 60%; border-top: 1px solid #000; opacity: 1;">
 
-                    <form class="text-start px-md-4">
+                    <form id="formEditarCliente" data-base-action="/cliente/update/" th:object="${cliente}" method="POST" class="text-start px-md-4">
+
                         <input type="hidden" id="editClienteId" name="id">
 
                         <div class="row g-4">
@@ -343,23 +468,41 @@
 
                             <div class="col-md-4">
                                 <label class="form-label fw-bold text-uppercase text-dark mb-1" style="font-size: 1.1rem;">Tipo</label>
-                                <select id="editClienteTipo" name="tipo" class="form-select form-select-lg" style="border: 1.6px solid #000; border-radius: 8px;" onchange="alternarCampoDocumento('edit')">
-                                    <option selected disabled value="">Selecione</option>
+                                <select id="editClienteTipo" name="tipo" class="form-select form-select-lg" style="border: 1.8px solid #000; border-radius: 8px;">
+                                    <option value="" hidden disabled>Selecione</option>
                                     <option value="CPF">Pessoa Física</option>
                                     <option value="CNPJ">Pessoa Jurídica</option>
                                 </select>
                             </div>
 
-                            <div class="col-md-8" id="divEditDocumento" style="display: none;">
-                                <label id="labelEditDocumento" class="form-label fw-bold text-uppercase text-dark mb-1" style="font-size: 1.1rem;">Documento</label>
-                                <input type="text" id="inputEditDocumento" name="documento" class="form-control form-control-lg"
-                                       style="border: 1.6px solid #000; border-radius: 8px; box-shadow: none;">
+                            <div class="col-md-6">
+                                <label class="form-label fw-bold text-uppercase text-dark mb-1" style="font-size: 1.1rem;">Logradouro</label>
+                                <input type="text" id="editClienteLogradouro" name="endereco.logradouro" class="form-control form-control-lg"
+                                       style="border: 1.8px solid #000; border-radius: 8px; box-shadow: none;">
                             </div>
 
-                            <div class="col-md-12">
-                                <label class="form-label fw-bold text-uppercase text-dark mb-1" style="font-size: 1.1rem;">Telefone</label>
-                                <input type="text" id="editClienteTelefone" name="telefone" class="form-control form-control-lg"
-                                       style="border: 1.6px solid #000; border-radius: 8px; box-shadow: none;">
+                            <div class="col-md-6">
+                                <label class="form-label fw-bold text-uppercase text-dark mb-1" style="font-size: 1.1rem;">Bairro</label>
+                                <input type="text" id="editClienteBairro" name="endereco.bairro" class="form-control form-control-lg"
+                                       style="border: 1.8px solid #000; border-radius: 8px; box-shadow: none;">
+                            </div>
+
+                            <div class="col-md-4">
+                                <label class="form-label fw-bold text-uppercase text-dark mb-1" style="font-size: 1.1rem;">Cidade</label>
+                                <input type="text" id="editClienteCidade" name="endereco.cidade" class="form-control form-control-lg"
+                                       style="border: 1.8px solid #000; border-radius: 8px; box-shadow: none;">
+                            </div>
+
+                            <div class="col-md-4">
+                                <label class="form-label fw-bold text-uppercase text-dark mb-1" style="font-size: 1.1rem;">Estado</label>
+                                <input type="text" id="editClienteEstado" name="endereco.estado" class="form-control form-control-lg"
+                                       style="border: 1.8px solid #000; border-radius: 8px; box-shadow: none;">
+                            </div>
+
+                            <div class="col-md-4">
+                                <label class="form-label fw-bold text-uppercase text-dark mb-1" style="font-size: 1.1rem;">CEP</label>
+                                <input type="text" id="editClienteCep" name="endereco.cep" class="form-control form-control-lg"
+                                       style="border: 1.8px solid #000; border-radius: 8px; box-shadow: none;">
                             </div>
 
                             <div class="col-md-12">
@@ -375,9 +518,9 @@
                                     style="font-size: 1.2rem; padding: 12px 40px; border-radius: 8px; border-width: 1.8px;">
                                 Cancelar
                             </button>
-                            <button type="button" class="btn btn-orange fw-bolder text-uppercase text-white"
+                            <button type="submit" class="btn btn-orange fw-bolder text-uppercase text-white"
                                     style="font-size: 1.2rem; padding: 12px 40px; border-radius: 8px; background-color: #ff9433; border: none;">
-                                Salvar Alterações
+                                Salvar
                             </button>
                         </div>
                     </form>
@@ -392,15 +535,19 @@
         const containerId = modalTipo === 'criar' ? 'containerCriarEmails' : 'containerEditEmails';
         const container = document.getElementById(containerId);
 
+        const indice = container.querySelectorAll('.email-input-group').length;
+
+        const nameAtributo = modalTipo === 'criar' ? `emails[${indice}].texto` : 'emailsInput';
+
         const div = document.createElement('div');
         div.className = 'd-flex gap-2 email-input-group';
         div.innerHTML = `
-            <input type="email" name="emails" class="form-control form-control-lg" value="${valor}" placeholder="email@exemplo.com"
-                   style="border: 1.6px solid #000; border-radius: 8px; box-shadow: none;">
-            <button type="button" class="btn btn-outline-danger fw-bold" onclick="removerCampoEmail(this)" style="border-radius: 8px;">
-                <i class="bi bi-trash-fill"></i>
-            </button>
-        `;
+        <input type="email" name="${nameAtributo}" class="form-control form-control-lg" value="${valor}" placeholder="email@exemplo.com"
+               style="border: 1.8px solid #000; border-radius: 8px; box-shadow: none;">
+        <button type="button" class="btn btn-outline-danger fw-bold" onclick="removerCampoEmail(this)" style="border-radius: 8px;">
+            <i class="bi bi-trash-fill"></i>
+        </button>
+    `;
         container.appendChild(div);
     }
 
@@ -410,116 +557,222 @@
     }
 
     function abrirModalDetalhes(row) {
+        const id = row.getAttribute('data-id');
         const nome = row.getAttribute('data-nome');
-        const documento = row.getAttribute('data-documento');
-        const emailsStr = row.getAttribute('data-emails'); // String separada por vírgula
-        const telefone = row.getAttribute('data-telefone');
+        const emailsStr = row.getAttribute('data-emails');
         const status = row.getAttribute('data-status');
         const tipo = row.getAttribute('data-tipo');
+        const cadastro = row.getAttribute('data-cadastro');
+        const inativacao = row.getAttribute('data-inativacao');
+        const logradouro = row.getAttribute('data-endereco-logradouro');
+        const bairro = row.getAttribute('data-endereco-bairro');
+        const cep = row.getAttribute('data-endereco-cep');
+        const cidade = row.getAttribute('data-endereco-cidade');
+        const estado = row.getAttribute('data-endereco-estado');
 
+        document.getElementById('detalheClienteId').value = id || '';
         document.getElementById('detalheClienteNome').value = nome || '';
-        document.getElementById('detalheClienteDocumento').value = documento || '';
-        document.getElementById('detalheClienteTelefone').value = telefone || '';
         document.getElementById('detalheClienteStatus').value = status || '';
+        document.getElementById('detalheClienteCadastro').value = cadastro || '';
+        document.getElementById('detalheClienteInativacao').value = inativacao || '';
+        document.getElementById('detalheClienteEndereco').value = `${logradouro || ''}, ${bairro || ''}, ${cidade || ''} - ${estado || ''}, CEP: ${cep || ''}`;
 
         let tipoDisplay = tipo === 'CPF' ? 'Pessoa Física' : (tipo === 'CNPJ' ? 'Pessoa Jurídica' : (tipo || 'N/A'));
         document.getElementById('detalheClienteTipo').value = tipoDisplay;
 
         const emailsDiv = document.getElementById('detalheClienteEmails');
-        emailsDiv.innerHTML = ''; // limpa o conteúdo anterior
+        emailsDiv.innerHTML = '';
+
         if (emailsStr && emailsStr.trim() !== "") {
-            const emailsArray = emailsStr.split(',');
+            const stringLimpa = emailsStr.replace(/[\[\]]/g, '');
+            const emailsArray = stringLimpa.split(',');
+
             emailsArray.forEach(email => {
-                const span = document.createElement('span');
-                span.className = 'd-block mb-1';
-                span.innerText = email.trim();
-                emailsDiv.appendChild(span);
+                const emailLimpo = email.trim();
+                if (emailLimpo !== "") {
+                    const span = document.createElement('span');
+                    span.className = 'd-block mb-1';
+                    span.innerText = emailLimpo;
+                    emailsDiv.appendChild(span);
+                }
             });
         } else {
             emailsDiv.innerHTML = '<span class="text-muted">Nenhum email cadastrado</span>';
         }
 
-        const modal = new bootstrap.Modal(document.getElementById('modalDetalhesCliente'));
-        modal.show();
+        if (id) {
+            history.pushState(null, '', '/cliente/' + id);
+        }
+
+        const modalElemento = document.getElementById('modalDetalhesCliente');
+        const modalInstance = bootstrap.Modal.getOrCreateInstance(modalElemento);
+        modalInstance.show();
     }
 
-    function alternarCampoDocumento(modalTipo) {
-        let selectTipo, divDocumento, labelDocumento, inputDocumento;
+    function alterarStatusCliente(button) {
+        const idCliente = button.getAttribute('data-id');
+        const statusAtual = button.getAttribute('data-status');
 
-        if (modalTipo === 'criar') {
-            selectTipo = document.getElementById('criarClienteTipo');
-            divDocumento = document.getElementById('divCriarDocumento');
-            labelDocumento = document.getElementById('labelCriarDocumento');
-            inputDocumento = document.getElementById('inputCriarDocumento');
-        } else {
-            selectTipo = document.getElementById('editClienteTipo');
-            divDocumento = document.getElementById('divEditDocumento');
-            labelDocumento = document.getElementById('labelEditDocumento');
-            inputDocumento = document.getElementById('inputEditDocumento');
-        }
+        if (!idCliente) return;
 
-        const tipoSelecionado = selectTipo.value;
+        const urlAction = (statusAtual === 'ATIVO')
+            ? `/cliente/disable/${idCliente}`
+            : `/cliente/activate/${idCliente}`;
 
-        if (tipoSelecionado === 'CPF') {
-            divDocumento.style.display = 'block';
-            labelDocumento.innerText = 'CPF :';
-            inputDocumento.placeholder = '000.000.000-00';
-        } else if (tipoSelecionado === 'CNPJ') {
-            divDocumento.style.display = 'block';
-            labelDocumento.innerText = 'CNPJ :';
-            inputDocumento.placeholder = '00.000.000/0000-00';
-        } else {
-            divDocumento.style.display = 'none';
-        }
+        const formFantasma = document.createElement('form');
+        formFantasma.method = 'POST';
+        formFantasma.action = urlAction;
+
+        document.body.appendChild(formFantasma);
+        formFantasma.submit();
+
+        formFantasma.remove();
     }
 
     document.getElementById('modalCriarCliente').addEventListener('hidden.bs.modal', function () {
         document.getElementById('criarClienteTipo').selectedIndex = 0;
-        document.getElementById('divCriarDocumento').style.display = 'none';
-        document.getElementById('inputCriarDocumento').value = '';
 
-        // Reseta os campos de e-mail para ter apenas um vazio
         const container = document.getElementById('containerCriarEmails');
         container.innerHTML = '';
         adicionarCampoEmail('criar');
     });
 
-    document.addEventListener('DOMContentLoaded', function () {
-        const modalEditar = document.getElementById('modalEditarCliente');
+    function realizarBuscaPorId() {
+        const inputId = document.getElementById('searchClienteId');
+        if (inputId && inputId.value.trim() !== "") {
+            window.location.href = '/cliente/' + inputId.value.trim();
+        }
+    }
 
+    const inputSearch = document.getElementById('searchClienteId');
+    if (inputSearch) {
+        inputSearch.addEventListener('keypress', function (event) {
+            if (event.key === 'Enter') {
+                event.preventDefault();
+                realizarBuscaPorId();
+            }
+        });
+    }
+
+    const btnSearch = document.getElementById('btnSearchCliente');
+    if (btnSearch) {
+
+        btnSearch.addEventListener('mouseenter', function() {
+            btnSearch.style.setProperty('background-color', 'transparent', 'important');
+            btnSearch.style.setProperty('color', '#ff7e12', 'important');
+        });
+
+        btnSearch.addEventListener('mouseleave', function() {
+            btnSearch.style.setProperty('background-color', '#ff7e12', 'important');
+            btnSearch.style.setProperty('color', '#fff', 'important');
+        });
+    }
+
+    document.addEventListener('DOMContentLoaded', function () {
+
+        const modalCriar = document.getElementById('modalCriarCliente');
+        if (modalCriar) {
+            modalCriar.addEventListener('hidden.bs.modal', function () {
+                document.getElementById('criarClienteTipo').selectedIndex = 0;
+                const container = document.getElementById('containerCriarEmails');
+                container.innerHTML = '';
+                adicionarCampoEmail('criar');
+            });
+        }
+
+        const modalEditar = document.getElementById('modalEditarCliente');
         if (modalEditar) {
             modalEditar.addEventListener('show.bs.modal', function (event) {
                 const button = event.relatedTarget;
-
-                if(!button) return;
+                if (!button) return;
 
                 const id = button.getAttribute('data-id');
                 const nome = button.getAttribute('data-nome');
-                const emailsStr = button.getAttribute('data-emails');
-                const telefone = button.getAttribute('data-telefone');
                 const status = button.getAttribute('data-status');
+                const tipo = button.getAttribute('data-tipo');
+                const emailsStr = button.getAttribute('data-emails');
 
-                document.getElementById('editClienteId').value = id;
-                document.getElementById('editClienteNome').value = nome;
-                document.getElementById('editClienteTelefone').value = telefone;
+                const logradouro = button.getAttribute('data-endereco-logradouro');
+                const bairro = button.getAttribute('data-endereco-bairro');
+                const cidade = button.getAttribute('data-endereco-cidade');
+                const estado = button.getAttribute('data-endereco-estado');
+                const cep = button.getAttribute('data-endereco-cep');
+
+                document.getElementById('editClienteId').value = id || '';
+                document.getElementById('editClienteNome').value = nome || '';
 
                 if (status) {
                     document.getElementById('editClienteStatus').value = status;
                 }
 
-                // Popula os e-mails dinamicamente
+                const selectTipo = document.getElementById('editClienteTipo');
+                if (selectTipo) {
+                    if (tipo && tipo.trim() !== "") {
+                        selectTipo.value = tipo;
+                    } else {
+                        selectTipo.value = "";
+                    }
+                }
+
+                document.getElementById('editClienteLogradouro').value = logradouro || '';
+                document.getElementById('editClienteBairro').value = bairro || '';
+                document.getElementById('editClienteCidade').value = cidade || '';
+                document.getElementById('editClienteEstado').value = estado || '';
+                document.getElementById('editClienteCep').value = cep || '';
+
+                const form = document.getElementById('formEditarCliente');
+                if (form && id) {
+                    const baseAction = form.getAttribute('data-base-action');
+                    form.action = baseAction + id;
+                }
+
                 const container = document.getElementById('containerEditEmails');
-                container.innerHTML = '';
-                if (emailsStr && emailsStr.trim() !== "") {
-                    const emailsArray = emailsStr.split(',');
-                    emailsArray.forEach(email => {
-                        adicionarCampoEmail('edit', email.trim());
-                    });
-                } else {
-                    adicionarCampoEmail('edit');
+                if (container) {
+                    container.innerHTML = '';
+
+                    if (emailsStr && emailsStr.trim() !== "" && emailsStr !== "null") {
+                        const stringLimpa = emailsStr.replace(/[\[\]]/g, '');
+                        const emailsArray = stringLimpa.split(',');
+
+                        emailsArray.forEach(email => {
+                            const emailLimpo = email.trim();
+                            if (emailLimpo !== "") {
+                                adicionarCampoEmail('edit', emailLimpo);
+                            }
+                        });
+                    } else {
+                        adicionarCampoEmail('edit');
+                    }
+                }
+
+                form.action = '/cliente/update/' + id;
+            });
+        }
+
+        const modalDetalhes = document.getElementById('modalDetalhesCliente');
+        if (modalDetalhes) {
+            modalDetalhes.addEventListener('hidden.bs.modal', function () {
+
+                const inputFlag = document.getElementById('flagFiltroId');
+                const isFiltroPorIdAtivo = inputFlag ? inputFlag.value === 'true' : false;
+
+                if (isFiltroPorIdAtivo) {
+                    return;
+                }
+
+                if (window.location.pathname !== '/cliente') {
+                    window.history.pushState({}, '', '/cliente');
                 }
             });
         }
+
+        const alertas = document.querySelectorAll('.alert');
+        alertas.forEach(function(alerta) {
+            setTimeout(function() {
+                const bsAlert = new bootstrap.Alert(alerta);
+                bsAlert.close();
+            }, 5000);
+        });
     });
 
     document.querySelectorAll('.table-custom button').forEach(button => {

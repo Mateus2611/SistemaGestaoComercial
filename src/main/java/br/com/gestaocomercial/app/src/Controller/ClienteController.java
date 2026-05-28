@@ -1,48 +1,130 @@
 package br.com.gestaocomercial.app.src.Controller;
 
-import br.com.gestaocomercial.app.src.Model.Cliente;
+import br.com.gestaocomercial.app.src.Model.*;
 import br.com.gestaocomercial.app.src.Model.DTO.UpdateClienteDTO;
-import br.com.gestaocomercial.app.src.Model.Email;
-import br.com.gestaocomercial.app.src.Model.Endereco;
 import br.com.gestaocomercial.app.src.Service.ClienteService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Controller;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.*;
+import org.springframework.web.servlet.ModelAndView;
+import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
+import java.util.ArrayList;
 import java.util.List;
 
 @Controller
+@RequestMapping("/cliente")
 public class ClienteController {
 
     @Autowired
     private ClienteService _clienteService;
 
-    @RequestMapping("/cliente")
-    public String cliente() {
-        return "cliente";
+    @RequestMapping
+    public ModelAndView cliente(@RequestParam(name = "page", defaultValue = "1") Integer page) { return carregarTelaBase(null, page); }
+
+    @GetMapping("/{id}")
+    public ModelAndView getById(@PathVariable("id") Integer id, RedirectAttributes redirectAttributes) {
+
+        try {
+            ModelAndView mv = new ModelAndView("cliente");
+
+            Cliente clienteUnico = _clienteService.BuscaPorId(id);
+
+            List<Cliente> listaFiltrada = new ArrayList<>();
+            listaFiltrada.add(clienteUnico);
+
+            mv.addObject("clientes", listaFiltrada);
+
+            Cliente novoCliente = new Cliente();
+            novoCliente.setEndereco(new Endereco());
+            novoCliente.setEmails(new ArrayList<>(List.of(new Email())));
+            mv.addObject("novoCliente", novoCliente);
+
+            return mv;
+        } catch (RuntimeException exception) {
+            redirectAttributes.addFlashAttribute("mensagemErro", "O cliente com o ID " + id + " não foi encontrado.");
+
+            return new ModelAndView("redirect:/cliente");
+        }
     }
 
-    public Iterable<Cliente> get() { return _clienteService.BuscaGeral(); }
+    private ModelAndView carregarTelaBase(Integer id, Integer page) {
+        ModelAndView mv = new ModelAndView("cliente");
+        Page<Cliente> clientes = _clienteService.BuscaGeral(page);
+        Cliente novoCliente = new Cliente();
+        novoCliente.setEndereco(new Endereco());
 
-    @RequestMapping("/cliente/{id}")
-    public Cliente getById(@Param("id") Integer id) { return _clienteService.BuscaPorId(id); }
+        List<Email> emailsIniciais = new ArrayList<>();
+        emailsIniciais.add(new Email());
+        novoCliente.setEmails(emailsIniciais);
 
-    public Cliente create(Cliente cliente, Endereco endereco, List<Email> emails) { return _clienteService.Criar(cliente, endereco, emails); }
+        mv.addObject("clientes", clientes.getContent());
 
-    public Cliente update(UpdateClienteDTO clienteDTO) { return _clienteService.Atualizar(clienteDTO); }
+        mv.addObject("paginaAtual", page);
+        mv.addObject("totalPaginas", clientes.getTotalPages());
+        mv.addObject("totalItens", clientes.getTotalElements());
 
-    public Cliente disable(Integer id) { return _clienteService.InativarCliente(id); }
+        mv.addObject("novoCliente", novoCliente);
 
-    public Cliente activate(Integer id) { return _clienteService.AtivarCliente(id); }
+        if (id != null) {
+            Cliente cliente = _clienteService.BuscaPorId(id);
+            mv.addObject("cliente", cliente);
+            mv.addObject("mostrarDropdown", true);
+        }
 
-    public List<Email> addEmails(Integer idCliente, List<Email> emails) { return _clienteService.CriarEmailCliente(idCliente, emails); }
+        return mv;
+    }
 
-    public void deleteEmail(Integer emailId) { _clienteService.ExcluirEmailCliente(emailId); }
+    @PostMapping("/create")
+    public String create(@ModelAttribute("novoCliente") Cliente cliente) {
 
-    public List<Email> getClientEmails(Integer clientId) { return _clienteService.ExibirEmailsCliente(clientId); }
+        Cliente novoCliente = _clienteService.Criar(cliente);
+
+        return "redirect:/cliente/" + novoCliente.getId();
+    }
+
+    @PostMapping("/update/{id}")
+    public String update(@PathVariable("id") Integer id, @ModelAttribute("cliente") Cliente cliente, @RequestParam(value = "emailsInput", required = false) List<String> emails, RedirectAttributes redirectAttributes) {
+        cliente.setId(id);
+
+        List<Email> listaDeEmailsNovos = new ArrayList<>();
+
+        if (emails != null && !emails.isEmpty()) {
+            for (String emailTexto : emails) {
+                    listaDeEmailsNovos.add(new Email(cliente, emailTexto));
+
+            }
+        }
+
+        cliente.setEmails(listaDeEmailsNovos);
+
+        _clienteService.Atualizar(cliente);
+
+        redirectAttributes.addFlashAttribute("mensagemSucesso", "Cliente atualizado com sucesso!");
+
+        return "redirect:/cliente/" + id;
+    }
+
+    @PostMapping("/disable/{id}")
+    public String disable(@PathVariable("id") Integer id, RedirectAttributes redirectAttributes) {
+
+        _clienteService.InativarCliente(id);
+
+        redirectAttributes.addFlashAttribute("mensagemSucesso", "Cliente INATIVADO com sucesso!");
+
+        return "redirect:/cliente";
+    }
+
+    @PostMapping("/activate/{id}")
+    public String activate(@PathVariable("id") Integer id, RedirectAttributes redirectAttributes) {
+        _clienteService.AtivarCliente(id);
+
+        redirectAttributes.addFlashAttribute("mensagemSucesso", "Cliente ATIVADO com sucesso!");
+
+        return "redirect:/cliente";
+    }
 
 
 }

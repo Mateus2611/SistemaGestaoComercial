@@ -32,6 +32,7 @@ public class Avaliacao {
     }
 
     @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "Id")
     private Integer Id;
     @OneToOne

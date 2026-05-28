@@ -26,7 +26,7 @@ public class AvaliacaoController {
         return _avaliacaoService.BuscaPorId(id);
     }
 
-    private ModelAndView carregarTelaBase(Integer idNovo, Integer page) {
+    private ModelAndView carregarTelaBase(Integer id, Integer page) {
         ModelAndView mv = new ModelAndView("avaliacao");
         Page<Avaliacao> avaliacoes = _avaliacaoService.BuscaGeral(page);
 
@@ -38,8 +38,8 @@ public class AvaliacaoController {
 
         mv.addObject("novaVenda", new Venda());
 
-        if (idNovo != null) {
-            Avaliacao avaliacao = _avaliacaoService.BuscaPorId(idNovo);
+        if (id != null) {
+            Avaliacao avaliacao = _avaliacaoService.BuscaPorId(id);
             mv.addObject("avaliacao", avaliacao);
             mv.addObject("mostrarDropdown", true);
         }

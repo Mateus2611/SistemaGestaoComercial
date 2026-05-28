@@ -36,7 +36,7 @@ public class ProdutoController {
         return carregarTelaBase(id, 1);
     }
 
-    private ModelAndView carregarTelaBase(Integer idNovo, Integer page) {
+    private ModelAndView carregarTelaBase(Integer id, Integer page) {
         ModelAndView mv = new ModelAndView("produto");
         Page<Produto> produtos = _produtoService.BuscaGeral(page);
 
@@ -48,8 +48,8 @@ public class ProdutoController {
 
         mv.addObject("novoProduto", new Produto());
 
-        if (idNovo != null) {
-            Produto produto = _produtoService.BuscaPorId(idNovo);
+        if (id != null) {
+            Produto produto = _produtoService.BuscaPorId(id);
             mv.addObject("produto", produto);
             mv.addObject("mostrarDropdown", true);
         }

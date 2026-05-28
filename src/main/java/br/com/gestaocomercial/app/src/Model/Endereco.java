@@ -1,9 +1,6 @@
 package br.com.gestaocomercial.app.src.Model;
 
-import jakarta.persistence.Column;
-import jakarta.persistence.Entity;
-import jakarta.persistence.Id;
-import jakarta.persistence.Table;
+import jakarta.persistence.*;
 
 @Entity
 @Table(name = "Endereco")
@@ -32,6 +29,7 @@ public class Endereco {
     }
 
     @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "Id")
     private Integer Id;
     @Column(name = "CEP")
