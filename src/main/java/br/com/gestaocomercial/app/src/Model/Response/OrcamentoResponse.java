@@ -36,4 +36,40 @@ public class OrcamentoResponse {
     public BigDecimal Valor;
     public Orcamento.StatusOrcamento Status;
     public BigDecimal Desconto;
+
+    public Cliente getCliente() {
+        return Cliente;
+    }
+
+    public List<Produto> getProdutos() {
+        return Produtos;
+    }
+
+    public Date getDataCriacao() {
+        return DataCriacao;
+    }
+
+    public Date getDataValidade() {
+        return DataValidade;
+    }
+
+    public BigDecimal getValor() {
+        return Valor;
+    }
+
+    public Orcamento.StatusOrcamento getStatus() {
+        return Status;
+    }
+
+    public BigDecimal getDesconto() {
+        return Desconto;
+    }
+
+    public Integer getId() {
+        return Id;
+    }
+
+    public Integer getIdCliente() {
+        return IdCliente;
+    }
 }

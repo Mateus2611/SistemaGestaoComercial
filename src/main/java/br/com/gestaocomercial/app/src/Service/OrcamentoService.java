@@ -41,7 +41,7 @@ public class OrcamentoService {
             Date dataCriacao = Date.valueOf(LocalDate.now());
             Date dataValidade = VerificarValidade(dataCriacao, orcamentoDTO.validade);
             Cliente cliente = _clienteRepository.findById(orcamentoDTO.idCliente).get();
-            Orcamento orcamento = new Orcamento(orcamentoDTO.idCliente, dataCriacao, dataValidade, Orcamento.StatusOrcamento.PENDENTE ,orcamentoDTO.Desconto);
+            Orcamento orcamento = new Orcamento(orcamentoDTO.idCliente, dataCriacao, dataValidade, Orcamento.StatusOrcamento.PENDENTE, orcamentoDTO.Desconto);
             List<Produto> produtos = new ArrayList<>();
             BigDecimal valorTotal = BigDecimal.ZERO;
 
@@ -58,7 +58,7 @@ public class OrcamentoService {
 
             Orcamento orcamentoCriado = _orcamentoRepository.save(orcamento);
 
-            orcamentoDTO.Produtos.forEach( ps -> _orcamentoProdutoRepository.save(new OrcamentoProduto(orcamentoCriado.getId(), ps.ProdutoId, ps.Quantidade)));
+            orcamentoDTO.Produtos.forEach(ps -> _orcamentoProdutoRepository.save(new OrcamentoProduto(orcamentoCriado.getId(), ps.ProdutoId, ps.Quantidade)));
 
             orcamentoCriado.setCliente(cliente);
 
@@ -74,7 +74,39 @@ public class OrcamentoService {
             Iterable<Orcamento> orcamentos = _orcamentoRepository.findAll();
             List<OrcamentoResponse> responses = new ArrayList<>();
 
-            orcamentos.forEach( o -> {
+            orcamentos.forEach(o -> {
+                List<Produto> produtos = new ArrayList<>();
+
+                o.setCliente(_clienteRepository.findById(o.getCliente().getId()).get());
+                _orcamentoProdutoRepository.findAllById(o.getId()).forEach(op -> produtos.add(
+                        _produtoRepository.findById(op.getIdProduto()).get()));
+
+                responses.add(
+                        new OrcamentoResponse(
+                                o.getId(),
+                                o.getCliente().getId(),
+                                o.getCliente(),
+                                produtos,
+                                o.getDataCriacao(),
+                                o.getDataValidade(),
+                                o.getValor(),
+                                o.getStatus(),
+                                o.getDesconto())
+                );
+            });
+
+            return responses;
+        } catch (RuntimeException e) {
+            throw new RuntimeException(e.getMessage());
+        }
+    }
+
+    public Iterable<OrcamentoResponse> BuscaPorStatusAprovado() {
+        try {
+            Iterable<Orcamento> orcamentos = _orcamentoRepository.findAllByStatus("APROVADO");
+            List<OrcamentoResponse> responses = new ArrayList<>();
+
+            orcamentos.forEach(o -> {
                 List<Produto> produtos = new ArrayList<>();
 
                 o.setCliente(_clienteRepository.findById(o.getCliente().getId()).get());

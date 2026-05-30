@@ -280,23 +280,23 @@
                     </h1>
                     <hr class="mx-auto mb-4" style="width: 45%; border-top: 1px solid #000; opacity: 1;">
 
-                    <form th:object="${novaVenda}" method="POST" class="text-start px-md-4">
+                    <form th:action="@{/venda/create}" th:object="${novaVenda}" method="POST" class="text-start px-md-4">
                         <div class="row g-4">
                             <div class="col-md-7">
                                 <label class="form-label fw-bold text-uppercase text-dark mb-1d"
                                        style="font-size: 1.1rem;">Orçamento</label>
-                                <select class="form-select form-select-lg"
+                                <select id="criarVenda" th:field="*{orcamento.id}" class="form-select form-select-lg"
                                         style="border: 1.6px solid #000; border-radius: 8px; box-shadow: none;">
                                     <option selected disabled value="">Selecione Orçamento Aprovado</option>
                                     <option th:each="orcamento : ${orcamentos}" th:value="${orcamento.id}"
-                                            th:text="'Orçamento #' + ${orcamento.id} + ' - ' + ${orcamento.cliente.nome}"></option>
+                                            th:text="'Orçamento #' + ${orcamento.id} + ' - ' + ${orcamento.Cliente.nome}"></option>
                                 </select>
                             </div>
 
                             <div class="col-md-5">
                                 <label class="form-label fw-bold text-uppercase text-dark mb-1"
                                        style="font-size: 1.1rem;">Prazo de Pagamento</label>
-                                <input type="date" class="form-control form-control-lg"
+                                <input type="date" th:field="*{prazoPagamento}" class="form-control form-control-lg"
                                        style="border: 1.6px solid #000; border-radius: 8px; box-shadow: none;">
                             </div>
                         </div>
@@ -307,7 +307,7 @@
                                     style="font-size: 1.2rem; padding: 12px 40px; border-radius: 8px; border-width: 1.8px;">
                                 Cancelar
                             </button>
-                            <button type="button" class="btn btn-orange fw-bolder text-uppercase text-white"
+                            <button type="submit" class="btn btn-orange fw-bolder text-uppercase text-white"
                                     style="font-size: 1.2rem; padding: 12px 40px; border-radius: 8px; background-color: #ff9433; border: none;">
                                 Salvar Venda
                             </button>
@@ -333,7 +333,7 @@
                     </h1>
                     <hr class="mx-auto mb-4" style="width: 60%; border-top: 1px solid #000; opacity: 1;">
 
-                    <form class="text-start px-md-4">
+                    <form class="text-start px-md-4" id="formEditarVenda" method="POST">
                         <input type="hidden" id="editVendaId" name="Id">
 
                         <div class="row g-4 align-items-end">
@@ -348,14 +348,14 @@
                             <div class="col-md-4">
                                 <label class="form-label fw-bold text-uppercase text-dark mb-1"
                                        style="font-size: 1.1rem;">Prazo de Pagamento</label>
-                                <input type="date" class="form-control form-control-lg" id="editVendaPrazo"
+                                <input type="date" name="prazoPagamento" class="form-control form-control-lg" id="editVendaPrazo"
                                        style="border: 1.6px solid #000; border-radius: 8px; box-shadow: none;">
                             </div>
 
                             <div class="col-md-4">
                                 <label class="form-label fw-bold text-uppercase text-dark mb-1"
                                        style="font-size: 1.1rem;">Status</label>
-                                <select class="form-select form-select-lg" id="editVendaStatus" name="StatusPagamento"
+                                <select class="form-select form-select-lg" id="editVendaStatus" name="statusPagamento"
                                         style="border: 1.6px solid #000; border-radius: 8px; background-color: #fff9e6; box-shadow: none;">
                                     <option disabled value="">Selecione</option>
                                     <option value="APROVADO">APROVADO</option>
@@ -372,7 +372,7 @@
                                     style="font-size: 1.2rem; padding: 12px 40px; border-radius: 8px; border-width: 1.8px;">
                                 Cancelar
                             </button>
-                            <button type="button" class="btn btn-orange fw-bolder text-uppercase text-white"
+                            <button type="submit" class="btn btn-orange fw-bolder text-uppercase text-white"
                                     style="font-size: 1.2rem; padding: 12px 40px; border-radius: 8px; background-color: #ff9433; border: none;">
                                 Salvar Alterações
                             </button>
@@ -422,6 +422,8 @@
                 const idOrcamento = button.getAttribute('data-orcamento');
                 const prazoPagamento = button.getAttribute('data-prazopagamento');
                 const status = button.getAttribute('data-status');
+
+                document.getElementById('formEditarVenda').action = '/venda/update/' + id;
 
                 document.getElementById('editVendaId').value = id;
                 document.getElementById('editVendaOrcamento').value = idOrcamento;
