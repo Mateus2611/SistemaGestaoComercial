@@ -12,6 +12,8 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
+import java.sql.Date;
+
 @Service
 public class VendaService {
 
@@ -21,22 +23,26 @@ public class VendaService {
     private IOrcamentoRepository _orcamentoRepository;
 
 
-    public Venda Criar(Venda venda, Orcamento orcamento) {
+    public Venda Criar(Venda venda) {
 
         if (venda == null)
             throw new RuntimeException("Dados de venda vazio. Preencha as informações");
-        if (orcamento == null)
-            throw new RuntimeException("Dados de venda vazio. Preencha as informações");
+
+        if (venda.getOrcamento() == null || venda.getOrcamento().getId() == null)
+            throw new RuntimeException("Dados de venda orçamento. Preencha as informações");
 
         try {
-            orcamento = _orcamentoRepository.save(orcamento);
-            venda.getOrcamento().setId(orcamento.getId());
-            venda = _vendaRepository.save(venda);
+            Orcamento orcamento = _orcamentoRepository.findById(venda.getOrcamento().getId()).orElseThrow(
+                    () -> new RuntimeException("Orçamento não encontrado"));
+
             venda.setOrcamento(orcamento);
+            venda.setStatusPagamento(Venda.StatusPagamento.PENDENTE.name());
+            venda.setDataCriacao(new Date(System.currentTimeMillis()));
+            venda = _vendaRepository.save(venda);
 
             return venda;
         } catch (RuntimeException ex) {
-            throw new RuntimeException(ex.getMessage());
+            throw new RuntimeException("Erro ao criar venda" + ex.getMessage());
         }
     }
 
@@ -65,15 +71,17 @@ public class VendaService {
     public Venda Atualizar(UpdateVendaDTO vendaDTO) {
         Venda venda = _vendaRepository.findById(vendaDTO.id).get();
 
-        if (vendaDTO.statusPagamento != null) venda.setStatusPagamento(vendaDTO.statusPagamento.toString());
+        if (vendaDTO.statusPagamento != null) {
+            venda.setStatusPagamento(vendaDTO.statusPagamento.toString());
 
-        if (vendaDTO.orcamento != null) {
-            Orcamento orcamento = _orcamentoRepository.save(vendaDTO.orcamento);
-
-            _orcamentoRepository.deleteById(venda.getOrcamento().getId());
-
-            venda.getOrcamento().setId(orcamento.getId());
+            if (vendaDTO.statusPagamento != Venda.StatusPagamento.APROVADO) {
+                venda.setDataConclusao(null);
+            } else {
+                venda.setDataConclusao(new Date(System.currentTimeMillis()));
+            }
         }
+
+        if (vendaDTO.prazoPagamento != null) venda.setPrazoPagamento(vendaDTO.prazoPagamento);
 
         return _vendaRepository.save(venda);
     }
