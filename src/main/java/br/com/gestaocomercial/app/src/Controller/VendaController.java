@@ -27,13 +27,34 @@ public class VendaController {
     @Autowired
     private OrcamentoService _orcamentoService;
 
-    @GetMapping
+    @RequestMapping
     public ModelAndView venda(@RequestParam(value = "page", defaultValue = "1") Integer page) {
         return carregarTelaBase(null, page);
     }
 
-    public Venda getById(Integer id) {
-        return _vendaService.BuscaPorId(id);
+    @GetMapping("/{id}")
+    public ModelAndView getById(@PathVariable("id") Integer id, RedirectAttributes redirectAttributes) {
+
+        try {
+            ModelAndView mv = new ModelAndView("venda");
+
+            Venda vendaUnica = _vendaService.BuscaPorId(id);
+
+            List<Venda> listaFiltrada = new ArrayList<>();
+            listaFiltrada.add(vendaUnica);
+
+            mv.addObject("vendas", listaFiltrada);
+
+            Venda novaVenda = new Venda();
+            novaVenda.setOrcamento(new Orcamento());
+            mv.addObject("novaVenda", novaVenda);
+
+            return mv;
+        } catch (RuntimeException e) {
+            redirectAttributes.addFlashAttribute("mensagemErro", "A venda de ID " + id + " não foi encontrada");
+
+            return new ModelAndView("redirect:/venda");
+        }
     }
 
     private ModelAndView carregarTelaBase(Integer id, Integer page) {

@@ -25,6 +25,29 @@
 <body>
 
 <div class="d-flex">
+
+    <div th:if="${mensagemSucesso}"
+         class="alert alert-success fade show shadow-lg border-0 position-fixed top-0 end-0 m-4"
+         role="alert"
+         style="border-radius: 10px; border-left: 5px solid #198754 !important; z-index: 1050; min-width: 320px; max-width: 500px;">
+
+        <div class="d-flex align-items-center pr-3">
+            <i class="bi bi-check-circle-fill me-2 fs-4"></i>
+            <span th:text="${mensagemSucesso}" class="fw-bold"></span>
+        </div>
+    </div>
+
+    <div th:if="${mensagemErro}"
+         class="alert alert-danger fade show shadow-lg border-0 position-fixed top-0 end-0 m-4 text-dark"
+         role="alert"
+         style="border-radius: 10px; border-left: 5px solid #dc3535 !important; z-index: 1050; min-width: 320px; max-width: 500px;">
+
+        <div class="d-flex align-items-center">
+            <i class="bi bi-exclamation-triangle-fill me-2 fs-4 text-dark"></i>
+            <span th:text="${mensagemErro}" class="fw-bold text-dark" style="font-size: 0.95rem;">Aviso do sistema.</span>
+        </div>
+    </div>
+
     <div class="sidebar-custom d-flex flex-column flex-shrink-0">
 
         <div class="sidebar-logo d-flex justify-content-center align-items-center py-3 mb-2 w-100">
@@ -68,10 +91,19 @@
 
         <div class="d-flex align-items-center gap-3 mb-4 flex-wrap">
 
-            <div class="search-container">
-                <i class="bi bi-search"></i>
-                <input type="text" class="search-input" placeholder="Procurar venda">
-            </div>
+            <form onsubmit="return false;" style="margin: 0; padding: 0;">
+                <div class="d-flex align-items-center">
+
+                    <button type="button" id="btnSearchVenda" class="btn fw-bold" onclick="realizarBuscaPorId()"
+                            style="background-color: #ff7e12 !important; color: #fff !important; border: 1.8px solid #ff9433 !important; border-radius: 8px; border-top-right-radius: 0; border-bottom-right-radius: 0; padding: 10px 16px; height: 46px; display: flex; align-items: center; justify-content: center; cursor: pointer; transition: all 0.2s ease;">
+                        <i class="bi bi-search" style="font-size: 1.1rem;"></i>
+                    </button>
+
+                    <input type="number" id="searchVendaId" class="search-input" placeholder="Digite o ID da Venda e pressione Enter"
+                           style="border: 1.8px solid #000; border-left: 1.8px; border-radius: 8px; border-top-left-radius: 0; border-bottom-left-radius: 0; padding: 10px 16px; box-shadow: none; outline: none;">
+
+                </div>
+            </form>
 
             <button class="btn btn-orange text-uppercase" data-bs-toggle="modal" data-bs-target="#modalCriarVenda">
                 Nova Venda
@@ -174,6 +206,15 @@
 
                     </ul>
                 </nav>
+            </div>
+
+            <div th:if="${#ctx.containsVariable('vendas') and vendas.size() == 1 and #vars['javax.servlet.forward.request_uri'] != '/venda'}" class="mb-3">
+                <a href="/venda" class="btn btn-sm fw-bold text-uppercase d-inline-flex align-items-center gap-2"
+                   style="background-color: #14213d; color: #ffffff; border: 1.8px solid; border-radius: 8px; padding: 8px 16px; transition: all 0.2s ease;"
+                   onmouseenter="this.style.backgroundColor='transparent'; this.style.color='#14213d';"
+                   onmouseleave="this.style.backgroundColor='#14213d'; this.style.color='#ffffff';">
+                    <i class="bi bi-arrow-left"></i> Voltar
+                </a>
             </div>
         </div>
     </div>
@@ -436,6 +477,14 @@
         }
     });
 
+    const alertas = document.querySelectorAll('.alert');
+    alertas.forEach(function(alerta) {
+        setTimeout(function() {
+            const bsAlert = new bootstrap.Alert(alerta);
+            bsAlert.close();
+        }, 5000);
+    });
+
     document.querySelectorAll('.table-custom button').forEach(button => {
         button.addEventListener('click', function (e) {
             e.stopPropagation();
@@ -463,6 +512,37 @@
 
         tbody.innerHTML = '';
         linhas.forEach(linha => tbody.appendChild(linha));
+    }
+
+    function realizarBuscaPorId() {
+        const inputId = document.getElementById('searchVendaId');
+        if (inputId && inputId.value.trim() !== "") {
+            window.location.href = '/venda/' + inputId.value.trim();
+        }
+    }
+
+    const inputSearch = document.getElementById('searchVendaId');
+    if (inputSearch) {
+        inputSearch.addEventListener('keypress', function (event) {
+            if (event.key === 'Enter') {
+                event.preventDefault();
+                realizarBuscaPorId();
+            }
+        });
+    }
+
+    const btnSearch = document.getElementById('btnSearchVenda');
+    if (btnSearch) {
+
+        btnSearch.addEventListener('mouseenter', function() {
+            btnSearch.style.setProperty('background-color', 'transparent', 'important');
+            btnSearch.style.setProperty('color', '#ff7e12', 'important');
+        });
+
+        btnSearch.addEventListener('mouseleave', function() {
+            btnSearch.style.setProperty('background-color', '#ff7e12', 'important');
+            btnSearch.style.setProperty('color', '#fff', 'important');
+        });
     }
 </script>
 
