@@ -11,6 +11,9 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
+import java.sql.Date;
+import java.time.LocalDate;
+
 @Service
 public class AvaliacaoService {
 
@@ -19,18 +22,20 @@ public class AvaliacaoService {
     @Autowired
     private IVendaRepository _vendaRepository;
 
-    public Avaliacao Criar(Avaliacao avaliacao, Venda venda) {
+    public Avaliacao Criar(Avaliacao avaliacao) {
 
         if (avaliacao == null)
             throw new RuntimeException("Dados da avaliação vazios. Preencha as informações");
-        if (venda == null)
+        if (avaliacao.getVenda() == null || avaliacao.getVenda().getId() == null)
             throw new RuntimeException("Dados da venda vazios. Preencha as informações");
 
         try {
-            venda = _vendaRepository.save(venda);
-            avaliacao.getVenda().setId(venda.getId());
+            Venda venda = _vendaRepository.findById(avaliacao.getVenda().getId()).orElseThrow(
+                    () -> new RuntimeException("Venda não encontrada"));
+
+            avaliacao.setVenda(venda);
+            avaliacao.setDataCriacao(Date.valueOf(LocalDate.now()));
             avaliacao = _avaliacaoRepository.save(avaliacao);
-            avaliacao.getVenda().setId(venda.getId());
 
             return avaliacao;
         } catch (RuntimeException ex) {
@@ -58,14 +63,6 @@ public class AvaliacaoService {
         } catch (RuntimeException ex) {
             throw new RuntimeException(ex.getMessage()) {
             };
-        }
-    }
-
-    public void Excluir(Integer id) {
-        try {
-            _avaliacaoRepository.deleteById(id);
-        } catch (Exception e) {
-            throw new RuntimeException(e.getMessage());
         }
     }
 }

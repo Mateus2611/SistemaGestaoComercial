@@ -2,6 +2,8 @@ package br.com.gestaocomercial.app.src.Service;
 
 import br.com.gestaocomercial.app.src.Model.DTO.UpdateVendaDTO;
 import br.com.gestaocomercial.app.src.Model.Orcamento;
+import br.com.gestaocomercial.app.src.Model.Response.OrcamentoResponse;
+import br.com.gestaocomercial.app.src.Model.Response.VendaResponse;
 import br.com.gestaocomercial.app.src.Model.Venda;
 import br.com.gestaocomercial.app.src.Repository.IOrcamentoRepository;
 import br.com.gestaocomercial.app.src.Repository.IVendaRepository;
@@ -13,6 +15,8 @@ import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
 import java.sql.Date;
+import java.util.ArrayList;
+import java.util.List;
 
 @Service
 public class VendaService {
@@ -65,6 +69,33 @@ public class VendaService {
             return venda;
         } catch (RuntimeException ex) {
             throw new RuntimeException(ex.getMessage());
+        }
+    }
+
+    public Iterable<VendaResponse> BuscaPorStatusAprovado() {
+        try {
+            Iterable<Venda> vendas = _vendaRepository.findAllByStatus("APROVADO");
+
+            List<VendaResponse> responses = new ArrayList<>();
+
+            vendas.forEach(venda -> {
+
+                responses.add(
+                        new VendaResponse(
+                                venda.getId(),
+                                venda.getOrcamento(),
+                                venda.getDataCriacao(),
+                                venda.getPrazoPagamento(),
+                                venda.getDataConclusao(),
+                                venda.getStatusPagamento()
+                        )
+                );
+            });
+
+            return responses;
+
+        } catch (RuntimeException e) {
+            throw new RuntimeException("Erro ao buscar vendas aprovadas: " + e.getMessage());
         }
     }
 
