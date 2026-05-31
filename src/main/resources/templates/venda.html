@@ -95,12 +95,12 @@
                 <div class="d-flex align-items-center">
 
                     <button type="button" id="btnSearchVenda" class="btn fw-bold" onclick="realizarBuscaPorId()"
-                            style="background-color: #ff7e12 !important; color: #fff !important; border: 1.8px solid #ff9433 !important; border-radius: 8px; border-top-right-radius: 0; border-bottom-right-radius: 0; padding: 10px 16px; height: 46px; display: flex; align-items: center; justify-content: center; cursor: pointer; transition: all 0.2s ease;">
+                            style="background-color: transparent !important; color: #000 !important; border: 1.8px solid #000 !important; border-radius: 8px; border-top-right-radius: 0; border-bottom-right-radius: 0; width: 50px; height: 40px; padding: 0; display: flex; align-items: center; justify-content: center; cursor: pointer; transition: all 0.2s ease;">
                         <i class="bi bi-search" style="font-size: 1.1rem;"></i>
                     </button>
 
-                    <input type="number" id="searchVendaId" class="search-input" placeholder="Digite o ID da Venda e pressione Enter"
-                           style="border: 1.8px solid #000; border-left: 1.8px; border-radius: 8px; border-top-left-radius: 0; border-bottom-left-radius: 0; padding: 10px 16px; box-shadow: none; outline: none;">
+                    <input type="text" id="searchVendaId" class="search-input" placeholder="ID da Venda"
+                           style="border: 1.8px solid #000; border-left: none; border-radius: 8px; border-top-left-radius: 0; border-bottom-left-radius: 0; padding: 0 16px; height: 40px; box-shadow: none; outline: none;">
 
                 </div>
             </form>
@@ -533,15 +533,16 @@
 
     const btnSearch = document.getElementById('btnSearchVenda');
     if (btnSearch) {
-
         btnSearch.addEventListener('mouseenter', function() {
-            btnSearch.style.setProperty('background-color', 'transparent', 'important');
-            btnSearch.style.setProperty('color', '#ff7e12', 'important');
+            btnSearch.style.setProperty('background-color', '#ff7e12', 'important');
+            btnSearch.style.setProperty('color', '#fff', 'important');
+            btnSearch.style.setProperty('border-color', '#ff7e12', 'important');
         });
 
         btnSearch.addEventListener('mouseleave', function() {
-            btnSearch.style.setProperty('background-color', '#ff7e12', 'important');
-            btnSearch.style.setProperty('color', '#fff', 'important');
+            btnSearch.style.setProperty('background-color', 'transparent', 'important');
+            btnSearch.style.setProperty('color', '#000', 'important');
+            btnSearch.style.setProperty('border-color', '#000', 'important');
         });
     }
 </script>

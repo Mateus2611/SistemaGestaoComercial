@@ -25,8 +25,27 @@
 <body>
 <div class="d-flex">
 
-    <div class="sidebar-custom d-flex flex-column flex-shrink-0">
+    <div th:if="${mensagemSucesso}"
+         class="alert alert-success fade show shadow-lg border-0 position-fixed top-0 end-0 m-4"
+         role="alert"
+         style="border-radius: 10px; border-left: 5px solid #198754 !important; z-index: 1050; min-width: 320px; max-width: 500px;">
+        <div class="d-flex align-items-center pr-3">
+            <i class="bi bi-check-circle-fill me-2 fs-4"></i>
+            <span th:text="${mensagemSucesso}" class="fw-bold"></span>
+        </div>
+    </div>
 
+    <div th:if="${mensagemErro}"
+         class="alert alert-danger fade show shadow-lg border-0 position-fixed top-0 end-0 m-4 text-dark"
+         role="alert"
+         style="border-radius: 10px; border-left: 5px solid #dc3535 !important; z-index: 1050; min-width: 320px; max-width: 500px;">
+        <div class="d-flex align-items-center">
+            <i class="bi bi-exclamation-triangle-fill me-2 fs-4 text-dark"></i>
+            <span th:text="${mensagemErro}" class="fw-bold text-dark" style="font-size: 0.95rem;">Aviso do sistema.</span>
+        </div>
+    </div>
+
+    <div class="sidebar-custom d-flex flex-column flex-shrink-0">
         <div class="sidebar-logo d-flex justify-content-center align-items-center py-3 mb-2 w-100">
             <img th:src="@{/images/acrillogo.svg}" src="../static/images/acrillogo.svg" alt="Logo AcrillService" class="img-fluid" style="max-height: 120px; max-width: 120px; object-fit: contain;">
         </div>
@@ -62,14 +81,22 @@
     </div>
 
     <div class="main-content flex-grow-1 p-5">
-
         <h1 class="page-title mb-2">AVALIAÇÕES</h1>
 
         <div class="d-flex align-items-center gap-3 mb-4 flex-wrap">
-            <div class="search-container">
-                <i class="bi bi-search"></i>
-                <input type="text" class="search-input" placeholder="Procurar avaliação">
-            </div>
+            <form onsubmit="return false;" style="margin: 0; padding: 0;">
+                <div class="d-flex align-items-center">
+
+                    <button type="button" id="btnSearchAvaliacao" class="btn fw-bold" onclick="realizarBuscaPorId()"
+                            style="background-color: transparent !important; color: #000 !important; border: 1.8px solid #000 !important; border-radius: 8px; border-top-right-radius: 0; border-bottom-right-radius: 0; width: 50px; height: 40px; padding: 0; display: flex; align-items: center; justify-content: center; cursor: pointer; transition: all 0.2s ease;">
+                        <i class="bi bi-search" style="font-size: 1.1rem;"></i>
+                    </button>
+
+                    <input type="text" id="searchAvaliacaoId" class="search-input" placeholder="ID do Cliente"
+                           style="border: 1.8px solid #000; border-left: none; border-radius: 8px; border-top-left-radius: 0; border-bottom-left-radius: 0; padding: 0 16px; height: 40px; box-shadow: none; outline: none;">
+
+                </div>
+            </form>
 
             <button class="btn btn-orange text-uppercase" data-bs-toggle="modal" data-bs-target="#modalCriarAvaliacao">
                 Nova Avaliação
@@ -79,7 +106,7 @@
         </div>
 
         <div class="table-responsive">
-            <table class="table table-custom table-hover">
+            <table class="table table-custom table-hover" id="tabelaAvaliacoes">
                 <thead>
                 <tr>
                     <th>Código</th>
@@ -87,7 +114,6 @@
                     <th>Título</th>
                     <th>Data</th>
                     <th>Nota</th>
-                    <th class="text-end">Ações</th>
                 </tr>
                 </thead>
                 <tbody>
@@ -110,20 +136,6 @@
                               th:classappend="${avaliacao.nota <= 1 ? 'badge-vermelho' : (avaliacao.nota <= 3 ? 'badge-amarelo' : 'badge-verde')}"
                               th:text="${#numbers.formatDecimal(avaliacao.nota, 1, 0) + ' / 5'}"></span>
                     </td>
-                    <td class="text-end">
-                        <button class="btn btn-sm btn-outline-secondary me-2" title="Editar"
-                                data-bs-toggle="modal" data-bs-target="#modalEditarAvaliacao"
-                                th:attr="data-id=${avaliacao.id},
-                                         data-venda=${avaliacao.venda.id},
-                                         data-titulo=${avaliacao.titulo},
-                                         data-descricao=${avaliacao.descricao},
-                                         data-nota=${avaliacao.nota}">
-                            <i class="bi bi-pencil-fill"></i>
-                        </button>
-                        <button class="btn btn-sm btn-outline-danger" title="Excluir">
-                            <i class="bi bi-trash-fill"></i>
-                        </button>
-                    </td>
                 </tr>
                 </tbody>
             </table>
@@ -136,13 +148,11 @@
 
                 <nav aria-label="Navegação de páginas">
                     <ul class="pagination mb-0">
-
                         <li class="page-item" th:classappend="${paginaAtual == 1} ? 'disabled'">
                             <a class="page-link" th:href="@{/avaliacao(page=${paginaAtual - 1})}" aria-label="Anterior" style="color: #000000; box-shadow: none;">
                                 <span aria-hidden="true">&laquo;</span>
                             </a>
                         </li>
-
                         <li class="page-item" th:each="i : ${#numbers.sequence(1, totalPaginas)}"
                             th:classappend="${paginaAtual == i} ? 'active'">
                             <a class="page-link fw-bold"
@@ -152,18 +162,24 @@
                                 1
                             </a>
                         </li>
-
                         <li class="page-item" th:classappend="${paginaAtual == totalPaginas} ? 'disabled'">
                             <a class="page-link" th:href="@{/avaliacao(page=${paginaAtual + 1})}" aria-label="Próximo" style="color: #000000; box-shadow: none;">
                                 <span aria-hidden="true">&raquo;</span>
                             </a>
                         </li>
-
                     </ul>
                 </nav>
             </div>
-        </div>
 
+            <div th:if="${#ctx.containsVariable('avaliacoes') and avaliacoes.size() == 1 and #vars['javax.servlet.forward.request_uri'] != '/avaliacao'}" class="mb-3 mt-3">
+                <a href="/avaliacao" class="btn btn-sm fw-bold text-uppercase d-inline-flex align-items-center gap-2"
+                   style="background-color: #14213d; color: #ffffff; border: 1.8px solid; border-radius: 8px; padding: 8px 16px; transition: all 0.2s ease;"
+                   onmouseenter="this.style.backgroundColor='transparent'; this.style.color='#14213d';"
+                   onmouseleave="this.style.backgroundColor='#14213d'; this.style.color='#ffffff';">
+                    <i class="bi bi-arrow-left"></i> Voltar
+                </a>
+            </div>
+        </div>
     </div>
 </div>
 
@@ -187,25 +203,21 @@
                                 <input type="text" id="detalheAvaliacaoTitulo" class="form-control form-control-lg fw-bold" readonly
                                        style="border: 1.6px solid #ccc; border-radius: 8px; background-color: #f8f9fa;">
                             </div>
-
                             <div class="col-md-4">
                                 <label class="form-label fw-bold text-uppercase text-dark mb-1" style="font-size: 1.1rem;">Nota</label>
                                 <input type="text" id="detalheAvaliacaoNota" class="form-control form-control-lg fw-bold" readonly
                                        style="border: 1.6px solid #ccc; border-radius: 8px; background-color: #f8f9fa;">
                             </div>
-
                             <div class="col-md-6">
                                 <label class="form-label fw-bold text-uppercase text-dark mb-1" style="font-size: 1.1rem;">Venda Relacionada</label>
                                 <input type="text" id="detalheAvaliacaoVenda" class="form-control form-control-lg" readonly
                                        style="border: 1.6px solid #ccc; border-radius: 8px; background-color: #f8f9fa;">
                             </div>
-
                             <div class="col-md-6">
                                 <label class="form-label fw-bold text-uppercase text-dark mb-1" style="font-size: 1.1rem;">Data</label>
                                 <input type="text" id="detalheAvaliacaoData" class="form-control form-control-lg" readonly
                                        style="border: 1.6px solid #ccc; border-radius: 8px; background-color: #f8f9fa;">
                             </div>
-
                             <div class="col-md-12">
                                 <label class="form-label fw-bold text-uppercase text-dark mb-1" style="font-size: 1.1rem;">Descrição</label>
                                 <textarea id="detalheAvaliacaoDescricao" class="form-control form-control-lg" rows="3" readonly
@@ -239,17 +251,16 @@
                     </h1>
                     <hr class="mx-auto mb-5" style="width: 60%; border-top: 1px solid #000; opacity: 1;">
 
-                    <form class="text-start px-md-4">
+                    <form th:action="@{/avaliacao/create}" th:object="${novaAvaliacao}" method="POST" class="text-start px-md-4">
                         <div class="row g-4">
                             <div class="col-md-8">
                                 <label class="form-label fw-bold text-uppercase text-dark mb-1" style="font-size: 1.1rem;">Título</label>
-                                <input type="text" class="form-control form-control-lg"
+                                <input type="text" th:field="*{titulo}" class="form-control form-control-lg" required
                                        style="border: 1.6px solid #000; border-radius: 8px; box-shadow: none;">
                             </div>
-
                             <div class="col-md-4">
                                 <label class="form-label fw-bold text-uppercase text-dark mb-1" style="font-size: 1.1rem;">Nota (0 a 5)</label>
-                                <select class="form-select form-select-lg" style="border: 1.6px solid #000; border-radius: 8px; box-shadow: none;">
+                                <select th:field="*{nota}" class="form-select form-select-lg" required style="border: 1.6px solid #000; border-radius: 8px; box-shadow: none;">
                                     <option selected disabled value="">Selecione</option>
                                     <option value="0">0</option>
                                     <option value="1">1</option>
@@ -259,20 +270,16 @@
                                     <option value="5">5</option>
                                 </select>
                             </div>
-
                             <div class="col-md-6">
                                 <label class="form-label fw-bold text-uppercase text-dark mb-1" style="font-size: 1.1rem;">Venda Relacionada</label>
-                                <select class="form-select form-select-lg" style="border: 1.6px solid #000; border-radius: 8px;">
+                                <select class="form-select form-select-lg" th:field="*{venda.id}" required style="border: 1.6px solid #000; border-radius: 8px;">
                                     <option selected disabled value="">Selecione a Venda</option>
                                     <option th:each="venda : ${vendas}" th:value="${venda.id}" th:text="${'Venda #' + venda.id}"></option>
-                                    <option value="101">Venda #101</option>
-                                    <option value="105">Venda #105</option>
                                 </select>
                             </div>
-
                             <div class="col-md-12">
                                 <label class="form-label fw-bold text-uppercase text-dark mb-1" style="font-size: 1.1rem;">Descrição</label>
-                                <textarea class="form-control form-control-lg" rows="3"
+                                <textarea th:field="*{descricao}" class="form-control form-control-lg" rows="3" required
                                           style="border: 1.6px solid #000; border-radius: 8px; box-shadow: none; resize: none;"></textarea>
                             </div>
                         </div>
@@ -282,7 +289,7 @@
                                     style="font-size: 1.2rem; padding: 12px 40px; border-radius: 8px; border-width: 1.8px;">
                                 Cancelar
                             </button>
-                            <button type="button" class="btn btn-orange fw-bolder text-uppercase text-white"
+                            <button type="submit" class="btn btn-orange fw-bolder text-uppercase text-white"
                                     style="font-size: 1.2rem; padding: 12px 40px; border-radius: 8px; background-color: #ff9433; border: none;">
                                 Salvar
                             </button>
@@ -294,73 +301,8 @@
     </div>
 </div>
 
-<div th:fragment="modalEditar" class="modal fade" id="modalEditarAvaliacao" tabindex="-1" aria-hidden="true">
-    <div class="modal-dialog modal-dialog-centered modal-lg">
-        <div class="modal-content shadow-lg border-0" style="border-radius: 16px; padding: 6px; background-color: #ffffff;">
-            <div style="border: 1.6px solid #14213d; border-radius: 12px; height: 100%;">
-                <div class="modal-header border-0 pb-0">
-                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                </div>
-                <div class="modal-body px-5 pb-5 pt-2 text-center">
-                    <h1 class="page-title text-uppercase mb-3" style="line-height: 1.1;">
-                        Editar<br>Avaliação
-                    </h1>
-                    <hr class="mx-auto mb-5" style="width: 60%; border-top: 1px solid #000; opacity: 1;">
-
-                    <form class="text-start px-md-4">
-                        <input type="hidden" id="editAvaliacaoId" name="Id">
-
-                        <div class="row g-4">
-                            <div class="col-md-8">
-                                <label class="form-label fw-bold text-uppercase text-dark mb-1" style="font-size: 1.1rem;">Título</label>
-                                <input type="text" id="editAvaliacaoTitulo" class="form-control form-control-lg"
-                                       style="border: 1.6px solid #000; border-radius: 8px; box-shadow: none;">
-                            </div>
-
-                            <div class="col-md-4">
-                                <label class="form-label fw-bold text-uppercase text-dark mb-1" style="font-size: 1.1rem;">Nota (0 a 5)</label>
-                                <select id="editAvaliacaoNota" class="form-select form-select-lg" style="border: 1.6px solid #000; border-radius: 8px; box-shadow: none;">
-                                    <option disabled value="">Selecione</option>
-                                    <option value="0">0</option>
-                                    <option value="1">1</option>
-                                    <option value="2">2</option>
-                                    <option value="3">3</option>
-                                    <option value="4">4</option>
-                                    <option value="5">5</option>
-                                </select>
-                            </div>
-
-                            <div class="col-md-6">
-                                <label class="form-label fw-bold text-uppercase text-dark mb-1" style="font-size: 1.1rem;">Venda Relacionada</label>
-                                <input type="text" id="editAvaliacaoVenda" class="form-control form-control-lg fw-bold" readonly
-                                       style="border: 1.6px solid #000; border-radius: 8px; background-color: #e9e9e9;">
-                            </div>
-
-                            <div class="col-md-12">
-                                <label class="form-label fw-bold text-uppercase text-dark mb-1" style="font-size: 1.1rem;">Descrição</label>
-                                <textarea id="editAvaliacaoDescricao" class="form-control form-control-lg" rows="3"
-                                          style="border: 1.6px solid #000; border-radius: 8px; box-shadow: none; resize: none;"></textarea>
-                            </div>
-                        </div>
-
-                        <div class="d-flex justify-content-center gap-3 mt-5">
-                            <button type="button" class="btn btn-outline-secondary fw-bolder text-uppercase" data-bs-dismiss="modal"
-                                    style="font-size: 1.2rem; padding: 12px 40px; border-radius: 8px; border-width: 1.8px;">
-                                Cancelar
-                            </button>
-                            <button type="button" class="btn btn-orange fw-bolder text-uppercase text-white"
-                                    style="font-size: 1.2rem; padding: 12px 40px; border-radius: 8px; background-color: #ff9433; border: none;">
-                                Salvar Alterações
-                            </button>
-                        </div>
-                    </form>
-                </div>
-            </div>
-        </div>
-    </div>
-</div>
-
 <script>
+
     function abrirModalDetalhes(row) {
         const titulo = row.getAttribute('data-titulo');
         const venda = row.getAttribute('data-venda');
@@ -375,70 +317,73 @@
         }
 
         document.getElementById('detalheAvaliacaoTitulo').value = titulo || '';
-        document.getElementById('detalheAvaliacaoVenda').value = venda ? + venda : '';
+        document.getElementById('detalheAvaliacaoVenda').value = venda ? 'Venda #' + venda : '';
         document.getElementById('detalheAvaliacaoNota').value = notaStr;
         document.getElementById('detalheAvaliacaoData').value = data || '';
         document.getElementById('detalheAvaliacaoDescricao').value = descricao || '';
 
-        const modal = new bootstrap.Modal(document.getElementById('modalDetalhesAvaliacao'));
+        const modalElement = document.getElementById('modalDetalhesAvaliacao');
+        const modal = bootstrap.Modal.getOrCreateInstance(modalElement);
         modal.show();
     }
 
     document.addEventListener('DOMContentLoaded', function () {
-        const modalEditar = document.getElementById('modalEditarAvaliacao');
-
-        if (modalEditar) {
-            modalEditar.addEventListener('show.bs.modal', function (event) {
-                const button = event.relatedTarget;
-                if(!button) return;
-
-                const id = button.getAttribute('data-id');
-                const idVenda = button.getAttribute('data-venda');
-                const titulo = button.getAttribute('data-titulo');
-                const descricao = button.getAttribute('data-descricao');
-
-                const notaFloat = parseFloat(button.getAttribute('data-nota'));
-                let notaInt = "";
-                if(!isNaN(notaFloat)){
-                    notaInt = Math.round(notaFloat).toString();
-                }
-
-                document.getElementById('editAvaliacaoId').value = id;
-                document.getElementById('editAvaliacaoVenda').value = 'Venda #' + idVenda;
-                document.getElementById('editAvaliacaoTitulo').value = titulo;
-                document.getElementById('editAvaliacaoNota').value = notaInt;
-                document.getElementById('editAvaliacaoDescricao').value = descricao;
-            });
-        }
-    });
-
-    document.querySelectorAll('.table-custom button').forEach(button => {
-        button.addEventListener('click', function (e) {
-            e.stopPropagation();
+        const alertas = document.querySelectorAll('.alert');
+        alertas.forEach(function(alerta) {
+            setTimeout(function() {
+                const bsAlert = new bootstrap.Alert(alerta);
+                bsAlert.close();
+            }, 5000);
         });
     });
 
-    let ordemCrescente = false;
 
+    let ordemCrescente = false;
     function ordenarTabela() {
-        const tbody = document.querySelector('.table-custom tbody');
+        const tbody = document.querySelector('#tabelaAvaliacoes tbody');
         const linhas = Array.from(tbody.querySelectorAll('tr'));
 
         linhas.sort((linhaA, linhaB) => {
             const idA = parseInt(linhaA.cells[0].innerText.trim());
             const idB = parseInt(linhaB.cells[0].innerText.trim());
-
-            if (ordemCrescente) {
-                return idA - idB;
-            } else {
-                return idB - idA;
-            }
+            return ordemCrescente ? idA - idB : idB - idA;
         });
 
         ordemCrescente = !ordemCrescente;
-
         tbody.innerHTML = '';
         linhas.forEach(linha => tbody.appendChild(linha));
+    }
+
+    function realizarBuscaPorId() {
+        const inputId = document.getElementById('searchAvaliacaoId');
+        if (inputId && inputId.value.trim() !== "") {
+            window.location.href = '/avaliacao/' + inputId.value.trim();
+        }
+    }
+
+    const inputSearch = document.getElementById('searchAvaliacaoId');
+    if (inputSearch) {
+        inputSearch.addEventListener('keypress', function (event) {
+            if (event.key === 'Enter') {
+                event.preventDefault();
+                realizarBuscaPorId();
+            }
+        });
+    }
+
+    const btnSearch = document.getElementById('btnSearchAvaliacao');
+    if (btnSearch) {
+        btnSearch.addEventListener('mouseenter', function() {
+            btnSearch.style.setProperty('background-color', '#ff7e12', 'important');
+            btnSearch.style.setProperty('color', '#fff', 'important');
+            btnSearch.style.setProperty('border-color', '#ff7e12', 'important');
+        });
+
+        btnSearch.addEventListener('mouseleave', function() {
+            btnSearch.style.setProperty('background-color', 'transparent', 'important');
+            btnSearch.style.setProperty('color', '#000', 'important');
+            btnSearch.style.setProperty('border-color', '#000', 'important');
+        });
     }
 </script>
 
