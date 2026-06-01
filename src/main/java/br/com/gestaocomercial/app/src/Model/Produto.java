@@ -11,48 +11,48 @@ public class Produto {
     }
 
     public Produto(Integer id, String nome, BigDecimal valor) {
-        this.id = id;
-        this.nome = nome;
-        this.valor = valor;
+        Id = id;
+        Nome = nome;
+        Valor = valor;
     }
 
     public Produto(String nome, BigDecimal valor) {
-        this.nome = nome;
-        this.valor = valor;
+        Nome = nome;
+        Valor = valor;
     }
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "Id")
-    private Integer id;
+    private Integer Id;
 
     @Column(name = "Nome")
-    private String nome;
+    private String Nome;
 
     @Column(name = "Valor")
-    private BigDecimal valor;
+    private BigDecimal Valor;
 
     public Integer getId() {
-        return id;
+        return Id;
     }
 
     public void setId(Integer id) {
-        this.id = id;
+        Id = id;
     }
 
     public String getNome() {
-        return nome;
+        return Nome;
     }
 
     public void setNome(String nome) {
-        this.nome = nome;
+        Nome = nome;
     }
 
     public BigDecimal getValor() {
-        return valor;
+        return Valor;
     }
 
     public void setValor(BigDecimal valor) {
-        this.valor = valor;
+        Valor = valor;
     }
 }

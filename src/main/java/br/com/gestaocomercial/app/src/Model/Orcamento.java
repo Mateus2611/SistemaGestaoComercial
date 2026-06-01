@@ -13,11 +13,11 @@ public class Orcamento {
     }
 
     public Orcamento(Cliente cliente, Date dataCriacao, Date dataValidade, StatusOrcamento status, BigDecimal desconto) {
-        this.cliente = cliente;
-        this.dataCriacao = dataCriacao;
-        this.dataValidade = dataValidade;
-        this.status = status;
-        this.desconto = desconto;
+        Cliente = cliente;
+        DataCriacao = dataCriacao;
+        DataValidade = dataValidade;
+        Status = status;
+        Desconto = desconto;
     }
 
     @Id
@@ -27,26 +27,26 @@ public class Orcamento {
 
     @OneToOne
     @JoinColumn(name = "Id_Cliente")
-    private Cliente cliente;
+    private Cliente Cliente;
 
-    @OneToMany(mappedBy = "orcamento", fetch = FetchType.EAGER, cascade = CascadeType.ALL, orphanRemoval = true)
+    @OneToMany(mappedBy = "Orcamento", fetch = FetchType.EAGER, cascade = CascadeType.ALL, orphanRemoval = true)
     private List<OrcamentoProduto> orcamentoProdutos;
 
     @Column(name = "Data_Criacao")
-    private Date dataCriacao;
+    private Date DataCriacao;
 
     @Column(name = "Data_Validade")
-    private Date dataValidade;
+    private Date DataValidade;
 
     @Column(name = "Valor")
-    private BigDecimal valor;
+    private BigDecimal Valor;
 
     @Column(name = "Status_Orcamento")
     @Enumerated(EnumType.STRING)
-    private StatusOrcamento status;
+    private StatusOrcamento Status;
 
     @Column(name = "Desconto")
-    private BigDecimal desconto;
+    private BigDecimal Desconto;
 
     public Integer getId() {
         return id;
@@ -57,11 +57,11 @@ public class Orcamento {
     }
 
     public Cliente getCliente() {
-        return cliente;
+        return Cliente;
     }
 
     public void setCliente(Cliente cliente) {
-        this.cliente = cliente;
+        Cliente = cliente;
     }
 
     public List<OrcamentoProduto> getOrcamentoProdutos() {
@@ -73,43 +73,43 @@ public class Orcamento {
     }
 
     public Date getDataCriacao() {
-        return dataCriacao;
+        return DataCriacao;
     }
 
     public void setDataCriacao(Date dataCriacao) {
-        this.dataCriacao = dataCriacao;
+        DataCriacao = dataCriacao;
     }
 
     public Date getDataValidade() {
-        return dataValidade;
+        return DataValidade;
     }
 
     public void setDataValidade(Date dataValidade) {
-        this.dataValidade = dataValidade;
+        DataValidade = dataValidade;
     }
 
     public BigDecimal getValor() {
-        return valor;
+        return Valor;
     }
 
     public void setValor(BigDecimal valor) {
-        this.valor = valor;
+        Valor = valor;
     }
 
     public StatusOrcamento getStatus() {
-        return status;
+        return Status;
     }
 
     public void setStatus(StatusOrcamento status) {
-        this.status = status;
+        Status = status;
     }
 
     public BigDecimal getDesconto() {
-        return desconto;
+        return Desconto;
     }
 
     public void setDesconto(BigDecimal desconto) {
-        this.desconto = desconto;
+        Desconto = desconto;
     }
 
     public enum StatusOrcamento {

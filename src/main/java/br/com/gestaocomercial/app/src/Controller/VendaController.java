@@ -60,7 +60,7 @@ public class VendaController {
     private ModelAndView carregarTelaBase(Integer id, Integer page) {
         ModelAndView mv = new ModelAndView("venda");
         Page<Venda> vendas = _vendaService.BuscaGeral(page);
-        Iterable<OrcamentoResponse> orcamentos = _orcamentoService.BuscaPorStatusAprovado();
+        Iterable<Orcamento> orcamentos = _orcamentoService.BuscaPorStatusAprovado();
 
         mv.addObject("vendas", vendas.getContent());
 

@@ -38,7 +38,7 @@ public class OrcamentoService {
     @Autowired
     private IProdutoRepository _produtoRepository;
 
-    public OrcamentoResponse Criar(CreateOrcamentoDTO orcamentoDTO) {
+    public Orcamento Criar(CreateOrcamentoDTO orcamentoDTO) {
         if (orcamentoDTO == null) {
             throw new RuntimeException("Objeto vazio. Preencha as informações.");
         }
@@ -76,19 +76,7 @@ public class OrcamentoService {
             orcamento.setValor(valorTotal);
             orcamento.setOrcamentoProdutos(orcamentoProdutos);
 
-            Orcamento orcamentoSalvo = _orcamentoRepository.save(orcamento);
-
-            return new OrcamentoResponse(
-                    orcamentoSalvo.getId(),
-                    orcamentoSalvo.getCliente().getId(),
-                    orcamentoSalvo.getCliente(),
-                    produtosParaResponse,
-                    orcamentoSalvo.getDataCriacao(),
-                    orcamentoSalvo.getDataValidade(),
-                    orcamentoSalvo.getValor(),
-                    orcamentoSalvo.getStatus(),
-                    orcamentoSalvo.getDesconto()
-            );
+            return  _orcamentoRepository.save(orcamento);
 
         } catch (Exception e) {
             throw new RuntimeException("Erro ao criar o orçamento: " + e.getMessage(), e);
@@ -106,37 +94,9 @@ public class OrcamentoService {
         }
     }
 
-    public Iterable<OrcamentoResponse> BuscaPorStatusAprovado() {
+    public Iterable<Orcamento> BuscaPorStatusAprovado() {
         try {
-            List<Orcamento> orcamentos = _orcamentoRepository.findAllByStatus(Orcamento.StatusOrcamento.APROVADO.name());
-            List<OrcamentoResponse> responses = new ArrayList<>();
-
-            for (Orcamento o : orcamentos) {
-                List<Produto> produtos = new ArrayList<>();
-
-                if (o.getOrcamentoProdutos() != null) {
-                    produtos = o.getOrcamentoProdutos().stream()
-                            .map(OrcamentoProduto::getProduto)
-                            .filter(Objects::nonNull)
-                            .toList();
-                }
-
-                Integer idCliente = (o.getCliente() != null) ? o.getCliente().getId() : null;
-
-                responses.add(new OrcamentoResponse(
-                        o.getId(),
-                        idCliente,
-                        o.getCliente(),
-                        produtos,
-                        o.getDataCriacao(),
-                        o.getDataValidade(),
-                        o.getValor(),
-                        o.getStatus(),
-                        o.getDesconto()
-                ));
-            }
-
-            return responses;
+            return _orcamentoRepository.findAllByStatus(Orcamento.StatusOrcamento.APROVADO.name());
 
         } catch (Exception e) {
             throw new RuntimeException("Erro ao buscar orçamentos aprovados: " + e.getMessage(), e);

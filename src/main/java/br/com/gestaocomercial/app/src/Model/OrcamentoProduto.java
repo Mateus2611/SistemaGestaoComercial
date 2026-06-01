@@ -6,31 +6,30 @@ import jakarta.persistence.*;
 @Table(name = "Orcamento_Produto")
 public class OrcamentoProduto {
 
+    public OrcamentoProduto() {
+    }
+
+    public OrcamentoProduto(Orcamento orcamento, Produto produto, Integer quantidade) {
+        Orcamento = orcamento;
+        Produto = produto;
+        Quantidade = quantidade;
+    }
+
     @EmbeddedId
     private OrcamentoProdutoId id = new OrcamentoProdutoId();
 
     @ManyToOne
     @MapsId("idOrcamento")
     @JoinColumn(name = "Id_Orcamento")
-    private Orcamento orcamento;
+    private Orcamento Orcamento;
 
     @ManyToOne
     @MapsId("idProduto")
     @JoinColumn(name = "Id_Produto")
-    private Produto produto;
+    private Produto Produto;
 
     @Column(name = "Quantidade")
-    private Integer quantidade;
-
-    public OrcamentoProduto() {
-    }
-
-    public OrcamentoProduto(Orcamento orcamento, Produto produto, Integer quantidade) {
-        this.orcamento = orcamento;
-        this.produto = produto;
-        this.quantidade = quantidade;
-        this.id = new OrcamentoProdutoId(orcamento.getId(), produto.getId());
-    }
+    private Integer Quantidade;
 
     public OrcamentoProdutoId getId() {
         return id;
@@ -41,26 +40,26 @@ public class OrcamentoProduto {
     }
 
     public Orcamento getOrcamento() {
-        return orcamento;
+        return Orcamento;
     }
 
     public void setOrcamento(Orcamento orcamento) {
-        this.orcamento = orcamento;
+        Orcamento = orcamento;
     }
 
     public Produto getProduto() {
-        return produto;
+        return Produto;
     }
 
     public void setProduto(Produto produto) {
-        this.produto = produto;
+        Produto = produto;
     }
 
     public Integer getQuantidade() {
-        return quantidade;
+        return Quantidade;
     }
 
     public void setQuantidade(Integer quantidade) {
-        this.quantidade = quantidade;
+        Quantidade = quantidade;
     }
 }
