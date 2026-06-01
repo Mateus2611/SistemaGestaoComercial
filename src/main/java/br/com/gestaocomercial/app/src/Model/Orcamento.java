@@ -1,10 +1,8 @@
 package br.com.gestaocomercial.app.src.Model;
 
 import jakarta.persistence.*;
-
 import java.math.BigDecimal;
 import java.sql.Date;
-import java.text.SimpleDateFormat;
 import java.util.List;
 
 @Entity
@@ -14,98 +12,104 @@ public class Orcamento {
     public Orcamento() {
     }
 
-    public Orcamento(Integer idCliente, Date dataCriacao, Date dataValidade, StatusOrcamento status, BigDecimal desconto) {
-        this.Cliente.setId(idCliente);
-        DataCriacao = dataCriacao;
-        DataValidade = dataValidade;
-        Status = status;
-        Desconto = desconto;
+    public Orcamento(Cliente cliente, Date dataCriacao, Date dataValidade, StatusOrcamento status, BigDecimal desconto) {
+        this.cliente = cliente;
+        this.dataCriacao = dataCriacao;
+        this.dataValidade = dataValidade;
+        this.status = status;
+        this.desconto = desconto;
     }
 
     @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "Id")
-    private Integer Id;
+    private Integer id;
+
     @OneToOne
     @JoinColumn(name = "Id_Cliente")
-    private Cliente Cliente;
-    @OneToMany(orphanRemoval = true)
-    @JoinColumn(name = "Id_Orcamento")
-    private List<OrcamentoProduto> OrcamentoProdutos;
+    private Cliente cliente;
+
+    @OneToMany(mappedBy = "orcamento", fetch = FetchType.EAGER, cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<OrcamentoProduto> orcamentoProdutos;
+
     @Column(name = "Data_Criacao")
-    private Date DataCriacao;
+    private Date dataCriacao;
+
     @Column(name = "Data_Validade")
-    private Date DataValidade;
+    private Date dataValidade;
+
     @Column(name = "Valor")
-    private BigDecimal Valor;
+    private BigDecimal valor;
+
     @Column(name = "Status_Orcamento")
     @Enumerated(EnumType.STRING)
-    private StatusOrcamento Status;
-    @Column(name = "Desconto")
-    private BigDecimal Desconto;
+    private StatusOrcamento status;
 
+    @Column(name = "Desconto")
+    private BigDecimal desconto;
 
     public Integer getId() {
-        return Id;
+        return id;
     }
 
     public void setId(Integer id) {
-        Id = id;
+        this.id = id;
     }
 
     public Cliente getCliente() {
-        return Cliente;
+        return cliente;
     }
 
     public void setCliente(Cliente cliente) {
-        Cliente = cliente;
+        this.cliente = cliente;
     }
 
     public List<OrcamentoProduto> getOrcamentoProdutos() {
-        return OrcamentoProdutos;
+        return orcamentoProdutos;
     }
 
     public void setOrcamentoProdutos(List<OrcamentoProduto> orcamentoProdutos) {
-        OrcamentoProdutos = orcamentoProdutos;
+        this.orcamentoProdutos = orcamentoProdutos;
     }
 
     public Date getDataCriacao() {
-        return DataCriacao;
+        return dataCriacao;
     }
 
     public void setDataCriacao(Date dataCriacao) {
-        DataCriacao = dataCriacao;
+        this.dataCriacao = dataCriacao;
     }
 
     public Date getDataValidade() {
-        return DataValidade;
+        return dataValidade;
     }
 
     public void setDataValidade(Date dataValidade) {
-        DataValidade = dataValidade;
+        this.dataValidade = dataValidade;
     }
 
     public BigDecimal getValor() {
-        return Valor;
+        return valor;
     }
 
     public void setValor(BigDecimal valor) {
-        Valor = valor;
+        this.valor = valor;
     }
 
     public StatusOrcamento getStatus() {
-        return Status;
-    }
-
-    public BigDecimal getDesconto() {
-        return Desconto;
-    }
-
-    public void setDesconto(BigDecimal desconto) {
-        Desconto = desconto;
+        return status;
     }
 
     public void setStatus(StatusOrcamento status) {
-        Status = status;
+        this.status = status;
+    }
+
+    public BigDecimal getDesconto() {
+        return desconto;
+    }
+
+    public void setDesconto(BigDecimal desconto) {
+        this.desconto = desconto;
     }
 
     public enum StatusOrcamento {

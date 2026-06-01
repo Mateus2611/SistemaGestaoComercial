@@ -13,6 +13,10 @@ import br.com.gestaocomercial.app.src.Repository.IOrcamentoProdutoRepository;
 import br.com.gestaocomercial.app.src.Repository.IOrcamentoRepository;
 import br.com.gestaocomercial.app.src.Repository.IProdutoRepository;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
@@ -20,6 +24,7 @@ import java.sql.Date;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 
 @Service
 public class OrcamentoService {
@@ -34,157 +39,148 @@ public class OrcamentoService {
     private IProdutoRepository _produtoRepository;
 
     public OrcamentoResponse Criar(CreateOrcamentoDTO orcamentoDTO) {
-        if (orcamentoDTO == null)
+        if (orcamentoDTO == null) {
             throw new RuntimeException("Objeto vazio. Preencha as informações.");
+        }
 
         try {
             Date dataCriacao = Date.valueOf(LocalDate.now());
             Date dataValidade = VerificarValidade(dataCriacao, orcamentoDTO.validade);
-            Cliente cliente = _clienteRepository.findById(orcamentoDTO.idCliente).get();
-            Orcamento orcamento = new Orcamento(orcamentoDTO.idCliente, dataCriacao, dataValidade, Orcamento.StatusOrcamento.PENDENTE, orcamentoDTO.Desconto);
-            List<Produto> produtos = new ArrayList<>();
+
+            Cliente cliente = _clienteRepository.findById(orcamentoDTO.idCliente)
+                    .orElseThrow(() -> new RuntimeException("Cliente não encontrado com o ID fornecido."));
+
+            Orcamento orcamento = new Orcamento(cliente, dataCriacao, dataValidade, Orcamento.StatusOrcamento.PENDENTE, orcamentoDTO.Desconto);
+
+            List<Produto> produtosParaResponse = new ArrayList<>();
+            List<OrcamentoProduto> orcamentoProdutos = new ArrayList<>();
             BigDecimal valorTotal = BigDecimal.ZERO;
 
             for (CreateOrcamentoProdutoDTO ps : orcamentoDTO.Produtos) {
-                Produto produto = _produtoRepository.findById(ps.ProdutoId).get();
+                Produto produto = _produtoRepository.findById(ps.ProdutoId)
+                        .orElseThrow(() -> new RuntimeException("Produto com ID " + ps.ProdutoId + " não encontrado."));
+
                 valorTotal = valorTotal.add(produto.getValor().multiply(new BigDecimal(ps.Quantidade)));
-                produtos.add(produto);
+
+                produtosParaResponse.add(produto);
+
+                OrcamentoProduto item = new OrcamentoProduto(orcamento, produto, ps.Quantidade);
+                orcamentoProdutos.add(item);
             }
 
             valorTotal = valorTotal.subtract(orcamentoDTO.Desconto);
-            if (valorTotal.equals(BigDecimal.ZERO)) valorTotal = BigDecimal.ZERO;
+            if (valorTotal.compareTo(BigDecimal.ZERO) < 0) {
+                valorTotal = BigDecimal.ZERO;
+            }
 
             orcamento.setValor(valorTotal);
+            orcamento.setOrcamentoProdutos(orcamentoProdutos);
 
-            Orcamento orcamentoCriado = _orcamentoRepository.save(orcamento);
+            Orcamento orcamentoSalvo = _orcamentoRepository.save(orcamento);
 
-            orcamentoDTO.Produtos.forEach(ps -> _orcamentoProdutoRepository.save(new OrcamentoProduto(orcamentoCriado.getId(), ps.ProdutoId, ps.Quantidade)));
+            return new OrcamentoResponse(
+                    orcamentoSalvo.getId(),
+                    orcamentoSalvo.getCliente().getId(),
+                    orcamentoSalvo.getCliente(),
+                    produtosParaResponse,
+                    orcamentoSalvo.getDataCriacao(),
+                    orcamentoSalvo.getDataValidade(),
+                    orcamentoSalvo.getValor(),
+                    orcamentoSalvo.getStatus(),
+                    orcamentoSalvo.getDesconto()
+            );
 
-            orcamentoCriado.setCliente(cliente);
-
-            return new OrcamentoResponse(orcamentoCriado.getId(), orcamentoCriado.getCliente().getId(), cliente, produtos, orcamentoCriado.getDataCriacao(), orcamentoCriado.getDataValidade(), orcamentoCriado.getValor(), orcamentoCriado.getStatus(), orcamentoCriado.getDesconto());
-        } catch (RuntimeException e) {
-            throw new RuntimeException(e.getMessage());
+        } catch (Exception e) {
+            throw new RuntimeException("Erro ao criar o orçamento: " + e.getMessage(), e);
         }
     }
 
-    public Iterable<OrcamentoResponse> BuscaGeral() {
-
+    public Page<Orcamento> BuscaGeral(Integer pagina) {
         try {
-            Iterable<Orcamento> orcamentos = _orcamentoRepository.findAll();
-            List<OrcamentoResponse> responses = new ArrayList<>();
+            Pageable pageable = PageRequest.of(pagina - 1, 15, Sort.by("id").descending());
 
-            orcamentos.forEach(o -> {
-                List<Produto> produtos = new ArrayList<>();
+            return _orcamentoRepository.findAll(pageable);
 
-                o.setCliente(_clienteRepository.findById(o.getCliente().getId()).get());
-                _orcamentoProdutoRepository.findAllById(o.getId()).forEach(op -> produtos.add(
-                        _produtoRepository.findById(op.getIdProduto()).get()));
-
-                responses.add(
-                        new OrcamentoResponse(
-                                o.getId(),
-                                o.getCliente().getId(),
-                                o.getCliente(),
-                                produtos,
-                                o.getDataCriacao(),
-                                o.getDataValidade(),
-                                o.getValor(),
-                                o.getStatus(),
-                                o.getDesconto())
-                );
-            });
-
-            return responses;
-        } catch (RuntimeException e) {
-            throw new RuntimeException(e.getMessage());
+        } catch (Exception e) {
+            throw new RuntimeException("Erro ao realizar a busca geral de orçamentos paginados: " + e.getMessage(), e);
         }
     }
 
     public Iterable<OrcamentoResponse> BuscaPorStatusAprovado() {
         try {
-            Iterable<Orcamento> orcamentos = _orcamentoRepository.findAllByStatus("APROVADO");
+            List<Orcamento> orcamentos = _orcamentoRepository.findAllByStatus(Orcamento.StatusOrcamento.APROVADO.name());
             List<OrcamentoResponse> responses = new ArrayList<>();
 
-            orcamentos.forEach(o -> {
+            for (Orcamento o : orcamentos) {
                 List<Produto> produtos = new ArrayList<>();
 
-                o.setCliente(_clienteRepository.findById(o.getCliente().getId()).get());
-                _orcamentoProdutoRepository.findAllById(o.getId()).forEach(op -> produtos.add(
-                        _produtoRepository.findById(op.getIdProduto()).get()));
+                if (o.getOrcamentoProdutos() != null) {
+                    produtos = o.getOrcamentoProdutos().stream()
+                            .map(OrcamentoProduto::getProduto)
+                            .filter(Objects::nonNull)
+                            .toList();
+                }
 
-                responses.add(
-                        new OrcamentoResponse(
-                                o.getId(),
-                                o.getCliente().getId(),
-                                o.getCliente(),
-                                produtos,
-                                o.getDataCriacao(),
-                                o.getDataValidade(),
-                                o.getValor(),
-                                o.getStatus(),
-                                o.getDesconto())
-                );
-            });
+                Integer idCliente = (o.getCliente() != null) ? o.getCliente().getId() : null;
+
+                responses.add(new OrcamentoResponse(
+                        o.getId(),
+                        idCliente,
+                        o.getCliente(),
+                        produtos,
+                        o.getDataCriacao(),
+                        o.getDataValidade(),
+                        o.getValor(),
+                        o.getStatus(),
+                        o.getDesconto()
+                ));
+            }
 
             return responses;
-        } catch (RuntimeException e) {
-            throw new RuntimeException(e.getMessage());
+
+        } catch (Exception e) {
+            throw new RuntimeException("Erro ao buscar orçamentos aprovados: " + e.getMessage(), e);
         }
     }
 
-    public OrcamentoResponse BuscaPorId(Integer id) {
+    public Orcamento BuscaPorId(Integer id) {
         try {
-            Orcamento orcamento = _orcamentoRepository.findById(id).get();
-            orcamento.setCliente(_clienteRepository.findById(orcamento.getCliente().getId()).get());
-            List<Produto> produtos = new ArrayList<>();
+            return _orcamentoRepository.findById(id)
+                    .orElseThrow(() -> new RuntimeException("Orçamento não encontrado com o ID: " + id));
 
-            _orcamentoProdutoRepository.findAllById(orcamento.getId()).forEach(op -> produtos.add(
-                    _produtoRepository.findById(op.getIdProduto()).get()));
-
-            return new OrcamentoResponse(
-                    orcamento.getId(),
-                    orcamento.getCliente().getId(),
-                    orcamento.getCliente(),
-                    produtos,
-                    orcamento.getDataCriacao(),
-                    orcamento.getDataValidade(),
-                    orcamento.getValor(),
-                    orcamento.getStatus(),
-                    orcamento.getDesconto());
         } catch (RuntimeException e) {
-            throw new RuntimeException(e.getMessage());
+            throw new RuntimeException("Erro ao buscar orçamento por ID: " + e.getMessage(), e);
         }
     }
 
     public Orcamento Atualizar(UpdateOrcamentoDTO orcamentoDTO) {
+        if (orcamentoDTO == null) {
+            throw new RuntimeException("Objeto vazio. Preencha as informações.");
+        }
+
         try {
+            Orcamento orcamento = _orcamentoRepository.findById(orcamentoDTO.Id)
+                    .orElseThrow(() -> new RuntimeException("Orçamento não encontrado com o ID: " + orcamentoDTO.Id));
 
-            if (orcamentoDTO == null)
-                throw new RuntimeException("Objeto vazio. Preencha as informações.");
-
-            Orcamento orcamento = _orcamentoRepository.findById(orcamentoDTO.Id).get();
-
-
-            if (orcamento.getStatus().toString().equalsIgnoreCase("EXPIRADO")) {
+            if (orcamento.getStatus() == Orcamento.StatusOrcamento.EXPIRADO) {
                 throw new RuntimeException("Atualização recusada. Orçamento EXPIRADO no dia: " + orcamento.getDataValidade());
             }
 
-            if (orcamento.getStatus().toString().equalsIgnoreCase("REPROVADO")) {
+            if (orcamento.getStatus() == Orcamento.StatusOrcamento.REPROVADO) {
                 throw new RuntimeException("Atualização recusada. Orçamento está com status REPROVADO.");
             }
 
             if (LocalDate.now().isAfter(orcamento.getDataValidade().toLocalDate())) {
                 orcamento.setStatus(Orcamento.StatusOrcamento.EXPIRADO);
-                _orcamentoRepository.save(orcamento);
                 throw new RuntimeException("Atualização recusada. Orçamento expirado no dia: " + orcamento.getDataValidade());
             }
 
             orcamento.setStatus(orcamentoDTO.Status);
 
             return _orcamentoRepository.save(orcamento);
+
         } catch (RuntimeException e) {
-            throw new RuntimeException(e.getMessage());
+            throw new RuntimeException("Erro ao atualizar o orçamento: " + e.getMessage(), e);
         }
     }
 

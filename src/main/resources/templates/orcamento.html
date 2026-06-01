@@ -26,6 +26,39 @@
 
 <div class="d-flex">
 
+    <div th:if="${mensagemSucesso}"
+         class="alert alert-success alert-dismissible fade show shadow-lg border-0 position-fixed top-0 end-0 m-4"
+         role="alert"
+         style="border-radius: 10px; border-left: 5px solid #198754 !important; z-index: 1050; min-width: 300px;">
+
+        <div class="d-flex align-items-center pr-3">
+            <i class="bi bi-check-circle-fill me-2 fs-4"></i>
+            <span th:text="${mensagemSucesso}" class="fw-bold">Orcamento excluído com sucesso!</span>
+        </div>
+    </div>
+
+    <div th:if="${mensagemAlerta}"
+         class="alert alert-warning alert-dismissible fade show shadow-lg border-0 position-fixed top-0 end-0 m-4"
+         role="alert"
+         style="border-radius: 10px; border-left: 5px solid #dc8b35 !important; z-index: 1050; min-width: 320px; max-width: 500px;">
+
+        <div class="d-flex align-items-center">
+            <i class="bi bi-shield-fill-x me-2 fs-4 text-warning"></i>
+            <span th:text="${mensagemAlerta}" class="fw-bold text-dark" style="font-size: 0.95rem;">Não foi possível excluir o orcamento.</span>
+        </div>
+    </div>
+
+    <div th:if="${mensagemErro}"
+         class="alert alert-danger fade show shadow-lg border-0 position-fixed top-0 end-0 m-4 text-dark"
+         role="alert"
+         style="border-radius: 10px; border-left: 5px solid #dc3535 !important; z-index: 1050; min-width: 320px; max-width: 500px;">
+
+        <div class="d-flex align-items-center">
+            <i class="bi bi-exclamation-triangle-fill me-2 fs-4 text-dark"></i>
+            <span th:text="${mensagemErro}" class="fw-bold text-dark" style="font-size: 0.95rem;">Aviso do sistema.</span>
+        </div>
+    </div>
+
     <div class="sidebar-custom d-flex flex-column flex-shrink-0">
 
         <div class="sidebar-logo d-flex justify-content-center align-items-center py-3 mb-2 w-100">
@@ -83,7 +116,7 @@
             <table class="table table-custom table-hover">
                 <thead>
                 <tr>
-                    <th>ID</th>
+                    <th>Código</th>
                     <th>Cliente</th>
                     <th>Emissão</th>
                     <th>Validade</th>
@@ -105,16 +138,16 @@
                              data-desconto=${orcamento.desconto},
                              data-total=${orcamento.valor}">
 
-                    <td th:text="${orcamento.id}">1</td>
-                    <td th:text="${orcamento.cliente.nome}">João da Silva</td>
-                    <td th:text="${#dates.format(orcamento.dataCriacao, 'dd/MM/yyyy')}">20/05/2026</td>
-                    <td th:text="${#dates.format(orcamento.dataValidade, 'dd/MM/yyyy')}">30/05/2026</td>
+                    <td th:text="${orcamento.id}"></td>
+                    <td th:text="${orcamento.cliente.nome}"></td>
+                    <td th:text="${#dates.format(orcamento.dataCriacao, 'dd/MM/yyyy')}"></td>
+                    <td th:text="${#dates.format(orcamento.dataValidade, 'dd/MM/yyyy')}"></td>
                     <td>
                         <span class="badge badge-amarelo"
                               th:classappend="${orcamento.status.name() == 'APROVADO' ? 'bad-verde' : (orcamento.status.name() == 'PENDENTE' ? 'badge-amarelo' : 'badge-vermelho')}"
-                              th:text="${orcamento.status}">PENDENTE</span>
+                              th:text="${orcamento.status}"></span>
                     </td>
-                    <td th:text="${#numbers.formatDecimal(orcamento.valor, 1, 'POINT', 2, 'COMMA')}">1500,00</td>
+                    <td th:text="${#numbers.formatDecimal(orcamento.valor, 1, 'POINT', 2, 'COMMA')}"></td>
                     <td class="text-end">
                         <button class="btn btn-sm btn-outline-secondary me-2"
                                 data-bs-toggle="modal" data-bs-target="#modalEditarOrcamento"
@@ -132,60 +165,44 @@
                         </button>
                     </td>
                 </tr>
-
-                <tr class="tr-clicavel" onclick="abrirModalDetalhes(this)"
-                    data-id="101" data-cliente="Construtora Alfa Ltda" data-emissao="15/05/2026" data-validade="25/05/2026" data-status="PENDENTE" data-desconto="0" data-total="4500.00">
-                    <td>101</td>
-                    <td>Construtora Alfa Ltda</td>
-                    <td>15/05/2026</td>
-                    <td>25/05/2026</td>
-                    <td><span class="badge badge-amarelo">PENDENTE</span></td>
-                    <td>4.500,00</td>
-                    <td class="text-end">
-                        <button class="btn btn-sm btn-outline-secondary me-2"
-                                data-bs-toggle="modal" data-bs-target="#modalEditarOrcamento"
-                                data-id="101" data-cliente="" data-validade="2026-05-25"
-                                data-status="PENDENTE" data-desconto="0" data-total="4500.00"
-                                title="Editar"><i class="bi bi-pencil-fill"></i></button>
-                        <button class="btn btn-sm btn-outline-danger" title="Excluir"><i class="bi bi-trash-fill"></i></button>
-                    </td>
-                </tr>
-                <tr class="tr-clicavel" onclick="abrirModalDetalhes(this)"
-                    data-id="102" data-cliente="Maria Oliveira" data-emissao="10/05/2026" data-validade="20/05/2026" data-status="APROVADO" data-desconto="50" data-total="850.50">
-                    <td>102</td>
-                    <td>Maria Oliveira</td>
-                    <td>10/05/2026</td>
-                    <td>20/05/2026</td>
-                    <td><span class="badge badge-verde">APROVADO</span></td>
-                    <td>850,50</td>
-                    <td class="text-end">
-                        <button class="btn btn-sm btn-outline-secondary me-2"
-                                data-bs-toggle="modal" data-bs-target="#modalEditarOrcamento"
-                                data-id="102" data-cliente="" data-validade="2026-05-20"
-                                data-status="APROVADO" data-desconto="50" data-total="850.50"
-                                title="Editar"><i class="bi bi-pencil-fill"></i></button>
-                        <button class="btn btn-sm btn-outline-danger" title="Excluir"><i class="bi bi-trash-fill"></i></button>
-                    </td>
-                </tr>
-                <tr class="tr-clicavel" onclick="abrirModalDetalhes(this)"
-                    data-id="103" data-cliente="Oficina Mecânica São José" data-emissao="01/05/2026" data-validade="10/05/2026" data-status="EXPIRADO" data-desconto="100" data-total="1200.00">
-                    <td>103</td>
-                    <td>Oficina Mecânica São José</td>
-                    <td>01/05/2026</td>
-                    <td>10/05/2026</td>
-                    <td><span class="badge badge-vermelho">EXPIRADO</span></td>
-                    <td>1.200,00</td>
-                    <td class="text-end">
-                        <button class="btn btn-sm btn-outline-secondary me-2"
-                                data-bs-toggle="modal" data-bs-target="#modalEditarOrcamento"
-                                data-id="103" data-cliente="" data-validade="2026-05-10"
-                                data-status="EXPIRADO" data-desconto="100" data-total="1200.00"
-                                title="Editar"><i class="bi bi-pencil-fill"></i></button>
-                        <button class="btn btn-sm btn-outline-danger" title="Excluir"><i class="bi bi-trash-fill"></i></button>
-                    </td>
-                </tr>
                 </tbody>
             </table>
+
+            <div th:if="${totalPaginas > 1}" class="d-flex justify-content-between align-items-center mt-4 px-2">
+                <div class="text-muted fw-bold" style="font-size: 0.95rem;">
+                    Exibindo página <span th:text="${paginaAtual}">1</span> de <span th:text="${totalPaginas}">5</span>
+                    (Total de <span th:text="${totalItens}">75</span> orçamentos)
+                </div>
+
+                <nav aria-label="Navegação de páginas">
+                    <ul class="pagination mb-0">
+
+                        <li class="page-item" th:classappend="${paginaAtual == 1} ? 'disabled'">
+                            <a class="page-link" th:href="@{/orcamento(page=${paginaAtual - 1})}" aria-label="Anterior" style="color: #000000; box-shadow: none;">
+                                <span aria-hidden="true">&laquo;</span>
+                            </a>
+                        </li>
+
+                        <li class="page-item" th:each="i : ${#numbers.sequence(1, totalPaginas)}"
+                            th:classappend="${paginaAtual == i} ? 'active'">
+
+                            <a class="page-link fw-bold"
+                               th:href="@{/orcamento(page=${i})}"
+                               th:text="${i}"
+                               th:style="${paginaAtual == i} ? 'background-color: #ff7e12; border-color: #000000; color: #000000;' : 'color: #000000; box-shadow: none;'">
+                                1
+                            </a>
+                        </li>
+
+                        <li class="page-item" th:classappend="${paginaAtual == totalPaginas} ? 'disabled'">
+                            <a class="page-link" th:href="@{/orcamento(page=${paginaAtual + 1})}" aria-label="Próximo" style="color: #000000; box-shadow: none;">
+                                <span aria-hidden="true">&raquo;</span>
+                            </a>
+                        </li>
+
+                    </ul>
+                </nav>
+            </div>
         </div>
 
     </div>

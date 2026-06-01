@@ -4,53 +4,63 @@ import jakarta.persistence.*;
 
 @Entity
 @Table(name = "Orcamento_Produto")
-@IdClass(OrcamentoProdutoId.class)
 public class OrcamentoProduto {
+
+    @EmbeddedId
+    private OrcamentoProdutoId id = new OrcamentoProdutoId();
+
+    @ManyToOne
+    @MapsId("idOrcamento")
+    @JoinColumn(name = "Id_Orcamento")
+    private Orcamento orcamento;
+
+    @ManyToOne
+    @MapsId("idProduto")
+    @JoinColumn(name = "Id_Produto")
+    private Produto produto;
+
+    @Column(name = "Quantidade")
+    private Integer quantidade;
 
     public OrcamentoProduto() {
     }
 
-    public OrcamentoProduto(Integer idOrcamento, Integer idProduto, Integer quantidade) {
-        IdOrcamento = idOrcamento;
-        IdProduto = idProduto;
-        Quantidade = quantidade;
+    public OrcamentoProduto(Orcamento orcamento, Produto produto, Integer quantidade) {
+        this.orcamento = orcamento;
+        this.produto = produto;
+        this.quantidade = quantidade;
+        this.id = new OrcamentoProdutoId(orcamento.getId(), produto.getId());
     }
 
-    public OrcamentoProduto(Integer idOrcamento, Integer idProduto) {
-        IdOrcamento = idOrcamento;
-        IdProduto = idProduto;
+    public OrcamentoProdutoId getId() {
+        return id;
     }
 
-    @Id
-    @Column(name = "Id_Orcamento")
-    private Integer IdOrcamento;
-    @Id
-    @Column(name = "Id_Produto")
-    private Integer IdProduto;
-    @Column(name = "Quantidade")
-    private Integer Quantidade;
-
-    public Integer getIdOrcamento() {
-        return IdOrcamento;
+    public void setId(OrcamentoProdutoId id) {
+        this.id = id;
     }
 
-    public void setIdOrcamento(Integer idOrcamento) {
-        IdOrcamento = idOrcamento;
+    public Orcamento getOrcamento() {
+        return orcamento;
     }
 
-    public Integer getIdProduto() {
-        return IdProduto;
+    public void setOrcamento(Orcamento orcamento) {
+        this.orcamento = orcamento;
     }
 
-    public void setIdProduto(Integer idProduto) {
-        IdProduto = idProduto;
+    public Produto getProduto() {
+        return produto;
+    }
+
+    public void setProduto(Produto produto) {
+        this.produto = produto;
     }
 
     public Integer getQuantidade() {
-        return Quantidade;
+        return quantidade;
     }
 
     public void setQuantidade(Integer quantidade) {
-        Quantidade = quantidade;
+        this.quantidade = quantidade;
     }
 }

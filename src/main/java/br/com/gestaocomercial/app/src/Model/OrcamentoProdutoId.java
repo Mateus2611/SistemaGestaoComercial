@@ -1,34 +1,38 @@
 package br.com.gestaocomercial.app.src.Model;
 
+import jakarta.persistence.Embeddable;
 import java.io.Serializable;
 import java.util.Objects;
 
+@Embeddable
 public class OrcamentoProdutoId implements Serializable {
+
+    private static final long serialVersionUID = 1L;
+
+    private Integer idOrcamento;
+    private Integer idProduto;
 
     public OrcamentoProdutoId() {}
 
     public OrcamentoProdutoId(Integer idOrcamento, Integer idProduto) {
-        IdOrcamento = idOrcamento;
-        IdProduto = idProduto;
+        this.idOrcamento = idOrcamento;
+        this.idProduto = idProduto;
     }
 
-    private Integer IdOrcamento;
-    private Integer IdProduto;
-
     public Integer getIdOrcamento() {
-        return IdOrcamento;
+        return idOrcamento;
     }
 
     public void setIdOrcamento(Integer idOrcamento) {
-        IdOrcamento = idOrcamento;
+        this.idOrcamento = idOrcamento;
     }
 
     public Integer getIdProduto() {
-        return IdProduto;
+        return idProduto;
     }
 
     public void setIdProduto(Integer idProduto) {
-        IdProduto = idProduto;
+        this.idProduto = idProduto;
     }
 
     @Override
@@ -36,11 +40,12 @@ public class OrcamentoProdutoId implements Serializable {
         if (this == obj) return true;
         if (obj == null || getClass() != obj.getClass()) return false;
         OrcamentoProdutoId that = (OrcamentoProdutoId) obj;
-        return Objects.equals(IdOrcamento, that.IdOrcamento) && Objects.equals(IdProduto, that.IdProduto);
+        return Objects.equals(idOrcamento, that.idOrcamento) &&
+                Objects.equals(idProduto, that.idProduto);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(IdOrcamento, IdProduto);
+        return Objects.hash(idOrcamento, idProduto);
     }
 }
