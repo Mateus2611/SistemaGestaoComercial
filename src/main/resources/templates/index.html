@@ -21,9 +21,7 @@
 <body>
 
 <div class="d-flex">
-
     <div class="sidebar-custom d-flex flex-column flex-shrink-0">
-
         <div class="sidebar-logo d-flex justify-content-center align-items-center py-3 mb-2 w-100">
             <img th:src="@{/images/acrillogo.svg}" src="../static/images/acrillogo.svg" alt="Logo AcrillService" class="img-fluid" style="max-height: 120px; max-width: 120px; object-fit: contain;">
         </div>
@@ -62,11 +60,6 @@
 
         <div class="d-flex justify-content-between align-items-center mb-5 flex-wrap">
             <h1 class="page-title mb-0">PAINEL DE CONTROLE</h1>
-
-            <div class="search-container">
-                <i class="bi bi-search"></i>
-                <input type="text" class="search-input" placeholder="Busca global (ex: Cliente, ID...)">
-            </div>
         </div>
 
         <div class="row mb-5">
@@ -75,25 +68,27 @@
                     <div class="card-body text-center">
                         <img th:src="@{/images/orcamentosPendentes.svg}" src="../static/images/orcamentosPendentes.svg" alt="Orçamentos Pendentes" style="width: 44px; height: 44px;" class="mb-3">
                         <h5 class="card-title text-uppercase fw-bold text-muted">Orçamentos Pendentes</h5>
-                        <h2 class="display-5 fw-bold text-dark">5</h2>
+                        <h2 class="display-5 fw-bold text-dark" th:text="${qtdOrcamentosPendentes}">0</h2>
                     </div>
                 </div>
             </div>
+
             <div class="col-md-3">
                 <div class="card shadow-sm border-0 bg-light" style="border-radius: 16px">
                     <div class="card-body text-center">
                         <img th:src="@{/images/vendasDoMes.svg}" src="../static/images/vendasDoMes.svg" alt="Vendas do Mês" style="width: 44px; height: 44px;" class="mb-3">
                         <h5 class="card-title text-uppercase fw-bold text-muted">Vendas do Mês</h5>
-                        <h2 class="display-5 fw-bold text-dark">12</h2>
+                        <h2 class="display-5 fw-bold text-dark" th:text="${qtdVendasMes}">0</h2>
                     </div>
                 </div>
             </div>
+
             <div class="col-md-3">
                 <div class="card shadow-sm border-0 bg-light" style="border-radius: 16px">
                     <div class="card-body text-center">
                         <i class="bi bi-people-fill fs-1 mb-2 icon-clientes-ativos"></i>
                         <h5 class="card-title text-uppercase fw-bold text-muted">Clientes Ativos</h5>
-                        <h2 class="display-5 fw-bold text-dark">48</h2>
+                        <h2 class="display-5 fw-bold text-dark" th:text="${qtdClientesAtivos}">0</h2>
                     </div>
                 </div>
             </div>
@@ -103,7 +98,7 @@
                     <div class="card-body text-center">
                         <i class="bi bi-box-seam-fill fs-1 mb-2 icon-produtos"></i>
                         <h5 class="card-title text-uppercase fw-bold text-muted">Produtos</h5>
-                        <h2 class="display-5 fw-bold text-dark">124</h2>
+                        <h2 class="display-5 fw-bold text-dark" th:text="${qtdProdutos}">0</h2>
                     </div>
                 </div>
             </div>
@@ -146,45 +141,49 @@
             <table class="table table-custom table-hover">
                 <thead>
                 <tr>
-                    <th>ID Venda</th>
-                    <th>Cliente</th>
+                    <th>Código da Venda</th>
+                    <th>Nome do Cliente</th>
+                    <th>Data de Criação</th>
+                    <th>Prazo Pagamento</th>
+                    <th>Data Conclusão</th>
+                    <th>Valor Total (R$)</th>
                     <th>Status Pagamento</th>
-                    <th>Data da Venda</th>
-                    <th>Valor (R$)</th>
                 </tr>
                 </thead>
                 <tbody>
-                <tr class="tr-clicavel" onclick="abrirModalDetalhes(this)"
-                    data-id="205" data-orcamento="301" data-cliente="Construtora Alfa Ltda" data-criacao="16/05/2026"
-                    data-prazo="16/06/2026" data-conclusao="-" data-valor="1250.00" data-status="APROVADO">
-                    <td>205</td>
-                    <td>Construtora Alfa Ltda</td>
-                    <td><span class="badge badge-verde">APROVADO</span></td>
-                    <td>16/05/2026</td>
-                    <td>1.250,00</td>
+                <tr th:each="venda : ${ultimasVendas}"
+                    class="tr-clicavel"
+                    onclick="abrirModalDetalhes(this)"
+                    th:attr="data-id=${venda.id},
+                             data-orcamento=${venda.orcamento != null ? venda.orcamento.id : ''},
+                             data-cliente=${venda.orcamento != null ? venda.orcamento.cliente.nome : 'N/A'},
+                             data-criacao=${venda.dataCriacao != null ? #dates.format(venda.dataCriacao, 'dd/MM/yyyy') : '-'},
+                             data-prazo=${venda.prazoPagamento != null ? #dates.format(venda.prazoPagamento, 'dd/MM/yyyy') : '-'},
+                             data-conclusao=${venda.dataConclusao != null ? #dates.format(venda.dataConclusao, 'dd/MM/yyyy') : '-'},
+                             data-valor=${venda.orcamento != null ? venda.orcamento.valor : 0},
+                             data-status=${venda.statusPagamento != null ? venda.statusPagamento.name() : ''}">
+
+                    <td th:text="${venda.id}"></td>
+                    <td th:text="${venda.orcamento != null ? venda.orcamento.cliente.nome : 'N/A'}"></td>
+                    <td th:text="${venda.dataCriacao != null ? #dates.format(venda.dataCriacao, 'dd/MM/yyyy') : 'N/A'}"></td>
+                    <td th:text="${venda.prazoPagamento != null ? #dates.format(venda.prazoPagamento, 'dd/MM/yyyy') : 'N/A'}"></td>
+                    <td th:text="${venda.dataConclusao != null ? #dates.format(venda.dataConclusao, 'dd/MM/yyyy') : '-'}"></td>
+                    <td th:text="${venda.orcamento != null ? #numbers.formatDecimal(venda.orcamento.valor, 1, 'POINT', 2, 'COMMA') : '0,00'}"></td>
+                    <td>
+                        <span class="badge"
+                              th:classappend="${venda.statusPagamento != null and venda.statusPagamento.name() == 'APROVADO' ? 'badge-verde' : (venda.statusPagamento != null and venda.statusPagamento.name() == 'PENDENTE' ? 'badge-amarelo' : 'badge-vermelho')}"
+                              th:text="${venda.statusPagamento}"></span>
+                    </td>
                 </tr>
-                <tr class="tr-clicavel" onclick="abrirModalDetalhes(this)"
-                    data-id="206" data-orcamento="305" data-cliente="Maria Oliveira" data-criacao="18/05/2026"
-                    data-prazo="18/06/2026" data-conclusao="-" data-valor="3400.80" data-status="PENDENTE">
-                    <td>206</td>
-                    <td>Maria Oliveira</td>
-                    <td><span class="badge badge-amarelo">PENDENTE</span></td>
-                    <td>18/05/2026</td>
-                    <td>3.400,80</td>
-                </tr>
-                <tr class="tr-clicavel" onclick="abrirModalDetalhes(this)"
-                    data-id="207" data-orcamento="312" data-cliente="Oficina Mecânica São José" data-criacao="19/05/2026"
-                    data-prazo="19/06/2026" data-conclusao="-" data-valor="450.00" data-status="CANCELADO">
-                    <td>207</td>
-                    <td>Oficina Mecânica São José</td>
-                    <td><span class="badge badge-vermelho">CANCELADO</span></td>
-                    <td>19/05/2026</td>
-                    <td>450,00</td>
+
+                <tr th:if="${#lists.isEmpty(ultimasVendas)}">
+                    <td colspan="7" class="text-center text-muted py-3">
+                        <em>Nenhuma venda realizada até o momento.</em>
+                    </td>
                 </tr>
                 </tbody>
             </table>
         </div>
-
     </div>
 </div>
 
@@ -259,245 +258,14 @@
     </div>
 </div>
 
-<div class="modal fade" id="modalCriarOrcamento" tabindex="-1" aria-hidden="true">
-    <div class="modal-dialog modal-dialog-centered modal-lg">
-        <div class="modal-content shadow-lg border-0" style="border-radius: 16px; padding: 6px; background-color: #ffffff;">
-            <div style="border: 1.6px solid #14213d; border-radius: 12px; height: 100%;">
-                <div class="modal-header border-0 pb-0">
-                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                </div>
-                <div class="modal-body px-5 pb-5 pt-2 text-center">
-                    <h1 class="page-title text-uppercase mb-3" style="line-height: 1.1;">
-                        Criar<br>Orçamento
-                    </h1>
-                    <hr class="mx-auto mb-4" style="width: 60%; border-top: 1px solid #000; opacity: 1;">
-
-                    <form class="text-start px-md-4">
-                        <div class="row g-4">
-                            <div class="col-md-7">
-                                <label class="form-label fw-bold text-uppercase text-dark mb-1" style="font-size: 1.1rem;">Cliente</label>
-                                <select class="form-select form-select-lg"
-                                        style="border: 1.6px solid #000; border-radius: 8px; box-shadow: none;"
-                                        id="clienteSelect" name="clienteId">
-                                    <option selected disabled value="">Selecione o Cliente</option>
-                                    <option th:each="cliente : ${clientes}"
-                                            th:value="${cliente.id}"
-                                            th:text="${cliente.nome}">
-                                    </option>
-                                </select>
-                            </div>
-                            <div class="col-md-5">
-                                <label class="form-label fw-bold text-uppercase text-dark mb-1" style="font-size: 1.1rem;">Data de Validade</label>
-                                <input type="date" class="form-control form-control-lg"
-                                       style="border: 1.6px solid #000; border-radius: 8px; box-shadow: none;">
-                            </div>
-                            <div class="col-md-4 offset-md-2">
-                                <label class="form-label fw-bold text-uppercase text-dark mb-1" style="font-size: 1.1rem;">Desconto (R$)</label>
-                                <input type="number" step="0.01" class="form-control form-control-lg" value="0.00"
-                                       style="border: 1.6px solid #000; border-radius: 8px; box-shadow: none;">
-                            </div>
-                            <div class="col-md-4">
-                                <label class="form-label fw-bold text-uppercase text-dark mb-1" style="font-size: 1.1rem;">Total (R$)</label>
-                                <input type="text" id="valorOrcamentoInput" class="form-control form-control-lg fw-bold" readonly value="0.00"
-                                       style="border: 1.6px solid #000; border-radius: 8px; background-color: #e9e9e9;">
-                            </div>
-
-                            <div class="col-12 mt-5">
-                                <div class="d-flex justify-content-center">
-                                    <h5 class="fw-bold text-uppercase border-bottom border-dark pb-2 mb-4 text-center" style="width: 100%;">
-                                        Produtos do Orçamento
-                                    </h5>
-                                </div>
-                                <div class="d-flex gap-2 mb-3 justify-content-center mx-auto" style="max-width: 800px;">
-                                    <select id="produtoSelect" class="form-select form-select-lg flex-grow-1" style="border: 1.6px solid #000; border-radius: 8px; box-shadow: none;">
-                                        <option selected disabled value="">Selecione um produto...</option>
-                                        <option th:each="produto : ${produtos}"
-                                                th:value="${produto.id}"
-                                                th:text="${produto.nome}"
-                                                th:attr="data-valor=${produto.valor}"> </option>
-                                    </select>
-                                    <input type="number" id="produtoQuantidade" class="form-control form-control-lg text-center" value="1" min="1" style="width: 100px; border: 1.6px solid #000; border-radius: 8px; box-shadow: none;">
-                                    <button type="button" class="btn btn-dark text-uppercase fw-bold" onclick="adicionarProdutoNaTabela()" style="border-radius: 8px; padding: 0 30px;">
-                                        Adicionar
-                                    </button>
-                                </div>
-                                <div class="table-responsive mx-auto" style="max-width: 800px;">
-                                    <table class="table table-bordered table-custom" id="tabelaProdutosOrcamento">
-                                        <thead class="table-dark">
-                                        <tr>
-                                            <th>Produto</th>
-                                            <th class="text-center" style="width: 100px;">Qtd</th>
-                                            <th class="text-end" style="width: 150px;">Valor Unit.</th>
-                                            <th class="text-end" style="width: 150px;">Subtotal</th>
-                                            <th class="text-center" style="width: 80px;">Ação</th>
-                                        </tr>
-                                        </thead>
-                                        <tbody id="corpoTabelaProdutos">
-                                        </tbody>
-                                    </table>
-                                </div>
-                            </div>
-                        </div>
-                        <div class="d-flex justify-content-center gap-3 mt-5">
-                            <button type="button" class="btn btn-outline-secondary fw-bolder text-uppercase" data-bs-dismiss="modal"
-                                    style="font-size: 1.2rem; padding: 12px 40px; border-radius: 8px; border-width: 1.8px;">
-                                Cancelar
-                            </button>
-                            <button type="button" class="btn btn-orange fw-bolder text-uppercase text-white"
-                                    style="font-size: 1.2rem; padding: 12px 40px; border-radius: 8px; background-color: #ff9433; border: none;">
-                                Salvar
-                            </button>
-                        </div>
-                    </form>
-                </div>
-            </div>
-        </div>
-    </div>
-</div>
-
-<div class="modal fade" id="modalCriarVenda" tabindex="-1" aria-hidden="true">
-    <div class="modal-dialog modal-dialog-centered modal-lg">
-        <div class="modal-content shadow-lg border-0" style="border-radius: 16px; padding: 6px; background-color: #ffffff;">
-            <div style="border: 1.6px solid #14213d; border-radius: 12px; height: 100%;">
-                <div class="modal-header border-0 pb-0">
-                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                </div>
-                <div class="modal-body px-5 pb-5 pt-2 text-center">
-                    <h1 class="page-title text-uppercase mb-3" style="line-height: 1.1;">
-                        Criar<br>Venda
-                    </h1>
-                    <hr class="mx-auto mb-4" style="width: 60%; border-top: 1px solid #000; opacity: 1;">
-
-                    <form class="text-start px-md-4">
-                        <div class="row g-4">
-                            <div class="col-md-7">
-                                <label class="form-label fw-bold text-uppercase text-dark mb-1" style="font-size: 1.1rem;">Orçamento</label>
-                                <select class="form-select form-select-lg" style="border: 1.6px solid #000; border-radius: 8px; box-shadow: none;">
-                                    <option selected disabled value="">Selecione Orçamento Aprovado</option>
-                                    <option th:each="orcamento : ${orcamentos}" th:value="${orcamento.id}" th:text="'Orçamento #' + ${orcamento.id} + ' - ' + ${orcamento.cliente.nome}"></option>
-                                </select>
-                            </div>
-
-                            <div class="col-md-5">
-                                <label class="form-label fw-bold text-uppercase text-dark mb-1" style="font-size: 1.1rem;">Prazo de Pagamento</label>
-                                <input type="date" class="form-control form-control-lg" style="border: 1.6px solid #000; border-radius: 8px; box-shadow: none;">
-                            </div>
-                        </div>
-
-                        <div class="d-flex justify-content-center gap-3 mt-5">
-                            <button type="button" class="btn btn-outline-secondary fw-bolder text-uppercase" data-bs-dismiss="modal"
-                                    style="font-size: 1.2rem; padding: 12px 40px; border-radius: 8px; border-width: 1.8px;">
-                                Cancelar
-                            </button>
-                            <button type="button" class="btn btn-orange fw-bolder text-uppercase text-white"
-                                    style="font-size: 1.2rem; padding: 12px 40px; border-radius: 8px; background-color: #ff9433; border: none;">
-                                Salvar Venda
-                            </button>
-                        </div>
-                    </form>
-                </div>
-            </div>
-        </div>
-    </div>
-</div>
-
-<div class="modal fade" id="modalCriarCliente" tabindex="-1" aria-hidden="true">
-    <div class="modal-dialog modal-dialog-centered modal-lg">
-        <div class="modal-content shadow-lg border-0" style="border-radius: 16px; padding: 6px; background-color: #ffffff;">
-            <div style="border: 1.6px solid #14213d; border-radius: 12px; height: 100%;">
-                <div class="modal-header border-0 pb-0">
-                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                </div>
-                <div class="modal-body px-5 pb-5 pt-2 text-center">
-                    <h1 class="page-title text-uppercase mb-3" style="line-height: 1.1;">
-                        Criar<br>Cliente
-                    </h1>
-                    <hr class="mx-auto mb-5" style="width: 60%; border-top: 1px solid #000; opacity: 1;">
-
-                    <form class="text-start px-md-4">
-                        <div class="row g-4">
-                            <div class="col-md-12">
-                                <label class="form-label fw-bold text-uppercase text-dark mb-1" style="font-size: 1.1rem;">Nome Completo / Razão Social :</label>
-                                <input type="text" name="nome" class="form-control form-control-lg"
-                                       style="border: 1.6px solid #000; border-radius: 8px; box-shadow: none;">
-                            </div>
-
-                            <div class="col-md-4">
-                                <label class="form-label fw-bold text-uppercase text-dark mb-1" style="font-size: 1.1rem;">Tipo :</label>
-                                <select id="criarClienteTipo" name="tipo" class="form-select form-select-lg" style="border: 1.6px solid #000; border-radius: 8px; box-shadow: none;" onchange="alternarCampoDocumento('criar')">
-                                    <option selected disabled value="">Selecione</option>
-                                    <option value="CPF">Pessoa Física</option>
-                                    <option value="CNPJ">Pessoa Jurídica</option>
-                                </select>
-                            </div>
-
-                            <div class="col-md-8" id="divCriarDocumento" style="display: none;">
-                                <label id="labelCriarDocumento" class="form-label fw-bold text-uppercase text-dark mb-1" style="font-size: 1.1rem;">Documento :</label>
-                                <input type="text" id="inputCriarDocumento" name="documento" class="form-control form-control-lg"
-                                       style="border: 1.6px solid #000; border-radius: 8px; box-shadow: none;">
-                            </div>
-
-                            <div class="col-md-12">
-                                <label class="form-label fw-bold text-uppercase text-dark mb-1" style="font-size: 1.1rem;">Telefone :</label>
-                                <input type="text" name="telefone" class="form-control form-control-lg"
-                                       style="border: 1.6px solid #000; border-radius: 8px; box-shadow: none;">
-                            </div>
-
-                            <div class="col-md-12">
-                                <label class="form-label fw-bold text-uppercase text-dark mb-1" style="font-size: 1.1rem;">Emails :</label>
-                                <div id="containerCriarEmails" class="d-flex flex-column gap-2 mb-2">
-                                    <div class="d-flex gap-2 email-input-group">
-                                        <input type="email" name="emails" class="form-control form-control-lg" placeholder="email@exemplo.com"
-                                               style="border: 1.6px solid #000; border-radius: 8px; box-shadow: none;">
-                                        <button type="button" class="btn btn-outline-danger fw-bold" onclick="removerCampoEmail(this)" style="border-radius: 8px;"><i class="bi bi-trash-fill"></i></button>
-                                    </div>
-                                </div>
-                                <button type="button" class="btn btn-sm btn-dark fw-bold" onclick="adicionarCampoEmail()" style="border-radius: 8px;">+ Adicionar Email</button>
-                            </div>
-
-                        </div>
-
-                        <div class="d-flex justify-content-center gap-3 mt-5">
-                            <button type="button" class="btn btn-outline-secondary fw-bolder text-uppercase" data-bs-dismiss="modal"
-                                    style="font-size: 1.2rem; padding: 12px 40px; border-radius: 8px; border-width: 1.8px;">
-                                Cancelar
-                            </button>
-                            <button type="button" class="btn btn-orange fw-bolder text-uppercase text-white"
-                                    style="font-size: 1.2rem; padding: 12px 40px; border-radius: 8px; background-color: #ff9433; border: none;">
-                                Salvar
-                            </button>
-                        </div>
-                    </form>
-                </div>
-            </div>
-        </div>
-    </div>
-</div>
+<div th:replace="~{orcamento :: modalCriarOrcamento}"></div>
+<div th:replace="~{cliente :: modalCriarCliente}"></div>
+<div th:replace="~{venda :: modalCriarVenda}"></div>
 
 <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.11.8/dist/umd/popper.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.min.js"></script>
 
 <script>
-    function adicionarCampoEmail(valor = '') {
-        const container = document.getElementById('containerCriarEmails');
-
-        const div = document.createElement('div');
-        div.className = 'd-flex gap-2 email-input-group';
-        div.innerHTML = `
-            <input type="email" name="emails" class="form-control form-control-lg" value="${valor}" placeholder="email@exemplo.com"
-                   style="border: 1.6px solid #000; border-radius: 8px; box-shadow: none;">
-            <button type="button" class="btn btn-outline-danger fw-bold" onclick="removerCampoEmail(this)" style="border-radius: 8px;">
-                <i class="bi bi-trash-fill"></i>
-            </button>
-        `;
-        container.appendChild(div);
-    }
-
-    function removerCampoEmail(button) {
-        const group = button.closest('.email-input-group');
-        if (group) group.remove();
-    }
-
     function abrirModalDetalhes(row) {
         const cliente = row.getAttribute('data-cliente');
         const orcamento = row.getAttribute('data-orcamento');
@@ -523,112 +291,121 @@
         modal.show();
     }
 
-    function alternarCampoDocumento(modalTipo) {
-        let selectTipo = document.getElementById('criarClienteTipo');
-        let divDocumento = document.getElementById('divCriarDocumento');
-        let labelDocumento = document.getElementById('labelCriarDocumento');
-        let inputDocumento = document.getElementById('inputCriarDocumento');
+    function adicionarCampoEmail(valor = '') {
+        const container = document.getElementById('containerCriarEmails');
+        const indice = container.querySelectorAll('.email-input-group').length;
 
-        const tipoSelecionado = selectTipo.value;
-
-        if (tipoSelecionado === 'CPF') {
-            divDocumento.style.display = 'block';
-            labelDocumento.innerText = 'CPF :';
-            inputDocumento.placeholder = '000.000.000-00';
-        } else if (tipoSelecionado === 'CNPJ') {
-            divDocumento.style.display = 'block';
-            labelDocumento.innerText = 'CNPJ :';
-            inputDocumento.placeholder = '00.000.000/0000-00';
-        } else {
-            divDocumento.style.display = 'none';
-        }
+        const div = document.createElement('div');
+        div.className = 'd-flex gap-2 email-input-group';
+        div.innerHTML = `
+            <input type="email" name="emails[${indice}].texto" class="form-control form-control-lg" value="${valor}" placeholder="email@exemplo.com"
+                   style="border: 1.6px solid #000; border-radius: 8px; box-shadow: none;">
+            <button type="button" class="btn btn-outline-danger fw-bold" onclick="removerCampoEmail(this)" style="border-radius: 8px;">
+                <i class="bi bi-trash-fill"></i>
+            </button>
+        `;
+        container.appendChild(div);
     }
 
-    // Limpa os dados do modal de criação quando ele for fechado, incluindo os e-mails
-    document.getElementById('modalCriarCliente').addEventListener('hidden.bs.modal', function () {
-        document.getElementById('criarClienteTipo').selectedIndex = 0;
-        document.getElementById('divCriarDocumento').style.display = 'none';
-        document.getElementById('inputCriarDocumento').value = '';
+    function removerCampoEmail(button) {
+        const group = button.closest('.email-input-group');
+        if (group) group.remove();
+    }
 
-        // Reseta os campos de e-mail para ter apenas um vazio
-        const container = document.getElementById('containerCriarEmails');
-        container.innerHTML = '';
-        adicionarCampoEmail();
-    });
+    const modalCriarClienteElement = document.getElementById('modalCriarCliente');
+    if(modalCriarClienteElement){
+        modalCriarClienteElement.addEventListener('hidden.bs.modal', function () {
+            document.getElementById('criarClienteTipo').selectedIndex = 0;
+            document.getElementById('divCriarDocumento').style.display = 'none';
+            document.getElementById('inputCriarDocumento').value = '';
 
-    // ==========================================
-    // SCRIPTS DO MODAL DE CRIAR ORÇAMENTO
-    // ==========================================
-    let produtoIndex = 0;
+            const container = document.getElementById('containerCriarEmails');
+            container.innerHTML = '';
+            adicionarCampoEmail();
+        });
+    }
+
+    function mascaraData(input) {
+        let valor = input.value.replace(/\D/g, '');
+        if (valor.length > 2) {
+            valor = valor.substring(0, 2) + '/' + valor.substring(2);
+        }
+        if (valor.length > 5) {
+            valor = valor.substring(0, 5) + '/' + valor.substring(5, 9);
+        }
+        input.value = valor;
+    }
+
+    let itemIndex = 0;
 
     function adicionarProdutoNaTabela() {
         const select = document.getElementById('produtoSelect');
-        const inputQuantidade = document.getElementById('produtoQuantidade');
-        const inputValorTotal = document.getElementById('valorOrcamentoInput');
+        const qtdInput = document.getElementById('produtoQuantidade');
+        const tbody = document.getElementById('corpoTabelaProdutos');
 
-        const opcaoSelecionada = select.options[select.selectedIndex];
-
-        if (!opcaoSelecionada.value) {
-            alert("Por favor, selecione um produto.");
+        if (select.value === "") {
+            alert("Por favor, selecione um produto antes de adicionar.");
             return;
         }
 
-        const idProduto = opcaoSelecionada.value;
-        const nomeProduto = opcaoSelecionada.text;
-        const valorUnitario = parseFloat(opcaoSelecionada.getAttribute('data-valor'));
-        const quantidade = parseInt(inputQuantidade.value);
-        const subtotal = valorUnitario * quantidade;
+        const produtoId = select.value;
+        const produtoNome = select.options[select.selectedIndex].text;
+        const produtoValor = parseFloat(select.options[select.selectedIndex].getAttribute('data-valor'));
 
-        const tbody = document.getElementById('corpoTabelaProdutos');
+        let qtd = parseInt(qtdInput.value);
+        if (isNaN(qtd) || qtd < 1) qtd = 1;
 
+        const subtotal = produtoValor * qtd;
         const tr = document.createElement('tr');
-        tr.id = `linha-produto-${produtoIndex}`;
-        tr.setAttribute('data-subtotal', subtotal);
 
         tr.innerHTML = `
             <td>
-                ${nomeProduto}
-                <input type="hidden" name="Produtos[${produtoIndex}].ProdutoId" value="${idProduto}">
-                <input type="hidden" name="Produtos[${produtoIndex}].Quantidade" value="${quantidade}">
+                ${produtoNome}
+                <input type="hidden" name="itens[${itemIndex}].produtoId" value="${produtoId}">
+                <input type="hidden" name="itens[${itemIndex}].quantidade" value="${qtd}">
             </td>
-            <td class="text-center">${quantidade}</td>
-            <td class="text-end">R$ ${valorUnitario.toFixed(2)}</td>
-            <td class="text-end fw-bold">R$ ${subtotal.toFixed(2)}</td>
-            <td class="text-center">
-                <button type="button" class="btn btn-sm btn-outline-danger" onclick="removerProduto(${produtoIndex})">
-                    <i class="bi bi-trash-fill"></i>
-                </button>
+            <td class="text-center align-middle">${qtd}</td>
+            <td class="text-end align-middle">R$ ${produtoValor.toFixed(2).replace('.', ',')}</td>
+            <td class="text-end align-middle subtotal-item" data-valor="${subtotal}">R$ ${subtotal.toFixed(2).replace('.', ',')}</td>
+            <td class="text-center align-middle">
+                <button type="button" class="btn btn-sm btn-danger fw-bold" onclick="removerProduto(this)">X</button>
             </td>
         `;
 
         tbody.appendChild(tr);
+        itemIndex++;
 
-        produtoIndex++;
-        atualizarValorTotal();
+        select.value = "";
+        qtdInput.value = "1";
 
-        select.selectedIndex = 0;
-        inputQuantidade.value = 1;
+        atualizarTotalGeral();
     }
 
-    function removerProduto(index) {
-        const linha = document.getElementById(`linha-produto-${index}`);
-        if (linha) {
+    function removerProduto(botao) {
+        const linha = botao.closest('tr');
+        if(linha){
             linha.remove();
-            atualizarValorTotal();
+            atualizarTotalGeral();
         }
     }
 
-    function atualizarValorTotal() {
+    function atualizarTotalGeral() {
         let total = 0;
-        const linhas = document.querySelectorAll('#corpoTabelaProdutos tr');
-
-        linhas.forEach(linha => {
-            total += parseFloat(linha.getAttribute('data-subtotal'));
+        const subtotais = document.querySelectorAll('.subtotal-item');
+        subtotais.forEach(td => {
+            total += parseFloat(td.getAttribute('data-valor'));
         });
 
-        const inputValorTotal = document.getElementById('valorOrcamentoInput');
-        if(inputValorTotal) {
-            inputValorTotal.value = total.toFixed(2);
+        const descontoInput = document.getElementById('orcamentoDesconto');
+        let desconto = descontoInput ? parseFloat(descontoInput.value) : 0;
+        if (isNaN(desconto) || desconto < 0) desconto = 0;
+
+        let totalFinal = total - desconto;
+        if (totalFinal < 0) totalFinal = 0;
+
+        const inputTotal = document.getElementById('valorOrcamentoInput');
+        if(inputTotal) {
+            inputTotal.value = totalFinal.toFixed(2);
         }
     }
 </script>

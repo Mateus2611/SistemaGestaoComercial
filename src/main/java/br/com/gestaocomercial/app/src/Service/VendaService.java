@@ -49,6 +49,14 @@ public class VendaService {
         }
     }
 
+    public List<Venda> BuscaGeral() {
+        try {
+            return _vendaRepository.findAll();
+        } catch (RuntimeException ex) {
+            throw new RuntimeException(ex.getMessage());
+        }
+    }
+
     public Page<Venda> BuscaGeral(Integer pagina) {
         try {
             Pageable pageable = PageRequest.of(pagina - 1, 15, Sort.by("id").descending());
