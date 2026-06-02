@@ -11,6 +11,8 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
+
 @Service
 public class ProdutoService {
 
@@ -35,6 +37,14 @@ public class ProdutoService {
             return _produtoRepository.findAll(pageable);
         } catch (RuntimeException e) {
             throw new RuntimeException(e.getMessage());
+        }
+    }
+
+    public List<Produto> BuscaGeral() {
+        try {
+            return _produtoRepository.findAll();
+        } catch (RuntimeException ex) {
+            throw new RuntimeException(ex.getMessage());
         }
     }
 

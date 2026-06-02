@@ -1,10 +1,10 @@
 package br.com.gestaocomercial.app.src.Model;
 
 import jakarta.persistence.*;
+import org.springframework.format.annotation.DateTimeFormat;
 
 import java.math.BigDecimal;
 import java.sql.Date;
-import java.text.SimpleDateFormat;
 import java.util.List;
 
 @Entity
@@ -14,8 +14,8 @@ public class Orcamento {
     public Orcamento() {
     }
 
-    public Orcamento(Integer idCliente, Date dataCriacao, Date dataValidade, StatusOrcamento status, BigDecimal desconto) {
-        this.Cliente.setId(idCliente);
+    public Orcamento(Cliente cliente, Date dataCriacao, Date dataValidade, StatusOrcamento status, BigDecimal desconto) {
+        Cliente = cliente;
         DataCriacao = dataCriacao;
         DataValidade = dataValidade;
         Status = status;
@@ -23,33 +23,41 @@ public class Orcamento {
     }
 
     @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "Id")
-    private Integer Id;
+    private Integer id;
+
     @OneToOne
     @JoinColumn(name = "Id_Cliente")
     private Cliente Cliente;
-    @OneToMany(orphanRemoval = true)
-    @JoinColumn(name = "Id_Orcamento")
-    private List<OrcamentoProduto> OrcamentoProdutos;
+
+    @OneToMany(mappedBy = "Orcamento", fetch = FetchType.EAGER, cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<OrcamentoProduto> orcamentoProdutos;
+
     @Column(name = "Data_Criacao")
+    @DateTimeFormat(pattern = "dd/MM/yyyy")
     private Date DataCriacao;
+
     @Column(name = "Data_Validade")
+    @DateTimeFormat(pattern = "dd/MM/yyyy")
     private Date DataValidade;
+
     @Column(name = "Valor")
     private BigDecimal Valor;
+
     @Column(name = "Status_Orcamento")
     @Enumerated(EnumType.STRING)
     private StatusOrcamento Status;
+
     @Column(name = "Desconto")
     private BigDecimal Desconto;
 
-
     public Integer getId() {
-        return Id;
+        return id;
     }
 
     public void setId(Integer id) {
-        Id = id;
+        this.id = id;
     }
 
     public Cliente getCliente() {
@@ -61,11 +69,11 @@ public class Orcamento {
     }
 
     public List<OrcamentoProduto> getOrcamentoProdutos() {
-        return OrcamentoProdutos;
+        return orcamentoProdutos;
     }
 
     public void setOrcamentoProdutos(List<OrcamentoProduto> orcamentoProdutos) {
-        OrcamentoProdutos = orcamentoProdutos;
+        this.orcamentoProdutos = orcamentoProdutos;
     }
 
     public Date getDataCriacao() {
@@ -96,16 +104,16 @@ public class Orcamento {
         return Status;
     }
 
+    public void setStatus(StatusOrcamento status) {
+        Status = status;
+    }
+
     public BigDecimal getDesconto() {
         return Desconto;
     }
 
     public void setDesconto(BigDecimal desconto) {
         Desconto = desconto;
-    }
-
-    public void setStatus(StatusOrcamento status) {
-        Status = status;
     }
 
     public enum StatusOrcamento {

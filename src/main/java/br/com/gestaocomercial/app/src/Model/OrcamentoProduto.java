@@ -4,46 +4,55 @@ import jakarta.persistence.*;
 
 @Entity
 @Table(name = "Orcamento_Produto")
-@IdClass(OrcamentoProdutoId.class)
 public class OrcamentoProduto {
 
     public OrcamentoProduto() {
     }
 
-    public OrcamentoProduto(Integer idOrcamento, Integer idProduto, Integer quantidade) {
-        IdOrcamento = idOrcamento;
-        IdProduto = idProduto;
+    public OrcamentoProduto(Orcamento orcamento, Produto produto, Integer quantidade) {
+        Orcamento = orcamento;
+        Produto = produto;
         Quantidade = quantidade;
     }
 
-    public OrcamentoProduto(Integer idOrcamento, Integer idProduto) {
-        IdOrcamento = idOrcamento;
-        IdProduto = idProduto;
-    }
+    @EmbeddedId
+    private OrcamentoProdutoId id = new OrcamentoProdutoId();
 
-    @Id
-    @Column(name = "Id_Orcamento")
-    private Integer IdOrcamento;
-    @Id
-    @Column(name = "Id_Produto")
-    private Integer IdProduto;
+    @ManyToOne
+    @MapsId("idOrcamento")
+    @JoinColumn(name = "Id_Orcamento")
+    private Orcamento Orcamento;
+
+    @ManyToOne
+    @MapsId("idProduto")
+    @JoinColumn(name = "Id_Produto")
+    private Produto Produto;
+
     @Column(name = "Quantidade")
     private Integer Quantidade;
 
-    public Integer getIdOrcamento() {
-        return IdOrcamento;
+    public OrcamentoProdutoId getId() {
+        return id;
     }
 
-    public void setIdOrcamento(Integer idOrcamento) {
-        IdOrcamento = idOrcamento;
+    public void setId(OrcamentoProdutoId id) {
+        this.id = id;
     }
 
-    public Integer getIdProduto() {
-        return IdProduto;
+    public Orcamento getOrcamento() {
+        return Orcamento;
     }
 
-    public void setIdProduto(Integer idProduto) {
-        IdProduto = idProduto;
+    public void setOrcamento(Orcamento orcamento) {
+        Orcamento = orcamento;
+    }
+
+    public Produto getProduto() {
+        return Produto;
+    }
+
+    public void setProduto(Produto produto) {
+        Produto = produto;
     }
 
     public Integer getQuantidade() {

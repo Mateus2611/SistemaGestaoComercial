@@ -2,7 +2,6 @@ package br.com.gestaocomercial.app.src.Service;
 
 import br.com.gestaocomercial.app.src.Model.DTO.UpdateVendaDTO;
 import br.com.gestaocomercial.app.src.Model.Orcamento;
-import br.com.gestaocomercial.app.src.Model.Response.OrcamentoResponse;
 import br.com.gestaocomercial.app.src.Model.Response.VendaResponse;
 import br.com.gestaocomercial.app.src.Model.Venda;
 import br.com.gestaocomercial.app.src.Repository.IOrcamentoRepository;
@@ -111,8 +110,6 @@ public class VendaService {
                 venda.setDataConclusao(new Date(System.currentTimeMillis()));
             }
         }
-
-        if (vendaDTO.prazoPagamento != null) venda.setPrazoPagamento(vendaDTO.prazoPagamento);
 
         return _vendaRepository.save(venda);
     }

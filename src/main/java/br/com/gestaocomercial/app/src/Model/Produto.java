@@ -1,9 +1,7 @@
 package br.com.gestaocomercial.app.src.Model;
 
 import jakarta.persistence.*;
-
 import java.math.BigDecimal;
-import java.util.List;
 
 @Entity
 @Table(name = "Produto")
@@ -27,8 +25,10 @@ public class Produto {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "Id")
     private Integer Id;
+
     @Column(name = "Nome")
     private String Nome;
+
     @Column(name = "Valor")
     private BigDecimal Valor;
 

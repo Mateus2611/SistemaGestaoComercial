@@ -1,5 +1,8 @@
 package br.com.gestaocomercial.app.src.Controller;
 
+import br.com.gestaocomercial.app.src.Model.Cliente;
+import br.com.gestaocomercial.app.src.Model.Email;
+import br.com.gestaocomercial.app.src.Model.Endereco;
 import br.com.gestaocomercial.app.src.Model.Produto;
 import br.com.gestaocomercial.app.src.Service.ProdutoService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -10,6 +13,8 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.ModelAndView;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.PrimitiveIterator;
 
 @Controller
@@ -24,34 +29,44 @@ public class ProdutoController {
 
     @GetMapping("/{id}")
     public ModelAndView getById(@PathVariable("id") Integer id, RedirectAttributes redirectAttributes) {
-
-        Produto produto = _produtoService.BuscaPorId(id);
-
-        if (produto == null) {
+        try {
+            return carregarTelaBase(id, 1);
+        } catch (RuntimeException exception) {
             redirectAttributes.addFlashAttribute("mensagemErro", "O produto com o ID " + id + " não foi encontrado.");
-
             return new ModelAndView("redirect:/produto");
         }
-
-        return carregarTelaBase(id, 1);
     }
 
     private ModelAndView carregarTelaBase(Integer id, Integer page) {
         ModelAndView mv = new ModelAndView("produto");
-        Page<Produto> produtos = _produtoService.BuscaGeral(page);
-
-        mv.addObject("produtos", produtos.getContent());
-
-        mv.addObject("paginaAtual", page);
-        mv.addObject("totalPaginas", produtos.getTotalPages());
-        mv.addObject("totalItens", produtos.getTotalElements());
 
         mv.addObject("novoProduto", new Produto());
 
         if (id != null) {
-            Produto produto = _produtoService.BuscaPorId(id);
-            mv.addObject("produto", produto);
+            Produto produtoUnico = _produtoService.BuscaPorId(id);
+
+            if (produtoUnico == null)
+                throw new RuntimeException("Produto com ID " + id + " não foi encontrado.");
+
+            List<Produto> listaFiltrada = java.util.Collections.singletonList(produtoUnico);
+
+            mv.addObject("produtos", listaFiltrada);
+            mv.addObject("paginaAtual", 1);
+            mv.addObject("totalPaginas", 1);
+            mv.addObject("totalItens", 1);
+
+            mv.addObject("produto", produtoUnico);
+            mv.addObject("isFiltrado", true);
             mv.addObject("mostrarDropdown", true);
+        } else {
+            Page<Produto> produtos = _produtoService.BuscaGeral(page);
+
+            mv.addObject("produtos", produtos.getContent());
+            mv.addObject("paginaAtual", page);
+            mv.addObject("totalPaginas", produtos.getTotalPages());
+            mv.addObject("totalItens", produtos.getTotalElements());
+
+            mv.addObject("isFiltrado", false);
         }
 
         return mv;
