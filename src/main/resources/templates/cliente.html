@@ -336,7 +336,7 @@
     </div>
 </div>
 
-<div th:fragment="modalCriar" class="modal fade" id="modalCriarCliente" tabindex="-1" aria-hidden="true">
+<div th:fragment="modalCriarCliente" class="modal fade" id="modalCriarCliente" tabindex="-1" aria-hidden="true">
     <div class="modal-dialog modal-dialog-centered modal-lg">
         <div class="modal-content shadow-lg border-0" style="border-radius: 16px; padding: 6px; background-color: #ffffff;">
             <div style="border: 1.6px solid #14213d; border-radius: 12px; height: 100%;">
@@ -386,8 +386,6 @@
                                 <label class="form-label fw-bold text-uppercase text-dark mb-1" style="font-size: 1.1rem;">CEP</label>
                                 <input type="text" th:field="*{endereco.cep}" class="form-control form-control-lg"
                                        style="border: 1.8px solid #000; border-radius: 8px; box-shadow: none;">
-                                <input type="text" class="form-control form-control-lg" name="nome"
-                                       style="border: 1.6px solid #000; border-radius: 8px; box-shadow: none;">
                             </div>
 
                             <div class="col-md-4">
@@ -408,9 +406,6 @@
                                         <button type="button" class="btn btn-outline-danger fw-bold" onclick="removerCampoEmail(this)" style="border-radius: 8px;">
                                             <i class="bi bi-trash-fill"></i>
                                         </button>
-                                        <input type="email" name="emails" class="form-control form-control-lg" placeholder="email@exemplo.com"
-                                               style="border: 1.6px solid #000; border-radius: 8px; box-shadow: none;">
-                                        <button type="button" class="btn btn-outline-danger fw-bold" onclick="removerCampoEmail(this)" style="border-radius: 8px;"><i class="bi bi-trash-fill"></i></button>
                                     </div>
                                 </div>
                                 <button type="button" class="btn btn-sm btn-dark fw-bold" onclick="adicionarCampoEmail('criar')" style="border-radius: 8px;">+ Adicionar Email</button>

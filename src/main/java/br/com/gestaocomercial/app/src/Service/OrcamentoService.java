@@ -90,6 +90,14 @@ public class OrcamentoService {
         return _orcamentoRepository.save(orcamento);
     }
 
+    public List<Orcamento> BuscaGeral() {
+        try {
+            return _orcamentoRepository.findAll();
+        } catch (RuntimeException ex) {
+            throw new RuntimeException(ex.getMessage());
+        }
+    }
+
     public Page<Orcamento> BuscaGeral(Integer pagina) {
         try {
             Pageable pageable = PageRequest.of(pagina - 1, 15, Sort.by("id").descending());
