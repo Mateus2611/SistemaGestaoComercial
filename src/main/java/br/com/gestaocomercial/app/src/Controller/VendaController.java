@@ -1,5 +1,6 @@
 package br.com.gestaocomercial.app.src.Controller;
 
+import br.com.gestaocomercial.app.src.Model.DTO.UpdateOrcamentoDTO;
 import br.com.gestaocomercial.app.src.Model.DTO.UpdateVendaDTO;
 import br.com.gestaocomercial.app.src.Model.Orcamento;
 import br.com.gestaocomercial.app.src.Model.Venda;
@@ -86,20 +87,31 @@ public class VendaController {
         return "redirect:/venda";
     }
 
-    @PostMapping("update/{id}")
-    public String update(@PathVariable("id") Integer id, @ModelAttribute("venda") Venda venda, Date prazoPagamento,
-                         Venda.StatusPagamento statusPagamento, RedirectAttributes redirectAttributes) {
+    @PostMapping("/approve/{id}")
+    public String approve(@PathVariable("id") Integer id, RedirectAttributes redirectAttributes) {
+        try {
+            _vendaService.Atualizar(new UpdateVendaDTO(id, Venda.StatusPagamento.APROVADO));
 
-        UpdateVendaDTO vendaDTO = new UpdateVendaDTO();
+            redirectAttributes.addFlashAttribute("mensagemSucesso", "O pagamento com o ID " + id + " foi APROVADO com sucesso!.");
 
-        vendaDTO.id = id;
-        vendaDTO.prazoPagamento = prazoPagamento;
-        vendaDTO.statusPagamento = statusPagamento;
+            return "redirect:/venda";
+        } catch (RuntimeException e) {
+            redirectAttributes.addFlashAttribute("mensagemErro", "Não foi possível aprovar o pagamento " + id + " ocorreu um erro inesperado");
+            return "redirect:/venda";
+        }
+    }
 
-        _vendaService.Atualizar(vendaDTO);
+    @PostMapping("/cancel/{id}")
+    public String reprobate(@PathVariable("id") Integer id, RedirectAttributes redirectAttributes) {
+        try {
+            _vendaService.Atualizar(new UpdateVendaDTO(id, Venda.StatusPagamento.CANCELADO));
 
-        redirectAttributes.addFlashAttribute("mensagemSucesso", "Venda atualizada com sucesso!");
+            redirectAttributes.addFlashAttribute("mensagemSucesso", "O pagamento com o ID " + id + " foi CANCELADO com sucesso!.");
 
-        return "redirect:/venda";
+            return "redirect:/venda";
+        } catch (RuntimeException e) {
+            redirectAttributes.addFlashAttribute("mensagemErro", "Não foi possível reprovar o cancelar " + id + " ocorreu um erro inesperado");
+            return "redirect:/venda";
+        }
     }
 }

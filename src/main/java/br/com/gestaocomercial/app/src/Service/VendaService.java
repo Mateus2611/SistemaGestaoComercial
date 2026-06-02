@@ -111,8 +111,6 @@ public class VendaService {
             }
         }
 
-        if (vendaDTO.prazoPagamento != null) venda.setPrazoPagamento(vendaDTO.prazoPagamento);
-
         return _vendaRepository.save(venda);
     }
 }

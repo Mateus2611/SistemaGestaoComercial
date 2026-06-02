@@ -373,7 +373,7 @@
 
                             <div class="col-md-4 offset-md-2">
                                 <label class="form-label fw-bold text-uppercase text-dark mb-1" style="font-size: 1.1rem;">Desconto (R$)</label>
-                                <input type="number" id="orcamentoDesconto" name="desconto" step="0.01" class="form-control form-control-lg" value="0.00"
+                                <input type="number" id="orcamentoDesconto" name="desconto" step="0.01" class="form-control form-control-lg" placeholder="0.00"
                                        style="border: 1.6px solid #000; border-radius: 8px;" oninput="atualizarTotalGeral()">
                             </div>
                             <div class="col-md-4">
@@ -661,6 +661,14 @@
                 }
             });
         }
+
+        const alertas = document.querySelectorAll('.alert');
+        alertas.forEach(function(alerta) {
+            setTimeout(function() {
+                const bsAlert = new bootstrap.Alert(alerta);
+                bsAlert.close();
+            }, 5000);
+        });
     });
 
     document.querySelectorAll('.table-custom button').forEach(button => {
