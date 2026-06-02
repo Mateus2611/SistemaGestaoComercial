@@ -2,8 +2,6 @@ package br.com.gestaocomercial.app.src.Controller;
 
 import br.com.gestaocomercial.app.src.Model.DTO.UpdateVendaDTO;
 import br.com.gestaocomercial.app.src.Model.Orcamento;
-import br.com.gestaocomercial.app.src.Model.Produto;
-import br.com.gestaocomercial.app.src.Model.Response.OrcamentoResponse;
 import br.com.gestaocomercial.app.src.Model.Venda;
 import br.com.gestaocomercial.app.src.Service.OrcamentoService;
 import br.com.gestaocomercial.app.src.Service.VendaService;

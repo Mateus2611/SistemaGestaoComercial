@@ -1,6 +1,8 @@
 package br.com.gestaocomercial.app.src.Model;
 
 import jakarta.persistence.*;
+import org.springframework.format.annotation.DateTimeFormat;
+
 import java.math.BigDecimal;
 import java.sql.Date;
 import java.util.List;
@@ -33,9 +35,11 @@ public class Orcamento {
     private List<OrcamentoProduto> orcamentoProdutos;
 
     @Column(name = "Data_Criacao")
+    @DateTimeFormat(pattern = "dd/MM/yyyy")
     private Date DataCriacao;
 
     @Column(name = "Data_Validade")
+    @DateTimeFormat(pattern = "dd/MM/yyyy")
     private Date DataValidade;
 
     @Column(name = "Valor")

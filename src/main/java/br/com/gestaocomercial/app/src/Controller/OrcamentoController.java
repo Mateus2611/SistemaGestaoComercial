@@ -3,19 +3,16 @@ package br.com.gestaocomercial.app.src.Controller;
 import br.com.gestaocomercial.app.src.Model.*;
 import br.com.gestaocomercial.app.src.Model.DTO.CreateOrcamentoDTO;
 import br.com.gestaocomercial.app.src.Model.DTO.UpdateOrcamentoDTO;
-import br.com.gestaocomercial.app.src.Model.Response.OrcamentoResponse;
+import br.com.gestaocomercial.app.src.Service.ClienteService;
 import br.com.gestaocomercial.app.src.Service.OrcamentoService;
+import br.com.gestaocomercial.app.src.Service.ProdutoService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.stereotype.Controller;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.ModelAndView;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
-import java.util.ArrayList;
 import java.util.List;
 
 @Controller
@@ -24,6 +21,12 @@ public class OrcamentoController {
 
     @Autowired
     private OrcamentoService _orcamentoService;
+
+    @Autowired
+    private ProdutoService _produtoService;
+
+    @Autowired
+    private ClienteService _clienteService;
 
     @GetMapping
     public ModelAndView orcamento(@RequestParam(value = "page", defaultValue = "1") Integer page) { return carregarTelaBase(null, page); }
@@ -47,6 +50,9 @@ public class OrcamentoController {
         novoOrcamento.setCliente(new Cliente());
         novoOrcamento.setOrcamentoProdutos(new java.util.ArrayList<>());
         mv.addObject("novoOrcamento", novoOrcamento);
+
+        mv.addObject("clientes", _clienteService.BuscaGeral());
+        mv.addObject("produtos", _produtoService.BuscaGeral());
 
         if (id != null) {
             Orcamento orcamentoUnico = _orcamentoService.BuscaPorId(id);
@@ -75,7 +81,49 @@ public class OrcamentoController {
         return mv;
     }
 
-    public Orcamento create(CreateOrcamentoDTO orcamentoDTO) { return _orcamentoService.Criar(orcamentoDTO); }
+    @PostMapping("/create")
+    public String create(@ModelAttribute("novoOrcamento") CreateOrcamentoDTO dto, RedirectAttributes redirectAttributes) {
+        try {
+            Orcamento orcamento = _orcamentoService.criar(dto);
 
-    public Orcamento update(UpdateOrcamentoDTO orcamentoDTO) { return _orcamentoService.Atualizar(orcamentoDTO); }
+            redirectAttributes.addFlashAttribute("mensagemSucesso", "Orçamento" + orcamento.getId() + " criado com sucesso!");
+            return "redirect:/orcamento/" + orcamento.getId();
+
+        } catch (IllegalArgumentException e) {
+            redirectAttributes.addFlashAttribute("mensagemErro", e.getMessage());
+            return "redirect:/orcamento";
+
+        } catch (Exception e) {
+            redirectAttributes.addFlashAttribute("mensagemErro", "Erro ao criar o orçamento: " + e.getMessage());
+            return "redirect:/orcamento";
+        }
+    }
+
+    @PostMapping("/approve/{id}")
+    public String approve(@PathVariable("id") Integer id, RedirectAttributes redirectAttributes) {
+        try {
+            _orcamentoService.Atualizar(new UpdateOrcamentoDTO(id, Orcamento.StatusOrcamento.APROVADO));
+
+            redirectAttributes.addFlashAttribute("mensagemSucesso", "O orçamento com o ID " + id + " foi APROVADO com sucesso!.");
+
+            return "redirect:/orcamento/";
+        } catch (RuntimeException e) {
+            redirectAttributes.addFlashAttribute("mensagemErro", "Não foi possível aprovar o orçamento " + id + " ocorreu um erro inesperado");
+            return "redirect:/orcamento";
+        }
+    }
+
+    @PostMapping("/reprobate/{id}")
+    public String reprobate(@PathVariable("id") Integer id, RedirectAttributes redirectAttributes) {
+        try {
+            _orcamentoService.Atualizar(new UpdateOrcamentoDTO(id, Orcamento.StatusOrcamento.REPROVADO));
+
+            redirectAttributes.addFlashAttribute("mensagemSucesso", "O orçamento com o ID " + id + " foi REPROVADO com sucesso!.");
+
+            return "redirect:/orcamento/";
+        } catch (RuntimeException e) {
+            redirectAttributes.addFlashAttribute("mensagemErro", "Não foi possível reprovar o orçamento " + id + " ocorreu um erro inesperado");
+            return "redirect:/orcamento";
+        }
+    }
 }

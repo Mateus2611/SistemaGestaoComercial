@@ -161,8 +161,6 @@
                         </div>
                     </td>
 
-                    <td th:text="${orcamento.id}"></td>
-                    <td th:text="${orcamento.cliente.nome}"></td>
                     <td th:text="${#dates.format(orcamento.dataCriacao, 'dd/MM/yyyy')}"></td>
                     <td th:text="${#dates.format(orcamento.dataValidade, 'dd/MM/yyyy')}"></td>
                     <td>
@@ -176,7 +174,7 @@
                         <div class="d-flex align-items-center justify-content-end gap-2">
 
                             <button class="btn btn-sm fw-bold text-uppercase btn-acao-orcamento"
-                                    th:attr="data-id=${orcamento.id}, data-acao='aprovar'"
+                                    th:attr="data-id=${orcamento.id}, data-acao='approve'"
                                     th:disabled="${orcamento.status != null and orcamento.status.name() != 'PENDENTE'}"
                                     th:styleappend="${orcamento.status != null and orcamento.status.name() != 'PENDENTE'
                                     ? 'background-color: #e9ecef; color: #6c757d; border: 1.8px solid #ced4da; border-radius: 8px; padding: 5px 12px; font-size: 0.82rem; cursor: not-allowed;'
@@ -186,7 +184,7 @@
                             </button>
 
                             <button class="btn btn-sm fw-bold text-uppercase btn-acao-orcamento"
-                                    th:attr="data-id=${orcamento.id}, data-acao='reprovar'"
+                                    th:attr="data-id=${orcamento.id}, data-acao='reprobate'"
                                     th:disabled="${orcamento.status != null and orcamento.status.name() != 'PENDENTE'}"
                                     th:styleappend="${orcamento.status != null and orcamento.status.name() != 'PENDENTE'
                                     ? 'background-color: #e9ecef; color: #6c757d; border: 1.8px solid #ced4da; border-radius: 8px; padding: 5px 12px; font-size: 0.82rem; cursor: not-allowed;'
@@ -353,29 +351,30 @@
                     </h1>
                     <hr class="mx-auto mb-4" style="width: 60%; border-top: 1px solid #000; opacity: 1;">
 
-                    <form th:action="@{/orcamento/create}" th:object="${novoOrcamento}" class="text-start px-md-4">
+                    <form th:action="@{/orcamento/create}" method="POST" th:object="${novoOrcamento}" class="text-start px-md-4">
                         <div class="row g-4">
-                            <div class="col-md-7">
+                            <div class="col-md-6 mb-3">
                                 <label class="form-label fw-bold text-uppercase text-dark mb-1" style="font-size: 1.1rem;">Cliente</label>
-                                <select class="form-select form-select-lg"
-                                        style="border: 1.6px solid #000; border-radius: 8px;"
-                                        id="clienteSelect" name="clienteId">
-                                    <option selected disabled value="">Selecione o Cliente</option>
+                                <select id="orcamentoCliente" name="cliente" class="form-select form-select-lg" style="border: 1.6px solid #000; border-radius: 8px;">
+                                    <option selected disabled value="">Selecione um cliente...</option>
                                     <option th:each="cliente : ${clientes}"
                                             th:value="${cliente.id}"
-                                            th:text="${cliente.nome}">
+                                            th:text="|#${cliente.id} - ${cliente.nome}|">
                                     </option>
                                 </select>
                             </div>
                             <div class="col-md-5">
                                 <label class="form-label fw-bold text-uppercase text-dark mb-1" style="font-size: 1.1rem;">Data de Validade</label>
-                                <input type="date" class="form-control form-control-lg"
-                                       style="border: 1.6px solid #000; border-radius: 8px;">
+                                <input type="text" name="dataValidade" class="form-control form-control-lg"
+                                       placeholder="DD/MM/AAAA" maxlength="10"
+                                       oninput="mascaraData(this)"
+                                       style="border: 1.6px solid #000; border-radius: 8px;" required>
                             </div>
+
                             <div class="col-md-4 offset-md-2">
                                 <label class="form-label fw-bold text-uppercase text-dark mb-1" style="font-size: 1.1rem;">Desconto (R$)</label>
-                                <input type="number" step="0.01" class="form-control form-control-lg" value="0.00"
-                                       style="border: 1.6px solid #000; border-radius: 8px;">
+                                <input type="number" id="orcamentoDesconto" name="desconto" step="0.01" class="form-control form-control-lg" value="0.00"
+                                       style="border: 1.6px solid #000; border-radius: 8px;" oninput="atualizarTotalGeral()">
                             </div>
                             <div class="col-md-4">
                                 <label class="form-label fw-bold text-uppercase text-dark mb-1" style="font-size: 1.1rem;">Total (R$)</label>
@@ -389,19 +388,27 @@
                                         Produtos do Orçamento
                                     </h5>
                                 </div>
+
                                 <div class="d-flex gap-2 mb-3 justify-content-center mx-auto" style="max-width: 800px;">
+
                                     <select id="produtoSelect" class="form-select form-select-lg flex-grow-1" style="border: 1.6px solid #000; border-radius: 8px;">
                                         <option selected disabled value="">Selecione um produto...</option>
                                         <option th:each="produto : ${produtos}"
                                                 th:value="${produto.id}"
-                                                th:text="${produto.nome}"
-                                                th:attr="data-valor=${produto.valor}"> </option>
+                                                th:text="|#${produto.id} - ${produto.nome}|"
+                                                th:attr="data-valor=${produto.valor}">
+                                        </option>
                                     </select>
-                                    <input type="number" id="produtoQuantidade" class="form-control form-control-lg text-center" value="1" min="1" style="width: 100px; border: 1.6px solid #000; border-radius: 8px;">
+
+                                    <input type="number" id="produtoQuantidade" class="form-control form-control-lg text-center"
+                                           placeholder="Qtd" min="1"
+                                           style="width: 110px; border: 1.6px solid #000; border-radius: 8px;">
+
                                     <button type="button" class="btn btn-dark text-uppercase fw-bold" onclick="adicionarProdutoNaTabela()" style="border-radius: 8px; padding: 0 30px;">
                                         Adicionar
                                     </button>
                                 </div>
+
                                 <div class="table-responsive mx-auto" style="max-width: 800px;">
                                     <table class="table table-bordered table-custom" id="tabelaProdutosOrcamento">
                                         <thead class="table-dark">
@@ -424,7 +431,7 @@
                                     style="font-size: 1.2rem; padding: 12px 40px; border-radius: 8px; border-width: 1.8px;">
                                 Cancelar
                             </button>
-                            <button type="button" class="btn btn-orange fw-bolder text-uppercase text-white"
+                            <button type="submit" class="btn btn-orange fw-bolder text-uppercase text-white"
                                     style="font-size: 1.2rem; padding: 12px 40px; border-radius: 8px; background-color: #ff9433; border: none;">
                                 Salvar
                             </button>
@@ -494,78 +501,88 @@
         modal.show();
     }
 
+    function mascaraData(input) {
+        let valor = input.value.replace(/\D/g, ''); // Remove tudo que não é número
 
-    let produtoIndex = 0;
+        if (valor.length > 2) {
+            valor = valor.substring(0, 2) + '/' + valor.substring(2);
+        }
+        if (valor.length > 5) {
+            valor = valor.substring(0, 5) + '/' + valor.substring(5, 9);
+        }
+
+        input.value = valor;
+    }
+
+    let itemIndex = 0;
 
     function adicionarProdutoNaTabela() {
         const select = document.getElementById('produtoSelect');
-        const inputQuantidade = document.getElementById('produtoQuantidade');
-        const inputValorTotal = document.getElementById('valorOrcamentoInput');
+        const qtdInput = document.getElementById('produtoQuantidade');
+        const tbody = document.getElementById('corpoTabelaProdutos');
 
-        const opcaoSelecionada = select.options[select.selectedIndex];
-
-        if (!opcaoSelecionada.value) {
-            alert("Por favor, selecione um produto.");
+        if (select.value === "") {
+            alert("Por favor, selecione um produto antes de adicionar.");
             return;
         }
 
-        const idProduto = opcaoSelecionada.value;
-        const nomeProduto = opcaoSelecionada.text;
-        const valorUnitario = parseFloat(opcaoSelecionada.getAttribute('data-valor'));
-        const quantidade = parseInt(inputQuantidade.value);
-        const subtotal = valorUnitario * quantidade;
+        const produtoId = select.value;
+        const produtoNome = select.options[select.selectedIndex].text;
+        const produtoValor = parseFloat(select.options[select.selectedIndex].getAttribute('data-valor'));
 
-        const tbody = document.getElementById('corpoTabelaProdutos');
+        let qtd = parseInt(qtdInput.value);
+        if (isNaN(qtd) || qtd < 1) qtd = 1;
+
+        const subtotal = produtoValor * qtd;
 
         const tr = document.createElement('tr');
-        tr.id = `linha-produto-${produtoIndex}`;
-        tr.setAttribute('data-subtotal', subtotal);
 
         tr.innerHTML = `
-            <td>
-                ${nomeProduto}
-                <input type="hidden" name="Produtos[${produtoIndex}].ProdutoId" value="${idProduto}">
-                <input type="hidden" name="Produtos[${produtoIndex}].Quantidade" value="${quantidade}">
-            </td>
-            <td class="text-center">${quantidade}</td>
-            <td class="text-end">R$ ${valorUnitario.toFixed(2)}</td>
-            <td class="text-end fw-bold">R$ ${subtotal.toFixed(2)}</td>
-            <td class="text-center">
-                <button type="button" class="btn btn-sm btn-outline-danger" onclick="removerProduto(${produtoIndex})">
-                    <i class="bi bi-trash-fill"></i>
-                </button>
-            </td>
-        `;
+        <td>
+            ${produtoNome}
+            <input type="hidden" name="itens[${itemIndex}].produtoId" value="${produtoId}">
+            <input type="hidden" name="itens[${itemIndex}].quantidade" value="${qtd}">
+        </td>
+        <td class="text-center align-middle">${qtd}</td>
+        <td class="text-end align-middle">R$ ${produtoValor.toFixed(2).replace('.', ',')}</td>
+        <td class="text-end align-middle subtotal-item" data-valor="${subtotal}">R$ ${subtotal.toFixed(2).replace('.', ',')}</td>
+        <td class="text-center align-middle">
+            <button type="button" class="btn btn-sm btn-danger fw-bold" onclick="removerProduto(this)">X</button>
+        </td>
+    `;
 
         tbody.appendChild(tr);
+        itemIndex++;
 
-        produtoIndex++;
-        atualizarValorTotal();
+        select.value = "";
+        qtdInput.value = "";
 
-        select.selectedIndex = 0;
-        inputQuantidade.value = 1;
+        atualizarTotalGeral();
     }
 
-    function removerProduto(index) {
-        const linha = document.getElementById(`linha-produto-${index}`);
-        if (linha) {
-            linha.remove();
-            atualizarValorTotal();
-        }
+    function removerProduto(botao) {
+        const linha = botao.closest('tr');
+        linha.remove();
+        atualizarTotalGeral();
     }
 
-    function atualizarValorTotal() {
+    function atualizarTotalGeral() {
         let total = 0;
-        const linhas = document.querySelectorAll('#corpoTabelaProdutos tr');
 
-        linhas.forEach(linha => {
-            total += parseFloat(linha.getAttribute('data-subtotal'));
+        const subtotais = document.querySelectorAll('.subtotal-item');
+        subtotais.forEach(td => {
+            total += parseFloat(td.getAttribute('data-valor'));
         });
 
-        const inputValorTotal = document.getElementById('valorOrcamentoInput');
-        if(inputValorTotal) {
-            inputValorTotal.value = total.toFixed(2);
-        }
+        const descontoInput = document.getElementById('orcamentoDesconto').value;
+        let desconto = parseFloat(descontoInput);
+        if (isNaN(desconto) || desconto < 0) desconto = 0;
+
+        let totalFinal = total - desconto;
+        if (totalFinal < 0) totalFinal = 0;
+
+        const inputTotal = document.getElementById('valorOrcamentoInput');
+        inputTotal.value = totalFinal.toFixed(2);
     }
 
     function realizarBuscaPorId() {
@@ -615,26 +632,10 @@
             }
         })
             .then(response => {
-                if (response.ok) {
-                    const containerPai = button.closest('.d-flex');
-                    const botoesDaLinha = containerPai.querySelectorAll('.btn-acao-orcamento');
-
-                    botoesDaLinha.forEach(btn => {
-                        btn.disabled = true;
-                        btn.style.setProperty('background-color', '#e9ecef', 'important');
-                        btn.style.setProperty('color', '#6c757d', 'important');
-                        btn.style.setProperty('border', '1.8px solid #ced4da', 'important');
-                        btn.style.setProperty('cursor', 'not-allowed', 'important');
-                    });
-
-                    button.textContent = acao === 'aprovar' ? 'APROVADO' : 'REPROVADO';
-                    if (acao === 'aprovar') {
-                        button.style.setProperty('background-color', '#ff7e12', 'important');
-                        button.style.setProperty('color', '#ffffff', 'important');
-                        button.style.setProperty('border', '1.8px solid #ff7e12', 'important');
-                    }
+                if (response.redirected || response.ok) {
+                    window.location.reload();
                 } else {
-                    alert('Erro ao processar a ação do orçamento.');
+                    alert('Não foi possível processar o orçamento.');
                 }
             })
             .catch(error => {

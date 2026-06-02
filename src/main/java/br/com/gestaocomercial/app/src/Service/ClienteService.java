@@ -1,12 +1,12 @@
 package br.com.gestaocomercial.app.src.Service;
 
 import br.com.gestaocomercial.app.src.Model.Cliente;
-import br.com.gestaocomercial.app.src.Model.DTO.UpdateClienteDTO;
 import br.com.gestaocomercial.app.src.Model.Email;
 import br.com.gestaocomercial.app.src.Model.Endereco;
 import br.com.gestaocomercial.app.src.Repository.IClienteRepository;
 import br.com.gestaocomercial.app.src.Repository.IEmailRepository;
 import br.com.gestaocomercial.app.src.Repository.IEnderecoRepository;
+import org.aspectj.apache.bcel.generic.InstructionConstants;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -56,6 +56,14 @@ public class ClienteService {
             Pageable pageable = PageRequest.of(pagina - 1, 15, Sort.by("id").descending());
 
             return _clienteRepository.findAll(pageable);
+        } catch (RuntimeException ex) {
+            throw new RuntimeException(ex.getMessage());
+        }
+    }
+
+    public List<Cliente> BuscaGeral() {
+        try {
+            return  _clienteRepository.findAll();
         } catch (RuntimeException ex) {
             throw new RuntimeException(ex.getMessage());
         }

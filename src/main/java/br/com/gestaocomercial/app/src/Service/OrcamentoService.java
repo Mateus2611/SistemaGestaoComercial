@@ -2,29 +2,29 @@ package br.com.gestaocomercial.app.src.Service;
 
 import br.com.gestaocomercial.app.src.Model.Cliente;
 import br.com.gestaocomercial.app.src.Model.DTO.CreateOrcamentoDTO;
-import br.com.gestaocomercial.app.src.Model.DTO.CreateOrcamentoProdutoDTO;
+import br.com.gestaocomercial.app.src.Model.DTO.ItemOrcamentoDTO;
 import br.com.gestaocomercial.app.src.Model.DTO.UpdateOrcamentoDTO;
 import br.com.gestaocomercial.app.src.Model.Orcamento;
 import br.com.gestaocomercial.app.src.Model.OrcamentoProduto;
 import br.com.gestaocomercial.app.src.Model.Produto;
-import br.com.gestaocomercial.app.src.Model.Response.OrcamentoResponse;
 import br.com.gestaocomercial.app.src.Repository.IClienteRepository;
 import br.com.gestaocomercial.app.src.Repository.IOrcamentoProdutoRepository;
 import br.com.gestaocomercial.app.src.Repository.IOrcamentoRepository;
 import br.com.gestaocomercial.app.src.Repository.IProdutoRepository;
+import jakarta.persistence.EntityNotFoundException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
 import java.sql.Date;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Objects;
 
 @Service
 public class OrcamentoService {
@@ -38,49 +38,56 @@ public class OrcamentoService {
     @Autowired
     private IProdutoRepository _produtoRepository;
 
-    public Orcamento Criar(CreateOrcamentoDTO orcamentoDTO) {
+    @Transactional
+    public Orcamento criar(CreateOrcamentoDTO orcamentoDTO) {
         if (orcamentoDTO == null) {
-            throw new RuntimeException("Objeto vazio. Preencha as informações.");
+            throw new IllegalArgumentException("Objeto vazio. Preencha as informações do orçamento.");
+        }
+        if (orcamentoDTO.getItens() == null || orcamentoDTO.getItens().isEmpty()) {
+            throw new IllegalArgumentException("O orçamento deve conter pelo menos um produto na tabela.");
         }
 
-        try {
-            Date dataCriacao = Date.valueOf(LocalDate.now());
-            Date dataValidade = VerificarValidade(dataCriacao, orcamentoDTO.validade);
+        Cliente cliente = _clienteRepository.findById(orcamentoDTO.getCliente())
+                .orElseThrow(() -> new EntityNotFoundException("Cliente não encontrado com o ID: " + orcamentoDTO.getCliente()));
 
-            Cliente cliente = _clienteRepository.findById(orcamentoDTO.idCliente)
-                    .orElseThrow(() -> new RuntimeException("Cliente não encontrado com o ID fornecido."));
+        Date dataCriacao = Date.valueOf(LocalDate.now());
 
-            Orcamento orcamento = new Orcamento(cliente, dataCriacao, dataValidade, Orcamento.StatusOrcamento.PENDENTE, orcamentoDTO.Desconto);
+        Date dataValidade = VerificarValidade(dataCriacao, Date.valueOf(orcamentoDTO.getDataValidade()));
 
-            List<Produto> produtosParaResponse = new ArrayList<>();
-            List<OrcamentoProduto> orcamentoProdutos = new ArrayList<>();
-            BigDecimal valorTotal = BigDecimal.ZERO;
+        BigDecimal desconto = orcamentoDTO.getDesconto() != null ? orcamentoDTO.getDesconto() : BigDecimal.ZERO;
 
-            for (CreateOrcamentoProdutoDTO ps : orcamentoDTO.Produtos) {
-                Produto produto = _produtoRepository.findById(ps.ProdutoId)
-                        .orElseThrow(() -> new RuntimeException("Produto com ID " + ps.ProdutoId + " não encontrado."));
+        Orcamento orcamento = new Orcamento(
+                cliente,
+                dataCriacao,
+                dataValidade,
+                Orcamento.StatusOrcamento.PENDENTE,
+                desconto
+        );
 
-                valorTotal = valorTotal.add(produto.getValor().multiply(new BigDecimal(ps.Quantidade)));
+        List<OrcamentoProduto> orcamentoProdutos = new ArrayList<>();
+        BigDecimal valorTotal = BigDecimal.ZERO;
 
-                produtosParaResponse.add(produto);
+        for (ItemOrcamentoDTO itemDto : orcamentoDTO.getItens()) {
+            Produto produto = _produtoRepository.findById(itemDto.getProdutoId())
+                    .orElseThrow(() -> new EntityNotFoundException("Produto não encontrado (ID: " + itemDto.getProdutoId() + ")."));
 
-                OrcamentoProduto item = new OrcamentoProduto(orcamento, produto, ps.Quantidade);
-                orcamentoProdutos.add(item);
-            }
+            BigDecimal quantidade = BigDecimal.valueOf(itemDto.getQuantidade());
+            BigDecimal subtotal = produto.getValor().multiply(quantidade);
+            valorTotal = valorTotal.add(subtotal);
 
-            valorTotal = valorTotal.subtract(orcamentoDTO.Desconto);
-            if (valorTotal.compareTo(BigDecimal.ZERO) < 0) {
-                valorTotal = BigDecimal.ZERO;
-            }
-
-            orcamento.setValor(valorTotal);
-            orcamento.setOrcamentoProdutos(orcamentoProdutos);
-
-            return  _orcamentoRepository.save(orcamento);
-
-        } catch (Exception e) {
-            throw new RuntimeException("Erro ao criar o orçamento: " + e.getMessage(), e);
+            OrcamentoProduto item = new OrcamentoProduto(orcamento, produto, itemDto.getQuantidade());
+            orcamentoProdutos.add(item);
         }
+
+        valorTotal = valorTotal.subtract(desconto);
+        if (valorTotal.compareTo(BigDecimal.ZERO) < 0) {
+            valorTotal = BigDecimal.ZERO;
+        }
+
+        orcamento.setValor(valorTotal);
+        orcamento.setOrcamentoProdutos(orcamentoProdutos);
+
+        return _orcamentoRepository.save(orcamento);
     }
 
     public Page<Orcamento> BuscaGeral(Integer pagina) {
@@ -144,11 +151,11 @@ public class OrcamentoService {
         }
     }
 
-    static Date VerificarValidade(Date dataCriacao, Integer validade) {
+    static Date VerificarValidade(Date dataCriacao, Date validade) {
 
-        if (!dataCriacao.before(Date.valueOf(LocalDate.now().plusDays(validade))))
+        if (validade.before(dataCriacao))
             throw new RuntimeException("Não foi possível criar o orçamento. Data de validade é menor que a data de criação. \nData de criação atual: " + dataCriacao);
 
-        return Date.valueOf(LocalDate.now().plusDays(validade));
+        return validade;
     }
 }
