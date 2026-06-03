@@ -81,8 +81,7 @@ public class VendaController {
 
     @PostMapping("/create")
     public String create(@ModelAttribute("novaVenda") Venda venda) {
-
-        Venda novaVenda = _vendaService.Criar(venda);
+        _vendaService.Criar(venda);
 
         return "redirect:/venda";
     }

@@ -56,6 +56,14 @@ public class ProdutoService {
         }
     }
 
+    public List<Produto> BuscaPorNome(String nome) {
+        List<Produto> produtos = _produtoRepository.findAll();
+
+        return produtos.stream()
+                .filter(p -> p.getNome().toLowerCase().contains(nome))
+                .toList();
+    }
+
     public Produto Atualizar(Produto produto) {
         if (produto == null)
             throw new RuntimeException("Objeto vazio. Preencha as informações.");

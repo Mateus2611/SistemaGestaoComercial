@@ -107,7 +107,7 @@
                         <i class="bi bi-search" style="font-size: 1.1rem;"></i>
                     </button>
 
-                    <input type="text" id="searchProdutoId" class="search-input" placeholder="ID do Produto"
+                    <input type="text" id="searchProdutoId" class="search-input" placeholder="Buscar produto..."
                            style="border: 1.8px solid #000; border-left: none; border-radius: 8px; border-top-left-radius: 0; border-bottom-left-radius: 0; padding: 0 16px; height: 40px; box-shadow: none; outline: none;">
 
                 </div>
@@ -199,7 +199,7 @@
 
             <input type="hidden" id="flagFiltroId" th:value="${isFiltrado != null ? isFiltrado : false}">
 
-            <div th:if="${#ctx.containsVariable('produtos') and produtos.size() == 1 and #vars['javax.servlet.forward.request_uri'] != '/produto'}" class="mb-3 mt-3">
+            <div id="btnVoltarContainer" class="mb-3" style="display: none;">
                 <a href="/produto" class="btn btn-sm fw-bold text-uppercase d-inline-flex align-items-center gap-2"
                    style="background-color: #14213d; color: #ffffff; border: 1.8px solid; border-radius: 8px; padding: 8px 16px; transition: all 0.2s ease;"
                    onmouseenter="this.style.backgroundColor='transparent'; this.style.color='#14213d';"
@@ -414,10 +414,27 @@
         modal.show();
     }
 
+    function realizarBusca() {
+        const inputId = document.getElementById('searchProdutoId');
+        if (inputId && inputId.value.trim() !== "" && parseInt(inputId.value)) {
+            realizarBuscaPorId();
+        }
+        else {
+            realizarBuscaPorNome();
+        }
+    }
+
     function realizarBuscaPorId() {
         const inputId = document.getElementById('searchProdutoId');
         if (inputId && inputId.value.trim() !== "") {
             window.location.href = '/produto/' + inputId.value.trim();
+        }
+    }
+
+    function realizarBuscaPorNome() {
+        const inputId = document.getElementById('searchProdutoId');
+        if (inputId && inputId.value.trim() !== "") {
+            window.location.href = '/produto/search?name=' + encodeURIComponent(inputId.value.trim().toLowerCase());
         }
     }
 
@@ -426,7 +443,7 @@
         inputSearch.addEventListener('keypress', function (event) {
             if (event.key === 'Enter') {
                 event.preventDefault();
-                realizarBuscaPorId();
+                realizarBusca();
             }
         });
     }
@@ -447,6 +464,13 @@
     }
 
     document.addEventListener("DOMContentLoaded", function() {
+
+        const path = window.location.pathname;
+        const params = window.location.search;
+
+        if ((path !== '/produto' && path !== '/produto/') || params.includes('name=') || params.includes('nome=')) {
+            document.getElementById('btnVoltarContainer').style.display = 'block';
+        }
 
         const modalDetalhes = document.getElementById('modalDetalhesProduto');
         if (modalDetalhes) {

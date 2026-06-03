@@ -37,6 +37,25 @@ public class ProdutoController {
         }
     }
 
+    @GetMapping("/search")
+    public ModelAndView getByName(@RequestParam("name") String name, RedirectAttributes redirectAttributes) {
+        try {
+            ModelAndView mv = new ModelAndView("produto");
+            List<Produto> produtos = _produtoService.BuscaPorNome(name);
+
+            Produto novoProduto = new Produto();
+
+            mv.addObject("produtos", produtos);
+            mv.addObject("novoProduto", novoProduto);
+
+            return mv;
+        } catch (RuntimeException exception) {
+            redirectAttributes.addFlashAttribute("mensagemErro", "O produto com o nome " + name + " não foi encontrado.");
+
+            return new ModelAndView("redirect:/produto");
+        }
+    }
+
     private ModelAndView carregarTelaBase(Integer id, Integer page) {
         ModelAndView mv = new ModelAndView("produto");
 

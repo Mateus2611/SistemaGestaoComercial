@@ -291,25 +291,45 @@
         modal.show();
     }
 
-    function adicionarCampoEmail(valor = '') {
-        const container = document.getElementById('containerCriarEmails');
-        const indice = container.querySelectorAll('.email-input-group').length;
+    function adicionarCampoEmail(modalTipo, valor = '') {
+        const containerId = modalTipo === 'criar' ? 'containerCriarEmails' : 'containerEditEmails';
+        const container = document.getElementById(containerId);
 
         const div = document.createElement('div');
         div.className = 'd-flex gap-2 email-input-group';
         div.innerHTML = `
-            <input type="email" name="emails[${indice}].texto" class="form-control form-control-lg" value="${valor}" placeholder="email@exemplo.com"
-                   style="border: 1.6px solid #000; border-radius: 8px; box-shadow: none;">
-            <button type="button" class="btn btn-outline-danger fw-bold" onclick="removerCampoEmail(this)" style="border-radius: 8px;">
+            <input type="email" class="form-control form-control-lg email-input-dinamico" value="${valor}" placeholder="email@exemplo.com"
+                   style="border: 1.8px solid #000; border-radius: 8px; box-shadow: none;">
+            <button type="button" class="btn btn-outline-danger fw-bold" onclick="removerCampoEmail(this, '${modalTipo}')" style="border-radius: 8px;">
                 <i class="bi bi-trash-fill"></i>
             </button>
         `;
         container.appendChild(div);
+
+        renumerarEmails(modalTipo);
     }
 
-    function removerCampoEmail(button) {
+    function removerCampoEmail(button, modalTipo) {
         const group = button.closest('.email-input-group');
-        if (group) group.remove();
+        if (group) {
+            group.remove();
+            renumerarEmails(modalTipo);
+        }
+    }
+
+    function renumerarEmails(modalTipo) {
+        const containerId = modalTipo === 'criar' ? 'containerCriarEmails' : 'containerEditEmails';
+        const container = document.getElementById(containerId);
+
+        const inputs = container.querySelectorAll('input[type="email"]');
+
+        inputs.forEach((input, index) => {
+            if (modalTipo === 'criar') {
+                input.name = `emails[${index}].endereco`;
+            } else {
+                input.name = 'emailsInput';
+            }
+        });
     }
 
     const modalCriarClienteElement = document.getElementById('modalCriarCliente');
