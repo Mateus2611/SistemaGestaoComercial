@@ -46,8 +46,10 @@
     </div>
 
     <div class="sidebar-custom d-flex flex-column flex-shrink-0">
-        <div class="sidebar-logo d-flex justify-content-center align-items-center py-3 mb-2 w-100">
-            <img th:src="@{/images/acrillogo.svg}" src="../static/images/acrillogo.svg" alt="Logo AcrillService" class="img-fluid" style="max-height: 120px; max-width: 120px; object-fit: contain;">
+        <div class="sidebar-logo d-flex justify-content-center align-items-center py-4 mb-2 w-100">
+            <a th:href="@{/}" class="d-flex align-items-center justify-content-center w-100">
+                <img th:src="@{/images/acrillogo.svg}" src="../static/images/acrillogo.svg" alt="Logo AcrillService" class="img-fluid" style="max-height: 120px; max-width: 120px; object-fit: contain;">
+            </a>
         </div>
 
         <a th:href="@{/}" class="nav-link-custom text-uppercase">
@@ -74,10 +76,6 @@
             <i class="bi bi-star-fill"></i>
             <span>Avaliações</span>
         </a>
-        <a th:href="@{/sobre}" class="nav-link-custom mt-auto text-uppercase no-hover">
-            <i class="bi bi-info-circle-fill"></i>
-            <span>Sobre</span>
-        </a>
     </div>
 
     <div class="main-content flex-grow-1 p-5">
@@ -92,7 +90,7 @@
                         <i class="bi bi-search" style="font-size: 1.1rem;"></i>
                     </button>
 
-                    <input type="text" id="searchAvaliacaoId" class="search-input" placeholder="ID do Cliente"
+                    <input type="text" id="searchAvaliacaoId" class="search-input" placeholder="ID da Avaliação"
                            style="border: 1.8px solid #000; border-left: none; border-radius: 8px; border-top-left-radius: 0; border-bottom-left-radius: 0; padding: 0 16px; height: 40px; box-shadow: none; outline: none;">
 
                 </div>
@@ -114,6 +112,7 @@
                     <th>Título</th>
                     <th>Data</th>
                     <th>Nota</th>
+                    <th class="text-end">Ações</th>
                 </tr>
                 </thead>
                 <tbody>
@@ -135,6 +134,23 @@
                         <span class="badge"
                               th:classappend="${avaliacao.nota <= 1 ? 'badge-vermelho' : (avaliacao.nota <= 3 ? 'badge-amarelo' : 'badge-verde')}"
                               th:text="${#numbers.formatDecimal(avaliacao.nota, 1, 0) + ' / 5'}"></span>
+                    </td>
+                    <td class="text-end">
+                        <button class="btn btn-sm btn-outline-secondary me-2" title="Editar"
+                                data-bs-toggle="modal" data-bs-target="#modalEditarAvaliacao"
+                                th:attr="data-id=${avaliacao.id},
+                                         data-venda=${avaliacao.venda.id},
+                                         data-titulo=${avaliacao.titulo},
+                                         data-descricao=${avaliacao.descricao},
+                                         data-datacriacao=${avaliacao.dataCriacao},
+                                         data-nota=${avaliacao.nota}">
+                            <i class="bi bi-pencil-fill"></i>
+                        </button>
+                        <button type="button" class="btn btn-sm btn-outline-danger" title="Excluir"
+                        data-bs-toggle="modal" data-bs-target="#modalConfirmarExclusao"
+                        th:attr="data-id=${avaliacao.id}, data-titulo=${avaliacao.titulo}, data-nota=${avaliacao.nota}">
+                            <i class="bi bi-trash-fill"></i>
+                        </button>
                     </td>
                 </tr>
                 </tbody>
@@ -238,6 +254,47 @@
     </div>
 </div>
 
+<div class="modal fade" id="modalConfirmarExclusao" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content shadow-lg border-0" style="border-radius: 16px; padding: 6px; background-color: #ffffff;">
+            <div style="border: 1.6px solid #14213d; border-radius: 12px; height: 100%;">
+
+                <div class="modal-header border-0 pb-0">
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+
+                <div class="modal-body px-4 pb-4 pt-2 text-center">
+                    <div class="text-danger mb-0" style="line-height: 1.2; margin-top: -20px">
+                        <i class="bi bi-exclamation-triangle-fill" style="font-size: 4rem;"></i>
+                    </div>
+
+                    <h2 class="text-uppercase fw-bold text-dark mb-3" style="font-size: 1.8rem; line-height: 1.1;">
+                        Confirmar<br>Exclusão
+                    </h2>
+
+                    <p class="text-muted mb-4" style="font-size: 1.05rem;">
+                        <strong id="nomeAvaliacaoExcluir" class="text-dark">Você tem certeza que deseja excluir a avaliação?</strong>
+                    </p>
+
+                    <form id="formExcluirAvaliacao" th:action="@{/avaliacao/delete/0}" th:method="DELETE">
+                        <div class="d-flex justify-content-center gap-3">
+                            <button type="button" class="btn btn-outline-secondary fw-bold text-uppercase py-2 px-4" data-bs-dismiss="modal" style="border-radius: 8px;">
+                                Cancelar
+                            </button>
+
+                            <button type="submit" class="btn fw-bold text-uppercase text-white py-2 px-4"
+                                    style="background-color: #ff7e12; border: none; border-radius: 8px;">
+                                Excluir
+                            </button>
+                        </div>
+                    </form>
+                </div>
+
+            </div>
+        </div>
+    </div>
+</div>
+
 <div th:fragment="modalCriar" class="modal fade" id="modalCriarAvaliacao" tabindex="-1" aria-hidden="true">
     <div class="modal-dialog modal-dialog-centered modal-lg">
         <div class="modal-content shadow-lg border-0" style="border-radius: 16px; padding: 6px; background-color: #ffffff;">
@@ -270,7 +327,7 @@
                                     <option value="5">5</option>
                                 </select>
                             </div>
-                            <div class="col-md-5">
+                            <div class="col-md-4">
                                 <label class="form-label fw-bold text-uppercase text-dark mb-1" style="font-size: 1.1rem;">Venda Relacionada</label>
                                 <select class="form-select form-select-lg" th:field="*{venda.id}" required style="border: 1.6px solid #000; border-radius: 8px;">
                                     <option selected disabled value="">Selecione a Venda</option>
@@ -300,6 +357,78 @@
         </div>
     </div>
 </div>
+
+<div th:fragment="modalEditar" class="modal fade" id="modalEditarAvaliacao" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered modal-lg">
+        <div class="modal-content shadow-lg border-0" style="border-radius: 16px; padding: 6px; background-color: #ffffff;">
+            <div style="border: 1.6px solid #14213d; border-radius: 12px; height: 100%;">
+                <div class="modal-header border-0 pb-0">
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body px-5 pb-5 pt-2 text-center">
+                    <h1 class="page-title text-uppercase mb-3" style="line-height: 1.1;">
+                        Editar<br>Avaliação
+                    </h1>
+                    <hr class="mx-auto mb-5" style="width: 60%; border-top: 1px solid #000; opacity: 1;">
+
+                    <form th:action="@{/avaliacao/update}" method="POST" class="text-start px-md-4">
+
+                        <input type="hidden" id="editAvaliacaoId" name="id">
+                        <input type="hidden" id="editAvaliacaoDataCriacao" name="dataCriacao">
+                        <input type="hidden" id="editAvaliacaoVendaId" name="venda.id">
+
+                        <div class="row g-4 justify-content-center">
+                            <div class="col-md-8">
+                                <label class="form-label fw-bold text-uppercase text-dark mb-1" style="font-size: 1.1rem;">Título</label>
+                                <input type="text" id="editAvaliacaoTitulo" name="titulo" class="form-control form-control-lg"
+                                       style="border: 1.6px solid #000; border-radius: 8px; box-shadow: none;">
+                            </div>
+
+                            <div class="col-md-3">
+                                <label class="form-label fw-bold text-uppercase text-dark mb-1" style="font-size: 1.1rem;">Nota (0 a 5)</label>
+                                <select id="editAvaliacaoNota" name="nota" class="form-select form-select-lg" style="border: 1.6px solid #000; border-radius: 8px; box-shadow: none;">
+                                    <option disabled value="">Selecione</option>
+                                    <option value="0">0</option>
+                                    <option value="1">1</option>
+                                    <option value="2">2</option>
+                                    <option value="3">3</option>
+                                    <option value="4">4</option>
+                                    <option value="5">5</option>
+                                </select>
+                            </div>
+
+                            <div class="col-md-4">
+                                <label class="form-label fw-bold text-uppercase text-dark mb-1" style="font-size: 1.1rem;">Venda Relacionada</label>
+                                <input type="text" id="editAvaliacaoVenda" class="form-control form-control-lg fw-bold" readonly
+                                       style="border: 1.6px solid #000; border-radius: 8px; background-color: #e9e9e9;">
+                            </div>
+
+                            <div class="col-md-12">
+                                <label class="form-label fw-bold text-uppercase text-dark mb-1" style="font-size: 1.1rem;">Descrição</label>
+                                <textarea id="editAvaliacaoDescricao" name="descricao" class="form-control form-control-lg" rows="3"
+                                          style="border: 1.6px solid #000; border-radius: 8px; box-shadow: none; resize: none;"></textarea>
+                            </div>
+                        </div>
+
+                        <div class="d-flex justify-content-center gap-3 mt-5">
+                            <button type="button" class="btn btn-outline-secondary fw-bolder text-uppercase" data-bs-dismiss="modal"
+                                    style="font-size: 1.2rem; padding: 12px 40px; border-radius: 8px; border-width: 1.8px;">
+                                Cancelar
+                            </button>
+                            <button type="submit" class="btn btn-orange fw-bolder text-uppercase text-white"
+                                    style="font-size: 1.2rem; padding: 12px 40px; border-radius: 8px; background-color: #ff9433; border: none;">
+                                Salvar Alterações
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+
 
 <script>
 
@@ -337,6 +466,56 @@
         });
     });
 
+    document.addEventListener('DOMContentLoaded', function () {
+        const modalEditar = document.getElementById('modalEditarAvaliacao');
+
+        if (modalEditar) {
+            modalEditar.addEventListener('show.bs.modal', function (event) {
+                const button = event.relatedTarget;
+                if(!button) return;
+
+                const id = button.getAttribute('data-id');
+                const idVenda = button.getAttribute('data-venda');
+                const titulo = button.getAttribute('data-titulo');
+                const descricao = button.getAttribute('data-descricao');
+                const datacriacao = button.getAttribute('data-datacriacao');
+
+                const notaFloat = parseFloat(button.getAttribute('data-nota'));
+                let notaInt = "";
+                if(!isNaN(notaFloat)){
+                    notaInt = Math.round(notaFloat).toString();
+                }
+
+                document.getElementById('editAvaliacaoId').value = id;
+
+                document.getElementById('editAvaliacaoDataCriacao').value = datacriacao;
+                document.getElementById('editAvaliacaoVendaId').value = idVenda;
+
+                document.getElementById('editAvaliacaoVenda').value = 'Venda #' + idVenda;
+                document.getElementById('editAvaliacaoTitulo').value = titulo;
+                document.getElementById('editAvaliacaoNota').value = notaInt;
+                document.getElementById('editAvaliacaoDescricao').value = descricao;
+            });
+        }
+    });
+
+    document.querySelectorAll('.table-custom button').forEach(button => {
+        button.addEventListener('click', function (e) {
+            e.stopPropagation();
+        });
+    });
+
+    const modalExclusao = document.getElementById('modalConfirmarExclusao');
+    if (modalExclusao) {
+        modalExclusao.addEventListener('show.bs.modal', function (event) {
+            const botao = event.relatedTarget;
+            const id = botao.getAttribute('data-id');
+            const titulo = botao.getAttribute('data-titulo');
+
+            document.getElementById('nomeAvaliacaoExcluir').textContent = 'Avaliação: ' + titulo;
+            document.getElementById('formExcluirAvaliacao').action = '/avaliacao/delete/' + id;
+        });
+    }
 
     let ordemCrescente = false;
     function ordenarTabela() {
