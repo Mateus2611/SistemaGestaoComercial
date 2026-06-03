@@ -40,6 +40,7 @@ public class IndexController {
     private ModelAndView carregarTelaBase() {
         ModelAndView mv = new ModelAndView("index");
 
+
         List<Orcamento> orcamentos = _orcamentoService.BuscaGeral();
         long qtdOrcamentosPendentes = orcamentos.stream()
                 .filter(o -> o.getStatus() != null && o.getStatus().name().equals("PENDENTE"))
@@ -78,6 +79,7 @@ public class IndexController {
 
         mv.addObject("clientes", _clienteService.BuscaGeral());
         mv.addObject("produtos", _produtoService.BuscaGeral());
+        mv.addObject("orcamentos", _orcamentoService.BuscaPorStatusAprovado());
 
         mv.addObject("novoOrcamento", new CreateOrcamentoDTO());
         mv.addObject("novoCliente", new Cliente());

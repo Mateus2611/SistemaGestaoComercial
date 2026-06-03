@@ -272,8 +272,8 @@
                     <hr class="mx-auto mb-5" style="width: 60%; border-top: 1px solid #000; opacity: 1;">
 
                     <div class="text-start px-md-4">
-                        <div class="row g-4">
-                            <div class="col-md-3">
+                        <div class="row g-4 justify-content-center">
+                            <div class="col-md-2">
                                 <label class="form-label fw-bold text-uppercase text-dark mb-1" style="font-size: 1.1rem;">Código</label>
                                 <input type="text" id="detalheClienteId" class="form-control form-control-lg fw-bold" disabled
                                        style="border: 1.8px solid #ccc; border-radius: 8px; background-color: #f8f9fa;">
@@ -291,19 +291,19 @@
                                        style="border: 1.8px solid #ccc; border-radius: 8px; background-color: #f8f9fa;">
                             </div>
 
-                            <div class="col-md-6">
+                            <div class="col-md-5">
                                 <label class="form-label fw-bold text-uppercase text-dark mb-1" style="font-size: 1.1rem;">Tipo</label>
                                 <input type="text" id="detalheClienteTipo" class="form-control form-control-lg" disabled
                                        style="border: 1.8px solid #ccc; border-radius: 8px; background-color: #f8f9fa;">
                             </div>
 
-                            <div class="col-md-6">
+                            <div class="col-md-4">
                                 <label class="form-label fw-bold text-uppercase text-dark mb-1" style="font-size: 1.1rem;">Criado</label>
                                 <input type="date" id="detalheClienteCadastro" class="form-control form-control-lg" disabled
                                        style="border: 1.8px solid #ccc; border-radius: 8px; background-color: #f8f9fa;">
                             </div>
 
-                            <div class="col-md-6">
+                            <div class="col-md-4">
                                 <label class="form-label fw-bold text-uppercase text-dark mb-1" style="font-size: 1.1rem;">Última Inativacao</label>
                                 <input type="date" id="detalheClienteInativacao" class="form-control form-control-lg" disabled
                                        style="border: 1.8px solid #ccc; border-radius: 8px; background-color: #f8f9fa;">
@@ -311,8 +311,7 @@
 
                             <div class="col-md-6">
                                 <label class="form-label fw-bold text-uppercase text-dark mb-1" style="font-size: 1.1rem;">Emails</label>
-                                <div id="detalheClienteEmails" class="p-2" style="border: 1.8px solid #ccc; border-radius: 8px; background-color: #f8f9fa; min-height: 48px; text-align: left;">
-
+                                <div id="detalheClienteEmails" class="form-control form-control-lg" style="border: 1.8px solid #ccc; border-radius: 8px; background-color: #f8f9fa;">
                                 </div>
                             </div>
 
@@ -350,7 +349,7 @@
                     <hr class="mx-auto mb-5" style="width: 60%; border-top: 1px solid #000; opacity: 1;">
 
                     <form th:action="@{/cliente/create}" th:object="${novoCliente}" method="POST" class="text-start px-md-4">
-                        <div class="row g-4">
+                        <div class="row g-4 justify-content-center">
 
                             <div class="col-md-12">
                                 <label class="form-label fw-bold text-uppercase text-dark mb-1" style="font-size: 1.1rem;">Nome Completo / Razão Social</label>
@@ -388,7 +387,7 @@
                                        style="border: 1.8px solid #000; border-radius: 8px; box-shadow: none;">
                             </div>
 
-                            <div class="col-md-4">
+                            <div class="col-md-5">
                                 <label class="form-label fw-bold text-uppercase text-dark mb-1" style="font-size: 1.1rem;">Tipo</label>
                                 <select id="criarClienteTipo" th:field="*{tipo}" class="form-select form-select-lg" style="border: 1.8px solid #000; border-radius: 8px;">
                                     <option value="" disabled hidden selected>Selecione</option>
@@ -446,7 +445,7 @@
 
                         <input type="hidden" id="editClienteId" name="id">
 
-                        <div class="row g-4">
+                        <div class="row g-4 justify-content-center">
                             <div class="col-md-8">
                                 <label class="form-label fw-bold text-uppercase text-dark mb-1" style="font-size: 1.1rem;">Nome Completo / Razão Social</label>
                                 <input type="text" id="editClienteNome" name="nome" class="form-control form-control-lg"

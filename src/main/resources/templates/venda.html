@@ -297,7 +297,7 @@
                                        style="border: 1.6px solid #ccc; border-radius: 8px; background-color: #f8f9fa;">
                             </div>
 
-                            <div class="col-md-12">
+                            <div class="col-md-5">
                                 <label class="form-label fw-bold text-uppercase text-dark mb-1"
                                        style="font-size: 1.1rem;">Valor Total</label>
                                 <input type="text" id="detalheVendaValorTotal"
@@ -336,8 +336,8 @@
                     <hr class="mx-auto mb-4" style="width: 45%; border-top: 1px solid #000; opacity: 1;">
 
                     <form th:action="@{/venda/create}" th:object="${novaVenda}" method="POST" class="text-start px-md-4">
-                        <div class="row g-4">
-                            <div class="col-md-7">
+                        <div class="row g-4 justify-content-center">
+                            <div class="col-md-10">
                                 <label class="form-label fw-bold text-uppercase text-dark mb-1d"
                                        style="font-size: 1.1rem;">Orçamento</label>
                                 <select id="criarVenda" th:field="*{orcamento.id}" class="form-select form-select-lg"

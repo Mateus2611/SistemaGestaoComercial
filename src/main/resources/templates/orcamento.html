@@ -262,7 +262,7 @@
                     <hr class="mx-auto mb-5" style="width: 60%; border-top: 1px solid #000; opacity: 1;">
 
                     <div class="text-start px-md-4">
-                        <div class="row g-4">
+                        <div class="row g-4 justify-content-center text-start">
                             <div class="col-md-8">
                                 <label class="form-label fw-bold text-uppercase text-dark mb-1" style="font-size: 1.1rem;">Cliente</label>
                                 <input type="text" id="detalheOrcamentoCliente" class="form-control form-control-lg fw-bold" readonly
@@ -275,25 +275,25 @@
                                        style="border: 1.6px solid #ccc; border-radius: 8px; background-color: #f8f9fa;">
                             </div>
 
-                            <div class="col-md-6">
+                            <div class="col-md-4">
                                 <label class="form-label fw-bold text-uppercase text-dark mb-1" style="font-size: 1.1rem;">Data de Emissão</label>
                                 <input type="text" id="detalheOrcamentoEmissao" class="form-control form-control-lg" readonly
                                        style="border: 1.6px solid #ccc; border-radius: 8px; background-color: #f8f9fa;">
                             </div>
 
-                            <div class="col-md-6">
+                            <div class="col-md-4">
                                 <label class="form-label fw-bold text-uppercase text-dark mb-1" style="font-size: 1.1rem;">Data de Validade</label>
                                 <input type="text" id="detalheOrcamentoValidade" class="form-control form-control-lg" readonly
                                        style="border: 1.6px solid #ccc; border-radius: 8px; background-color: #f8f9fa;">
                             </div>
 
-                            <div class="col-md-6">
+                            <div class="col-md-5">
                                 <label class="form-label fw-bold text-uppercase text-dark mb-1" style="font-size: 1.1rem;">Desconto</label>
                                 <input type="text" id="detalheOrcamentoDesconto" class="form-control form-control-lg" readonly
                                        style="border: 1.6px solid #ccc; border-radius: 8px; background-color: #f8f9fa;">
                             </div>
 
-                            <div class="col-md-6">
+                            <div class="col-md-5">
                                 <label class="form-label fw-bold text-uppercase text-dark mb-1" style="font-size: 1.1rem;">Total</label>
                                 <input type="text" id="detalheOrcamentoTotal" class="form-control form-control-lg fw-bold text-success" readonly
                                        style="border: 1.6px solid #ccc; border-radius: 8px; background-color: #f8f9fa;">
@@ -301,14 +301,14 @@
 
                             <div class="col-12 mt-4">
                                 <div class="table-responsive mx-auto" style="max-width: 800px;">
-                                    <table class="table table-bordered table-custom align-middle">
+                                    <table class="table table-bordered table-orcamento align-middle">
                                         <thead class="table-dark">
                                         <tr>
                                             <th class="text-center" style="width: 10%;">Código</th>
                                             <th>Produto</th>
                                             <th class="text-center" style="width: 12%;">Qtd</th>
-                                            <th class="text-end" style="width: 20%;">Val. Unitário</th>
-                                            <th class="text-end" style="width: 20%;">Subtotal</th>
+                                            <th class="text-center" style="width: 20%;">Val. Unitário</th>
+                                            <th class="text-center" style="width: 20%;">Subtotal</th>
                                         </tr>
                                         </thead>
 
@@ -352,8 +352,8 @@
                     <hr class="mx-auto mb-4" style="width: 60%; border-top: 1px solid #000; opacity: 1;">
 
                     <form th:action="@{/orcamento/create}" method="POST" th:object="${novoOrcamento}" class="text-start px-md-4">
-                        <div class="row g-4">
-                            <div class="col-md-6 mb-3">
+                        <div class="row g-4 justify-content-center text-start">
+                            <div class="col-md-8 mb-3">
                                 <label class="form-label fw-bold text-uppercase text-dark mb-1" style="font-size: 1.1rem;">Cliente</label>
                                 <select id="orcamentoCliente" name="cliente" class="form-select form-select-lg" style="border: 1.6px solid #000; border-radius: 8px;">
                                     <option selected disabled value="">Selecione um cliente...</option>
@@ -363,7 +363,7 @@
                                     </option>
                                 </select>
                             </div>
-                            <div class="col-md-5">
+                            <div class="col-md-4">
                                 <label class="form-label fw-bold text-uppercase text-dark mb-1" style="font-size: 1.1rem;">Data de Validade</label>
                                 <input type="text" name="dataValidade" class="form-control form-control-lg"
                                        placeholder="DD/MM/AAAA" maxlength="10"
@@ -371,19 +371,19 @@
                                        style="border: 1.6px solid #000; border-radius: 8px;" required>
                             </div>
 
-                            <div class="col-md-4 offset-md-2">
+                            <div class="col-md-5">
                                 <label class="form-label fw-bold text-uppercase text-dark mb-1" style="font-size: 1.1rem;">Desconto (R$)</label>
                                 <input type="number" id="orcamentoDesconto" name="desconto" step="0.01" class="form-control form-control-lg" placeholder="0.00"
                                        style="border: 1.6px solid #000; border-radius: 8px;" oninput="atualizarTotalGeral()">
                             </div>
-                            <div class="col-md-4">
+                            <div class="col-md-5">
                                 <label class="form-label fw-bold text-uppercase text-dark mb-1" style="font-size: 1.1rem;">Total (R$)</label>
                                 <input type="text" id="valorOrcamentoInput" class="form-control form-control-lg fw-bold" readonly value="0.00"
                                        style="border: 1.6px solid #000; border-radius: 8px; background-color: #e9e9e9;">
                             </div>
 
                             <div class="col-12 mt-5">
-                                <div class="d-flex justify-content-center">
+                                <div class="d-flex">
                                     <h5 class="fw-bold text-uppercase border-bottom border-dark pb-2 mb-4 text-center" style="width: 100%;">
                                         Produtos do Orçamento
                                     </h5>
@@ -410,13 +410,13 @@
                                 </div>
 
                                 <div class="table-responsive mx-auto" style="max-width: 800px;">
-                                    <table class="table table-bordered table-custom" id="tabelaProdutosOrcamento">
+                                    <table class="table table-bordered table-orcamento" id="tabelaProdutosOrcamento">
                                         <thead class="table-dark">
                                         <tr>
                                             <th>Produto</th>
                                             <th class="text-center" style="width: 100px;">Qtd</th>
-                                            <th class="text-end" style="width: 150px;">Valor Unit.</th>
-                                            <th class="text-end" style="width: 150px;">Subtotal</th>
+                                            <th class="text-center" style="width: 150px;">Valor Unit.</th>
+                                            <th class="text-center" style="width: 150px;">Subtotal</th>
                                             <th class="text-center" style="width: 80px;">Ação</th>
                                         </tr>
                                         </thead>

@@ -353,7 +353,7 @@
         const produtoValor = parseFloat(select.options[select.selectedIndex].getAttribute('data-valor'));
 
         let qtd = parseInt(qtdInput.value);
-        if (isNaN(qtd) || qtd < 1) qtd = 1;
+        if (Number.isNaN(qtd) || qtd < 1) qtd = 1;
 
         const subtotal = produtoValor * qtd;
         const tr = document.createElement('tr');
