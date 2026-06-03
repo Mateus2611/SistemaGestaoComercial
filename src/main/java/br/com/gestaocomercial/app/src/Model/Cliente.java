@@ -51,10 +51,10 @@ public class Cliente {
     private String Nome;
     @OneToMany(cascade = CascadeType.ALL)
     @JoinColumn(name = "Id_Cliente")
-    private List<Email> Emails;
+    private List<Email> Emails = new ArrayList<>();
     @OneToOne(cascade = CascadeType.ALL)
     @JoinColumn(name = "Id_Endereco", referencedColumnName = "Id")
-    private Endereco Endereco;
+    private Endereco Endereco = new Endereco();
     @Column(name = "Data_Cadastro")
     private Date DataCadastro;
     @Column(name = "Data_Inativacao")

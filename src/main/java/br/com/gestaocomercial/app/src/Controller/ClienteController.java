@@ -19,8 +19,31 @@ public class ClienteController {
     @Autowired
     private ClienteService _clienteService;
 
-    @RequestMapping
+    @GetMapping
     public ModelAndView cliente(@RequestParam(name = "page", defaultValue = "1") Integer page) { return carregarTelaBase(null, page); }
+
+    @GetMapping("/search")
+    public ModelAndView getByName(@RequestParam("name") String name, RedirectAttributes redirectAttributes) {
+        try {
+            ModelAndView mv = new ModelAndView("cliente");
+            List<Cliente> clientes = _clienteService.BuscaPorNome(name);
+
+            Cliente novoCliente = new Cliente();
+            novoCliente.setEndereco(new Endereco());
+            List<Email> emailsIniciais = new ArrayList<>();
+            emailsIniciais.add(new Email());
+            novoCliente.setEmails(emailsIniciais);
+
+            mv.addObject("clientes", clientes);
+            mv.addObject("novoCliente", novoCliente);
+
+            return mv;
+        } catch (RuntimeException exception) {
+            redirectAttributes.addFlashAttribute("mensagemErro", "O cliente com o nome " + name + " não foi encontrado.");
+
+            return new ModelAndView("redirect:/cliente");
+        }
+    }
 
     @GetMapping("/{id}")
     public ModelAndView getById(@PathVariable("id") Integer id, RedirectAttributes redirectAttributes) {
@@ -76,11 +99,16 @@ public class ClienteController {
     }
 
     @PostMapping("/create")
-    public String create(@ModelAttribute("novoCliente") Cliente cliente) {
+    public String create(@ModelAttribute("novoCliente") Cliente cliente, RedirectAttributes redirectAttributes) {
+        try {
+            Cliente novoCliente = _clienteService.Criar(cliente);
 
-        Cliente novoCliente = _clienteService.Criar(cliente);
+            return "redirect:/cliente/" + novoCliente.getId();
+        } catch (RuntimeException ex) {
+            redirectAttributes.addFlashAttribute("mensagemErro", "Não foi possível cadastrar o cliente");
 
-        return "redirect:/cliente/" + novoCliente.getId();
+            return "redirect:/cliente";
+        }
     }
 
     @PostMapping("/update/{id}")

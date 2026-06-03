@@ -11,6 +11,7 @@ import org.springframework.stereotype.Repository;
 
 import java.sql.Date;
 import java.time.LocalDate;
+import java.util.List;
 import java.util.Optional;
 
 @Repository
@@ -25,4 +26,8 @@ public interface IClienteRepository extends JpaRepository<Cliente, Integer> {
     @Modifying
     @Query(value = "UPDATE Cliente SET Status_Cliente = 'ATIVO' WHERE Id = :id", nativeQuery = true)
     void Activate(@Param("id") Integer id);
+
+    @Transactional
+    @Query(value = "SELECT * FROM Cliente WHERE Status_Cliente = :status", nativeQuery = true)
+    List<Cliente> findAll(@Param("status") String status);
 }

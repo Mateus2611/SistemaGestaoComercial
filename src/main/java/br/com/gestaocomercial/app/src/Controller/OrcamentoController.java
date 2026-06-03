@@ -51,7 +51,9 @@ public class OrcamentoController {
         novoOrcamento.setOrcamentoProdutos(new java.util.ArrayList<>());
         mv.addObject("novoOrcamento", novoOrcamento);
 
-        mv.addObject("clientes", _clienteService.BuscaGeral());
+        List<Cliente> clientes = _clienteService.BuscaGeral(Cliente.StatusCliente.ATIVO.name());
+
+        mv.addObject("clientes", clientes);
         mv.addObject("produtos", _produtoService.BuscaGeral());
 
         if (id != null) {
@@ -106,7 +108,7 @@ public class OrcamentoController {
 
             redirectAttributes.addFlashAttribute("mensagemSucesso", "O orçamento com o ID " + id + " foi APROVADO com sucesso!.");
 
-            return "redirect:/orcamento/";
+            return "redirect:/orcamento";
         } catch (RuntimeException e) {
             redirectAttributes.addFlashAttribute("mensagemErro", "Não foi possível aprovar o orçamento " + id + " ocorreu um erro inesperado");
             return "redirect:/orcamento";
@@ -120,7 +122,7 @@ public class OrcamentoController {
 
             redirectAttributes.addFlashAttribute("mensagemSucesso", "O orçamento com o ID " + id + " foi REPROVADO com sucesso!.");
 
-            return "redirect:/orcamento/";
+            return "redirect:/orcamento";
         } catch (RuntimeException e) {
             redirectAttributes.addFlashAttribute("mensagemErro", "Não foi possível reprovar o orçamento " + id + " ocorreu um erro inesperado");
             return "redirect:/orcamento";

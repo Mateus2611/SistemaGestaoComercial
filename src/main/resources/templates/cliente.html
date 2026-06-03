@@ -121,12 +121,12 @@
             <form onsubmit="return false;" style="margin: 0; padding: 0;">
                 <div class="d-flex align-items-center">
 
-                    <button type="button" id="btnSearchCliente" class="btn fw-bold" onclick="realizarBuscaPorId()"
+                    <button type="button" id="btnSearchCliente" class="btn fw-bold" onclick="realizarBusca()"
                             style="background-color: transparent !important; color: #000 !important; border: 1.8px solid #000 !important; border-radius: 8px; border-top-right-radius: 0; border-bottom-right-radius: 0; width: 50px; height: 40px; padding: 0; display: flex; align-items: center; justify-content: center; cursor: pointer; transition: all 0.2s ease;">
                         <i class="bi bi-search" style="font-size: 1.1rem;"></i>
                     </button>
 
-                    <input type="text" id="searchClienteId" class="search-input" placeholder="ID do Cliente"
+                    <input type="text" id="searchClienteId" class="search-input" placeholder="Buscar cliente..."
                            style="border: 1.8px solid #000; border-left: none; border-radius: 8px; border-top-left-radius: 0; border-bottom-left-radius: 0; padding: 0 16px; height: 40px; box-shadow: none; outline: none;">
 
                 </div>
@@ -198,11 +198,11 @@
                         </button>
                         <button class="btn btn-sm fw-bold text-uppercase"
                                 th:text="${cliente.status != null and cliente.status.name() == 'ATIVO' ? 'INATIVAR' : 'ATIVAR'}"
-                                th:attr="data-id=${cliente.id}, data-status=${cliente.status}"
+                                th:attr="data-id=${cliente.id}, data-status=${cliente.status}, data-nome=${cliente.nome}"
                                 th:styleappend="${cliente.status != null and cliente.status.name() == 'INATIVO'
                                 ? 'background-color: #ff7e12; color: #ffffff; border: 1.8px solid #ff7e12; border-radius: 8px; padding: 5px 16px; font-size: 0.875rem; width: 8em;'
                                 : 'background-color: transparent; color: #ff7e12; border: 1.8px solid #ff7e12; border-radius: 8px; padding: 5px 16px; font-size: 0.875rem; width: 8em;'}"
-                                onclick="alterarStatusCliente(this)">
+                                onclick="prepararModalStatus(this)">
                         </button>
                     </td>
                 </tr>
@@ -244,7 +244,7 @@
                 </nav>
             </div>
 
-            <div th:if="${#ctx.containsVariable('clientes') and clientes.size() == 1 and #vars['javax.servlet.forward.request_uri'] != '/cliente'}" class="mb-3">
+            <div id="btnVoltarContainer" class="mb-3" style="display: none;">
                 <a href="/cliente" class="btn btn-sm fw-bold text-uppercase d-inline-flex align-items-center gap-2"
                    style="background-color: #14213d; color: #ffffff; border: 1.8px solid; border-radius: 8px; padding: 8px 16px; transition: all 0.2s ease;"
                    onmouseenter="this.style.backgroundColor='transparent'; this.style.color='#14213d';"
@@ -524,31 +524,94 @@
     </div>
 </div>
 
+<div class="modal fade" id="modalConfirmarStatus" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content shadow-lg border-0" style="border-radius: 16px; padding: 6px; background-color: #ffffff;">
+            <div style="border: 1.6px solid #14213d; border-radius: 12px; height: 100%;">
+                <div class="modal-header border-0 pb-0">
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body px-4 pb-4 pt-2 text-center">
+
+                    <div class="text-warning mb-0" style="line-height: 1.2; margin-top: -20px">
+                        <i class="bi bi-exclamation-triangle-fill" style="font-size: 4rem;"></i>
+                    </div>
+
+                    <h2 class="text-uppercase fw-bold text-dark mb-3" style="font-size: 1.8rem; line-height: 1.1;">
+                        Confirmar Ação
+                    </h2>
+
+                    <p class="text-muted mb-4" style="font-size: 1.05rem;">
+                        Você tem certeza que deseja <strong id="textoAcaoModal" class="text-dark"></strong> o cliente <br>
+                        <strong id="textoNomeClienteModal" class="text-dark"></strong>?
+                    </p>
+
+                    <form id="formAlterarStatusCliente" method="POST">
+                        <div class="d-flex justify-content-center gap-3">
+                            <button type="button" class="btn btn-outline-secondary fw-bold text-uppercase py-2 px-4" data-bs-dismiss="modal" style="border-radius: 8px;">
+                                Cancelar
+                            </button>
+                            <button type="submit" class="btn fw-bold text-uppercase text-white py-2 px-4" style="background-color: #ff7e12; border: none; border-radius: 8px;">
+                                Confirmar
+                            </button>
+                        </div>
+                    </form>
+
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
 <script>
     function adicionarCampoEmail(modalTipo, valor = '') {
         const containerId = modalTipo === 'criar' ? 'containerCriarEmails' : 'containerEditEmails';
         const container = document.getElementById(containerId);
 
-        const indice = container.querySelectorAll('.email-input-group').length;
-
-        const nameAtributo = modalTipo === 'criar' ? `emails[${indice}].texto` : 'emailsInput';
-
         const div = document.createElement('div');
         div.className = 'd-flex gap-2 email-input-group';
         div.innerHTML = `
-        <input type="email" name="${nameAtributo}" class="form-control form-control-lg" value="${valor}" placeholder="email@exemplo.com"
-               style="border: 1.8px solid #000; border-radius: 8px; box-shadow: none;">
-        <button type="button" class="btn btn-outline-danger fw-bold" onclick="removerCampoEmail(this)" style="border-radius: 8px;">
-            <i class="bi bi-trash-fill"></i>
-        </button>
-    `;
+            <input type="email" class="form-control form-control-lg email-input-dinamico" value="${valor}" placeholder="email@exemplo.com"
+                   style="border: 1.8px solid #000; border-radius: 8px; box-shadow: none;">
+            <button type="button" class="btn btn-outline-danger fw-bold" onclick="removerCampoEmail(this, '${modalTipo}')" style="border-radius: 8px;">
+                <i class="bi bi-trash-fill"></i>
+            </button>
+        `;
         container.appendChild(div);
+
+        renumerarEmails(modalTipo);
     }
 
-    function removerCampoEmail(button) {
+    function removerCampoEmail(button, modalTipo) {
         const group = button.closest('.email-input-group');
-        if (group) group.remove();
+        if (group) {
+            group.remove();
+            renumerarEmails(modalTipo);
+        }
     }
+
+    function renumerarEmails(modalTipo) {
+        const containerId = modalTipo === 'criar' ? 'containerCriarEmails' : 'containerEditEmails';
+        const container = document.getElementById(containerId);
+
+        const inputs = container.querySelectorAll('input[type="email"]');
+
+        inputs.forEach((input, index) => {
+            if (modalTipo === 'criar') {
+                input.name = `emails[${index}].endereco`;
+            } else {
+                input.name = 'emailsInput';
+            }
+        });
+    }
+
+    document.getElementById('modalCriarCliente').addEventListener('hidden.bs.modal', function () {
+        document.getElementById('criarClienteTipo').selectedIndex = 0;
+
+        const container = document.getElementById('containerCriarEmails');
+        container.innerHTML = '';
+        adicionarCampoEmail('criar');
+    });
 
     function abrirModalDetalhes(row) {
         const id = row.getAttribute('data-id');
@@ -631,10 +694,47 @@
         adicionarCampoEmail('criar');
     });
 
+    function prepararModalStatus(button) {
+        const idCliente = button.getAttribute('data-id');
+        const statusAtual = button.getAttribute('data-status');
+        const nomeCliente = button.getAttribute('data-nome');
+
+        if (!idCliente) return;
+
+        const isAtivo = (statusAtual === 'ATIVO');
+        const acaoTexto = isAtivo ? 'inativar' : 'ativar';
+        const urlAction = isAtivo ? `/cliente/disable/${idCliente}` : `/cliente/activate/${idCliente}`;
+
+        document.getElementById('textoAcaoModal').textContent = acaoTexto;
+        document.getElementById('textoNomeClienteModal').textContent = nomeCliente || 'selecionado';
+
+        document.getElementById('formAlterarStatusCliente').action = urlAction;
+
+        const modal = new bootstrap.Modal(document.getElementById('modalConfirmarStatus'));
+        modal.show();
+    }
+
+    function realizarBusca() {
+        const inputId = document.getElementById('searchClienteId');
+        if (inputId && inputId.value.trim() !== "" && parseInt(inputId.value)) {
+            realizarBuscaPorId();
+        }
+        else {
+            realizarBuscaPorNome();
+        }
+    }
+
     function realizarBuscaPorId() {
         const inputId = document.getElementById('searchClienteId');
         if (inputId && inputId.value.trim() !== "") {
             window.location.href = '/cliente/' + inputId.value.trim();
+        }
+    }
+
+    function realizarBuscaPorNome() {
+        const inputId = document.getElementById('searchClienteId');
+        if (inputId && inputId.value.trim() !== "") {
+            window.location.href = '/cliente/search?name=' + encodeURIComponent(inputId.value.trim().toLowerCase());
         }
     }
 
@@ -643,7 +743,7 @@
         inputSearch.addEventListener('keypress', function (event) {
             if (event.key === 'Enter') {
                 event.preventDefault();
-                realizarBuscaPorId();
+                realizarBusca();
             }
         });
     }
@@ -664,6 +764,13 @@
     }
 
     document.addEventListener('DOMContentLoaded', function () {
+
+        const path = window.location.pathname;
+        const params = window.location.search;
+
+        if ((path !== '/cliente' && path !== '/cliente/') || params.includes('name=') || params.includes('nome=')) {
+            document.getElementById('btnVoltarContainer').style.display = 'block';
+        }
 
         const modalCriar = document.getElementById('modalCriarCliente');
         if (modalCriar) {

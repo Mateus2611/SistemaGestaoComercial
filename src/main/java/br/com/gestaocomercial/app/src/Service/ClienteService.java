@@ -6,6 +6,7 @@ import br.com.gestaocomercial.app.src.Model.Endereco;
 import br.com.gestaocomercial.app.src.Repository.IClienteRepository;
 import br.com.gestaocomercial.app.src.Repository.IEmailRepository;
 import br.com.gestaocomercial.app.src.Repository.IEnderecoRepository;
+import jakarta.transaction.Transactional;
 import org.aspectj.apache.bcel.generic.InstructionConstants;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
@@ -31,21 +32,38 @@ public class ClienteService {
     @Autowired
     private IClienteRepository _clienteRepository;
 
+    @Transactional
     public Cliente Criar(Cliente cliente) {
 
+        if (cliente == null) {
+            throw new IllegalArgumentException("Dados do cliente vazios. Preencha as informações.");
+        }
+        if (cliente.getEndereco() == null) {
+            throw new IllegalArgumentException("Dados de endereço vazios. Preencha as informações.");
+        }
+        if (cliente.getEmails() == null) {
+            throw new IllegalArgumentException("A lista de e-mails não pode ser nula.");
+        }
+
+        cliente.getEmails().removeIf(email ->
+                email == null ||
+                        email.getEndereco() == null ||
+                        email.getEndereco().trim().isEmpty()
+        );
+
+        if (cliente.getEmails().isEmpty()) {
+            throw new IllegalArgumentException("É necessário informar pelo menos um endereço de e-mail válido.");
+        }
+
+        cliente.setDataCadastro(Date.valueOf(LocalDate.now()));
+        cliente.setStatus(Cliente.StatusCliente.ATIVO);
+
+        return _clienteRepository.save(cliente);
+    }
+
+    public List<Cliente> BuscaGeral() {
         try {
-
-            if (cliente == null)
-                throw new RuntimeException("Dados do cliente vazio. Preencha as informações");
-            if (cliente.getEndereco() == null)
-                throw new RuntimeException("Dados de endereço vazio. Preencha as informações");
-            if (cliente.getEmails() == null)
-                throw new RuntimeException("Endereço de email vazio. Preencha a informação");
-
-            cliente.setDataCadastro(Date.valueOf(LocalDate.now()));
-            cliente.setStatus(Cliente.StatusCliente.ATIVO);
-            return _clienteRepository.save(cliente);
-
+            return  _clienteRepository.findAll();
         } catch (RuntimeException ex) {
             throw new RuntimeException(ex.getMessage());
         }
@@ -61,9 +79,9 @@ public class ClienteService {
         }
     }
 
-    public List<Cliente> BuscaGeral() {
+    public List<Cliente> BuscaGeral(String status) {
         try {
-            return  _clienteRepository.findAll();
+            return  _clienteRepository.findAll(status);
         } catch (RuntimeException ex) {
             throw new RuntimeException(ex.getMessage());
         }
@@ -75,6 +93,15 @@ public class ClienteService {
         } catch (RuntimeException ex) {
             throw new RuntimeException(ex.getMessage());
         }
+    }
+
+    public List<Cliente> BuscaPorNome(String nome) {
+
+        List<Cliente> clientes = _clienteRepository.findAll();
+
+        return clientes.stream()
+                .filter(c -> c.getNome().toLowerCase().contains(nome))
+                .toList();
     }
 
     public Cliente Atualizar(Cliente clienteUpdate) {
