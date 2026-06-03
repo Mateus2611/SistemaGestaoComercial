@@ -203,17 +203,17 @@
                                 <input type="text" id="detalheAvaliacaoTitulo" class="form-control form-control-lg fw-bold" readonly
                                        style="border: 1.6px solid #ccc; border-radius: 8px; background-color: #f8f9fa;">
                             </div>
-                            <div class="col-md-4">
+                            <div class="col-md-3">
                                 <label class="form-label fw-bold text-uppercase text-dark mb-1" style="font-size: 1.1rem;">Nota</label>
                                 <input type="text" id="detalheAvaliacaoNota" class="form-control form-control-lg fw-bold" readonly
                                        style="border: 1.6px solid #ccc; border-radius: 8px; background-color: #f8f9fa;">
                             </div>
-                            <div class="col-md-6">
+                            <div class="col-md-5">
                                 <label class="form-label fw-bold text-uppercase text-dark mb-1" style="font-size: 1.1rem;">Venda Relacionada</label>
                                 <input type="text" id="detalheAvaliacaoVenda" class="form-control form-control-lg" readonly
                                        style="border: 1.6px solid #ccc; border-radius: 8px; background-color: #f8f9fa;">
                             </div>
-                            <div class="col-md-6">
+                            <div class="col-md-4">
                                 <label class="form-label fw-bold text-uppercase text-dark mb-1" style="font-size: 1.1rem;">Data</label>
                                 <input type="text" id="detalheAvaliacaoData" class="form-control form-control-lg" readonly
                                        style="border: 1.6px solid #ccc; border-radius: 8px; background-color: #f8f9fa;">
@@ -252,13 +252,13 @@
                     <hr class="mx-auto mb-5" style="width: 60%; border-top: 1px solid #000; opacity: 1;">
 
                     <form th:action="@{/avaliacao/create}" th:object="${novaAvaliacao}" method="POST" class="text-start px-md-4">
-                        <div class="row g-4">
+                        <div class="row g-4 justify-content-center">
                             <div class="col-md-8">
                                 <label class="form-label fw-bold text-uppercase text-dark mb-1" style="font-size: 1.1rem;">Título</label>
                                 <input type="text" th:field="*{titulo}" class="form-control form-control-lg" required
                                        style="border: 1.6px solid #000; border-radius: 8px; box-shadow: none;">
                             </div>
-                            <div class="col-md-4">
+                            <div class="col-md-3">
                                 <label class="form-label fw-bold text-uppercase text-dark mb-1" style="font-size: 1.1rem;">Nota (0 a 5)</label>
                                 <select th:field="*{nota}" class="form-select form-select-lg" required style="border: 1.6px solid #000; border-radius: 8px; box-shadow: none;">
                                     <option selected disabled value="">Selecione</option>
@@ -270,7 +270,7 @@
                                     <option value="5">5</option>
                                 </select>
                             </div>
-                            <div class="col-md-6">
+                            <div class="col-md-5">
                                 <label class="form-label fw-bold text-uppercase text-dark mb-1" style="font-size: 1.1rem;">Venda Relacionada</label>
                                 <select class="form-select form-select-lg" th:field="*{venda.id}" required style="border: 1.6px solid #000; border-radius: 8px;">
                                     <option selected disabled value="">Selecione a Venda</option>
