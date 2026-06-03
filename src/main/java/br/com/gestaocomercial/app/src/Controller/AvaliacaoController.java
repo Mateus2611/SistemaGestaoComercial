@@ -80,8 +80,29 @@ public class AvaliacaoController {
 
     @PostMapping("/create")
     public String create(@ModelAttribute("novaAvaliacao") Avaliacao avaliacao) {
-
         Avaliacao novaAvaliacao = _avaliacaoService.Criar(avaliacao);
+        return "redirect:/avaliacao";
+    }
+
+    @PostMapping("/update")
+    public String update(@ModelAttribute("avaliacao") Avaliacao avaliacao, RedirectAttributes redirectAttributes) {
+        try {
+            _avaliacaoService.Atualizar(avaliacao);
+            redirectAttributes.addFlashAttribute("mensagemSucesso", "A avaliação foi atualizada com sucesso!");
+        } catch (Exception e) {
+            redirectAttributes.addFlashAttribute("mensagemErro", "Erro ao atualizar avaliação.");
+        }
+        return "redirect:/avaliacao";
+    }
+
+    @PostMapping("/delete/{id}")
+    public String delete(@PathVariable("id") Integer id, RedirectAttributes redirectAttributes) {
+        try {
+            _avaliacaoService.Excluir(id);
+            redirectAttributes.addFlashAttribute("mensagemSucesso", "A avaliação foi removida com sucesso!");
+        } catch (RuntimeException e) {
+            redirectAttributes.addFlashAttribute("mensagemErro", "Não foi possível excluir a avaliação.");
+        }
 
         return "redirect:/avaliacao";
     }

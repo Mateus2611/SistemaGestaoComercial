@@ -61,8 +61,10 @@
 
     <div class="sidebar-custom d-flex flex-column flex-shrink-0">
 
-        <div class="sidebar-logo d-flex justify-content-center align-items-center py-3 mb-2 w-100">
-            <img th:src="@{/images/acrillogo.svg}" src="../static/images/acrillogo.svg" alt="Logo AcrillService" class="img-fluid" style="max-height: 120px; max-width: 120px; object-fit: contain;">
+        <div class="sidebar-logo d-flex justify-content-center align-items-center py-4 mb-2 w-100">
+            <a th:href="@{/}" class="d-flex align-items-center justify-content-center w-100">
+                <img th:src="@{/images/acrillogo.svg}" src="../static/images/acrillogo.svg" alt="Logo AcrillService" class="img-fluid" style="max-height: 120px; max-width: 120px; object-fit: contain;">
+            </a>
         </div>
 
         <a th:href="@{/}" class="nav-link-custom text-uppercase">
@@ -88,10 +90,6 @@
         <a th:href="@{/avaliacao}" class="nav-link-custom text-uppercase">
             <i class="bi bi-star-fill"></i>
             <span>Avaliações</span>
-        </a>
-        <a th:href="@{/sobre}" class="nav-link-custom mt-auto text-uppercase no-hover">
-            <i class="bi bi-info-circle-fill"></i>
-            <span>Sobre</span>
         </a>
     </div>
 

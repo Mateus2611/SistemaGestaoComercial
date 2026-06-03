@@ -5,6 +5,7 @@ import br.com.gestaocomercial.app.src.Model.Venda;
 import br.com.gestaocomercial.app.src.Repository.IAvaliacaoRepository;
 import br.com.gestaocomercial.app.src.Repository.IVendaRepository;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.dao.OptimisticLockingFailureException;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
@@ -63,6 +64,25 @@ public class AvaliacaoService {
         } catch (RuntimeException ex) {
             throw new RuntimeException(ex.getMessage()) {
             };
+        }
+    }
+
+    public Avaliacao Atualizar(Avaliacao avaliacao) {
+        if (avaliacao == null)
+            throw new RuntimeException("Objeto vazio. Preencha as informações.");
+
+        try {
+            return _avaliacaoRepository.save(avaliacao);
+        } catch (Exception e) {
+            throw new RuntimeException(e.getMessage());
+        }
+    }
+
+    public void Excluir(Integer id) {
+        try {
+            _avaliacaoRepository.deleteById(id);
+        } catch (IllegalArgumentException | OptimisticLockingFailureException e) {
+            throw new RuntimeException(e.getMessage());
         }
     }
 }
