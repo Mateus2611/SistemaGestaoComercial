@@ -276,7 +276,7 @@
                         <strong id="nomeAvaliacaoExcluir" class="text-dark">Você tem certeza que deseja excluir a avaliação?</strong>
                     </p>
 
-                    <form id="formExcluirAvaliacao" th:action="@{/avaliacao/delete/0}" th:method="DELETE">
+                    <form id="formExcluirAvaliacao" th:action="@{/avaliacao/delete/0}" th:method="POST">
                         <div class="d-flex justify-content-center gap-3">
                             <button type="button" class="btn btn-outline-secondary fw-bold text-uppercase py-2 px-4" data-bs-dismiss="modal" style="border-radius: 8px;">
                                 Cancelar
