@@ -332,13 +332,13 @@
                     </h1>
                     <hr class="mx-auto mb-4" style="width: 45%; border-top: 1px solid #000; opacity: 1;">
 
-                    <form th:action="@{/venda/create}" th:object="${novaVenda}" method="POST" class="text-start px-md-4">
+                    <form th:action="@{/venda/create}" th:object="${novaVenda}" method="POST" class="text-start px-md-4" onsubmit="return prepararDataSubmit()">
                         <div class="row g-4 justify-content-center">
+
                             <div class="col-md-10">
-                                <label class="form-label fw-bold text-uppercase text-dark mb-1d"
-                                       style="font-size: 1.1rem;">Orçamento</label>
+                                <label class="form-label fw-bold text-uppercase text-dark mb-1" style="font-size: 1.1rem;">Orçamento</label>
                                 <select id="criarVenda" th:field="*{orcamento.id}" class="form-select form-select-lg"
-                                        style="border: 1.6px solid #000; border-radius: 8px; box-shadow: none;">
+                                        style="border: 1.6px solid #000; border-radius: 8px; box-shadow: none;" required>
                                     <option selected disabled value="">Selecione Orçamento Aprovado</option>
                                     <option th:each="orcamento : ${orcamentos}" th:value="${orcamento.id}"
                                             th:text="'Orçamento #' + ${orcamento.id} + ' - ' + ${orcamento.Cliente.nome}"></option>
@@ -348,9 +348,13 @@
                             <div class="col-md-5">
                                 <label class="form-label fw-bold text-uppercase text-dark mb-1" style="font-size: 1.1rem;">Prazo de Pagamento</label>
 
-                                <input type="date" th:field="*{prazoPagamento}" class="form-control form-control-lg"
-                                       style="border: 1.6px solid #000; border-radius: 8px; box-shadow: none;">
+                                <input type="text" id="prazoVisual" class="form-control form-control-lg"
+                                       oninput="mascaraData(this)" maxlength="10" placeholder="DD/MM/AAAA"
+                                       style="border: 1.6px solid #000; border-radius: 8px; box-shadow: none;" required>
+
+                                <input type="hidden" id="prazoReal" th:field="*{prazoPagamento}">
                             </div>
+
                         </div>
 
                         <div class="d-flex justify-content-center gap-3 mt-5">
@@ -504,6 +508,21 @@
         const inputId = document.getElementById('searchVendaId');
         if (inputId && inputId.value.trim() !== "") {
             window.location.href = '/venda/' + inputId.value.trim();
+        }
+    }
+
+    function prepararDataSubmit() {
+        const inputVisual = document.getElementById('prazoVisual').value;
+
+        if (inputVisual.length === 10) {
+            const partes = inputVisual.split('/');
+            const dataSQL = `${partes[2]}-${partes[1]}-${partes[0]}`;
+
+            document.getElementById('prazoReal').value = dataSQL;
+            return true;
+        } else {
+            alert('Por favor, preencha a data de pagamento corretamente no formato DD/MM/AAAA.');
+            return false;
         }
     }
 

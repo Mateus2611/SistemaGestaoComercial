@@ -58,7 +58,7 @@ public class AvaliacaoController {
     private ModelAndView carregarTelaBase(Integer id, Integer page) {
         ModelAndView mv = new ModelAndView("avaliacao");
         Page<Avaliacao> avaliacoes = _avaliacaoService.BuscaGeral(page);
-        Iterable<VendaResponse> vendas = _vendaService.BuscaPorStatusAprovado();
+        Iterable<VendaResponse> vendas = _vendaService.BuscaPorStatus();
 
         mv.addObject("avaliacoes", avaliacoes.getContent());
 
@@ -80,7 +80,7 @@ public class AvaliacaoController {
 
     @PostMapping("/create")
     public String create(@ModelAttribute("novaAvaliacao") Avaliacao avaliacao) {
-        Avaliacao novaAvaliacao = _avaliacaoService.Criar(avaliacao);
+        _avaliacaoService.Criar(avaliacao);
         return "redirect:/avaliacao";
     }
 
