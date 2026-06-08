@@ -327,11 +327,11 @@
                                     <option value="5">5</option>
                                 </select>
                             </div>
-                            <div class="col-md-4">
+                            <div class="col-lg-9">
                                 <label class="form-label fw-bold text-uppercase text-dark mb-1" style="font-size: 1.1rem;">Venda Relacionada</label>
                                 <select class="form-select form-select-lg" th:field="*{venda.id}" required style="border: 1.6px solid #000; border-radius: 8px;">
                                     <option selected disabled value="">Selecione a Venda</option>
-                                    <option th:each="venda : ${vendas}" th:value="${venda.id}" th:text="${'Venda #' + venda.id}"></option>
+                                    <option th:each="venda : ${vendas}" th:value="${venda.id}" th:text="${'Venda #' + venda.id + ' - ' + venda.Orcamento.Cliente.nome}"></option>
                                 </select>
                             </div>
                             <div class="col-md-12">

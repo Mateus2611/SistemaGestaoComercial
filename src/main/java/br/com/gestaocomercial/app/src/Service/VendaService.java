@@ -15,6 +15,7 @@ import org.springframework.stereotype.Service;
 
 import java.sql.Date;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 @Service
@@ -79,9 +80,10 @@ public class VendaService {
         }
     }
 
-    public Iterable<VendaResponse> BuscaPorStatusAprovado() {
+    public Iterable<VendaResponse> BuscaPorStatus() {
         try {
-            Iterable<Venda> vendas = _vendaRepository.findAllByStatus("APROVADO");
+            List<String> statusFiltrados = Arrays.asList("APROVADO", "CANCELADO");
+            Iterable<Venda> vendas = _vendaRepository.findAllByStatus(statusFiltrados);
 
             List<VendaResponse> responses = new ArrayList<>();
 

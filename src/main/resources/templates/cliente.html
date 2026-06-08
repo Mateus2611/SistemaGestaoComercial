@@ -159,8 +159,8 @@
                     th:attr="data-id=${cliente.id},
                              data-nome=${cliente.nome},
                              data-status=${cliente.status != null ? cliente.status.name() : ''},
-                             data-cadastro=${cliente.dataCadastro},
-                             data-inativacao=${cliente.dataInativacao},
+                             data-cadastro=${cliente.dataCadastro != null ? #dates.format(cliente.dataCadastro, 'dd/MM/yyyy') : ''},
+                             data-inativacao=${cliente.dataInativacao != null ? #dates.format(cliente.dataInativacao, 'dd/MM/yyyy') : ''},
                              data-emails=${cliente.emails},
                              data-tipo=${cliente.tipo != null ? cliente.tipo.name() : ''},
                              data-endereco-logradouro=${cliente.endereco.logradouro},
@@ -173,17 +173,18 @@
                     <td th:text="${cliente.nome}"></td>
                     <td th:text="${cliente.tipo != null ? cliente.tipo : 'N/A'}"></td>
                     <td th:text="|${cliente.endereco.logradouro}, ${cliente.endereco.bairro}, ${cliente.endereco.cidade}|"></td>
-                    <td th:text="${cliente.dataCadastro}"></td>
-                    <td th:text="${cliente.dataInativacao}"></td>
+                    <td th:text="${#dates.format(cliente.dataCadastro, 'dd/MM/yyyy')}"></td>
+                    <td th:text="${#dates.format(cliente.dataInativacao, 'dd/MM/yyyy')}"></td>
                     <td>
                         <span class="badge"
                               th:classappend="${cliente.status != null and cliente.status.name() == 'ATIVO' ? 'badge-verde' : 'badge-vermelho'}"
                               th:text="${cliente.status}"></span>
                     </td>
                     <td class="text-end ">
-                        <button class="btn btn-sm btn-outline-secondary me-2" title="Editar"
-                                data-bs-toggle="modal" data-bs-target="#modalEditarCliente"
-                                th:attr="data-id=${cliente.id},
+                        <div class="d-flex align-items-center justify-content-end gap-2">
+                            <button class="btn btn-sm btn-outline-secondary me-2" title="Editar"
+                                    data-bs-toggle="modal" data-bs-target="#modalEditarCliente"
+                                    th:attr="data-id=${cliente.id},
                                 data-nome=${cliente.nome},
                                 data-emails=${cliente.emails != null ? #strings.listJoin(cliente.emails, ',') : ''},
                                 data-status=${cliente.status},
@@ -192,16 +193,17 @@
                                 data-endereco-cep=${cliente.endereco.cep},
                                 data-endereco-cidade=${cliente.endereco.cidade},
                                 data-endereco-estado=${cliente.endereco.estado}">
-                            <i class="bi bi-pencil-fill"></i>
-                        </button>
-                        <button class="btn btn-sm fw-bold text-uppercase"
-                                th:text="${cliente.status != null and cliente.status.name() == 'ATIVO' ? 'INATIVAR' : 'ATIVAR'}"
-                                th:attr="data-id=${cliente.id}, data-status=${cliente.status}, data-nome=${cliente.nome}"
-                                th:styleappend="${cliente.status != null and cliente.status.name() == 'INATIVO'
+                                <i class="bi bi-pencil-fill"></i>
+                            </button>
+                            <button class="btn btn-sm fw-bold text-uppercase"
+                                    th:text="${cliente.status != null and cliente.status.name() == 'ATIVO' ? 'INATIVAR' : 'ATIVAR'}"
+                                    th:attr="data-id=${cliente.id}, data-status=${cliente.status}, data-nome=${cliente.nome}"
+                                    th:styleappend="${cliente.status != null and cliente.status.name() == 'INATIVO'
                                 ? 'background-color: #ff7e12; color: #ffffff; border: 1.8px solid #ff7e12; border-radius: 8px; padding: 5px 16px; font-size: 0.875rem; width: 8em;'
                                 : 'background-color: transparent; color: #ff7e12; border: 1.8px solid #ff7e12; border-radius: 8px; padding: 5px 16px; font-size: 0.875rem; width: 8em;'}"
-                                onclick="prepararModalStatus(this)">
-                        </button>
+                                    onclick="prepararModalStatus(this)">
+                            </button>
+                        </div>
                     </td>
                 </tr>
                 </tbody>
@@ -297,19 +299,20 @@
 
                             <div class="col-md-4">
                                 <label class="form-label fw-bold text-uppercase text-dark mb-1" style="font-size: 1.1rem;">Criado</label>
-                                <input type="date" id="detalheClienteCadastro" class="form-control form-control-lg" disabled
+                                <input type="text" id="detalheClienteCadastro" class="form-control form-control-lg" oninput="mascaraData(this)" disabled
                                        style="border: 1.8px solid #ccc; border-radius: 8px; background-color: #f8f9fa;">
                             </div>
 
                             <div class="col-md-4">
                                 <label class="form-label fw-bold text-uppercase text-dark mb-1" style="font-size: 1.1rem;">Última Inativacao</label>
-                                <input type="date" id="detalheClienteInativacao" class="form-control form-control-lg" disabled
+                                <input type="text" id="detalheClienteInativacao" class="form-control form-control-lg" oninput="mascaraData(this)" disabled
                                        style="border: 1.8px solid #ccc; border-radius: 8px; background-color: #f8f9fa;">
                             </div>
 
-                            <div class="col-md-6">
+                            <div class="col-lg-xl">
                                 <label class="form-label fw-bold text-uppercase text-dark mb-1" style="font-size: 1.1rem;">Emails</label>
-                                <div id="detalheClienteEmails" class="form-control form-control-lg" style="border: 1.8px solid #ccc; border-radius: 8px; background-color: #f8f9fa;">
+                                <div id="detalheClienteEmails" class="form-control form-control-lg"
+                                     style="border: 1.8px solid #ccc; border-radius: 8px; background-color: #f8f9fa; height: auto !important; min-height: 48px; word-break: break-all;">
                                 </div>
                             </div>
 
@@ -662,6 +665,19 @@
         const modalElemento = document.getElementById('modalDetalhesCliente');
         const modalInstance = bootstrap.Modal.getOrCreateInstance(modalElemento);
         modalInstance.show();
+    }
+
+    function mascaraData(input) {
+        let valor = input.value.replace(/\D/g, '');
+
+        if (valor.length > 2) {
+            valor = valor.substring(0, 2) + '/' + valor.substring(2);
+        }
+        if (valor.length > 5) {
+            valor = valor.substring(0, 5) + '/' + valor.substring(5, 9);
+        }
+
+        input.value = valor;
     }
 
     function alterarStatusCliente(button) {
