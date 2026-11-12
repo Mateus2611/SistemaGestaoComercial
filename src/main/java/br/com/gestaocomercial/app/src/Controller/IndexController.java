@@ -10,6 +10,7 @@ import br.com.gestaocomercial.app.src.Service.OrcamentoService;
 import br.com.gestaocomercial.app.src.Service.ProdutoService;
 import br.com.gestaocomercial.app.src.Service.VendaService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -33,6 +34,7 @@ public class IndexController {
     private VendaService _vendaService;
 
     @GetMapping
+    @PreAuthorize("hasAuthority('ROLE_ADMIN', 'ROLE_SALES')")
     public ModelAndView index() {
         return carregarTelaBase();
     }

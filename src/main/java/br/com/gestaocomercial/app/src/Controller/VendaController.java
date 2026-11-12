@@ -8,6 +8,7 @@ import br.com.gestaocomercial.app.src.Service.OrcamentoService;
 import br.com.gestaocomercial.app.src.Service.VendaService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.ModelAndView;
@@ -19,6 +20,7 @@ import java.util.List;
 
 @Controller
 @RequestMapping("/venda")
+@PreAuthorize("hasAuthority('ROLE_ADMIN', 'ROLE_SALES')")
 public class VendaController {
 
     @Autowired

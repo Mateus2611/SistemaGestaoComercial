@@ -7,6 +7,7 @@ import br.com.gestaocomercial.app.src.Model.Produto;
 import br.com.gestaocomercial.app.src.Service.ProdutoService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
@@ -19,6 +20,7 @@ import java.util.PrimitiveIterator;
 
 @Controller
 @RequestMapping("/produto")
+@PreAuthorize("hasAuthority('ROLE_ADMIN', 'ROLE_ADD_PRODUCT')")
 public class ProdutoController {
 
     @Autowired
@@ -91,6 +93,7 @@ public class ProdutoController {
         return mv;
     }
 
+    @PreAuthorize("HasAnyAuthority('ROLE_ADMIN', 'ROLE_ADD_PRODUCT')")
     @PostMapping("/create")
     public String create(@ModelAttribute("novoProduto") Produto produto) {
 
@@ -99,6 +102,7 @@ public class ProdutoController {
         return "redirect:/produto/" + novoProduto.getId();
     }
 
+    @PreAuthorize("HasAnyAuthority('ROLE_ADMIN', 'ROLE_ADD_PRODUCT')")
     @PostMapping("/update/{id}")
     public String update(@PathVariable("id") Integer id, @ModelAttribute("produto") Produto produto, RedirectAttributes redirectAttributes) {
         produto.setId(id);
@@ -110,6 +114,7 @@ public class ProdutoController {
         return "redirect:/produto";
     }
 
+    @PreAuthorize("HasAnyAuthority('ROLE_ADMIN', 'ROLE_ADD_PRODUCT')")
     @DeleteMapping("/delete/{id}")
     public String delete(@PathVariable("id") Integer id, RedirectAttributes redirectAttributes) {
         try {

@@ -5,6 +5,8 @@ import jakarta.persistence.*;
 
 import java.sql.Date;
 
+import org.springframework.security.access.prepost.PreAuthorize;
+
 @Entity
 @Table(name = "Avaliacao")
 public class Avaliacao {

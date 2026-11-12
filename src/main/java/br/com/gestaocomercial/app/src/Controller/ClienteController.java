@@ -4,6 +4,7 @@ import br.com.gestaocomercial.app.src.Model.*;
 import br.com.gestaocomercial.app.src.Service.ClienteService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.ModelAndView;
@@ -14,6 +15,7 @@ import java.util.List;
 
 @Controller
 @RequestMapping("/cliente")
+@PreAuthorize("hasAuthority('ROLE_ADMIN', 'ROLE_SALES')")
 public class ClienteController {
 
     @Autowired
