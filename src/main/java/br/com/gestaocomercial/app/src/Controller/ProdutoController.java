@@ -20,7 +20,7 @@ import java.util.PrimitiveIterator;
 
 @Controller
 @RequestMapping("/produto")
-@PreAuthorize("hasAuthority('ROLE_ADMIN', 'ROLE_ADD_PRODUCT')")
+@PreAuthorize("hasAnyAuthority('ROLE_ADMIN', 'ROLE_ADD_PRODUCT')")
 public class ProdutoController {
 
     @Autowired

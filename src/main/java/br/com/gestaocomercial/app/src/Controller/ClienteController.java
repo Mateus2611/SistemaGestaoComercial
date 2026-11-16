@@ -15,7 +15,7 @@ import java.util.List;
 
 @Controller
 @RequestMapping("/cliente")
-@PreAuthorize("hasAuthority('ROLE_ADMIN', 'ROLE_SALES')")
+@PreAuthorize("hasAnyAuthority('ROLE_ADMIN', 'ROLE_SALES')")
 public class ClienteController {
 
     @Autowired

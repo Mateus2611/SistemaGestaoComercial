@@ -34,7 +34,6 @@ public class IndexController {
     private VendaService _vendaService;
 
     @GetMapping
-    @PreAuthorize("hasAuthority('ROLE_ADMIN', 'ROLE_SALES')")
     public ModelAndView index() {
         return carregarTelaBase();
     }

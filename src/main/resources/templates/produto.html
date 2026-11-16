@@ -90,6 +90,10 @@
             <i class="bi bi-star-fill"></i>
             <span>Avaliações</span>
         </a>
+        <a href="http://localhost:5500/index.html" class="nav-link-custom text-uppercase" sec:authorize="hasAuthority('Admin')">
+            <i class="bi bi-shield-lock-fill"></i>
+            <span>Sysadmin</span>
+        </a>
     </div>
 
     <div class="main-content flex-grow-1 p-5">

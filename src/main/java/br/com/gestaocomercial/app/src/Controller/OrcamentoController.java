@@ -18,7 +18,7 @@ import java.util.List;
 
 @Controller
 @RequestMapping("/orcamento")
-@PreAuthorize("hasAuthority('ROLE_ADMIN', 'ROLE_SALES')")
+@PreAuthorize("hasAnyAuthority('ROLE_ADMIN', 'ROLE_SALES')")
 public class OrcamentoController {
 
     @Autowired
