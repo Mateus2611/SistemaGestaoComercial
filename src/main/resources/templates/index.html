@@ -52,6 +52,10 @@
             <i class="bi bi-star-fill"></i>
             <span>Avaliações</span>
         </a>
+        <a href="http://localhost:5501/src/index.html" class="nav-link-custom text-uppercase" sec:authorize="hasAuthority('Admin')" lass="nav-item active">
+                <i class="bi bi-bar-chart-line-fill"></i>
+                <span>RELATÓRIOS</span>
+        </a>
         <a href="http://localhost:5500/index.html" class="nav-link-custom text-uppercase" sec:authorize="hasAuthority('Admin')">
             <i class="bi bi-shield-lock-fill"></i>
             <span>Sysadmin</span>
