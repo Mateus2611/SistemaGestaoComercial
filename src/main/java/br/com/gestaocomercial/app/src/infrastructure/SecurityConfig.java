@@ -31,8 +31,15 @@ public class SecurityConfig {
                 .csrf(csrf -> csrf.disable())
                 .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .authorizeHttpRequests(authorize -> authorize
-                        .requestMatchers("/css/**", "/js/**", "/img/**", "/admin/sync/**").permitAll()
+                        .requestMatchers("/css/**", "/js/**", "/img/**", "/fonts/**", "/images/**", "/admin/sync/**").permitAll()
                         .anyRequest().authenticated()
+                )
+                .logout(logout -> logout
+                        .logoutUrl("/logout")
+                        .deleteCookies("token", "access_token", "jwt", "JSESSIONID")
+                        .clearAuthentication(true)
+                        .logoutSuccessUrl(loginUrl)
+                        .permitAll()
                 )
                 .exceptionHandling(ex -> ex
                         .authenticationEntryPoint((request, response, authException) -> {
