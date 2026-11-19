@@ -1,25 +1,25 @@
 package br.com.gestaocomercial.app.src.Service;
 
 import br.com.gestaocomercial.app.src.Model.Cliente;
+import br.com.gestaocomercial.app.src.Model.DTO.ClienteSyncDTO;
+import br.com.gestaocomercial.app.src.Model.DTO.SyncEvent;
 import br.com.gestaocomercial.app.src.Model.Email;
 import br.com.gestaocomercial.app.src.Model.Endereco;
 import br.com.gestaocomercial.app.src.Repository.IClienteRepository;
 import br.com.gestaocomercial.app.src.Repository.IEmailRepository;
 import br.com.gestaocomercial.app.src.Repository.IEnderecoRepository;
-import jakarta.transaction.Transactional;
-import org.aspectj.apache.bcel.generic.InstructionConstants;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.sql.Date;
 import java.time.LocalDate;
 import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Iterator;
 import java.util.List;
 
 @Service
@@ -31,6 +31,8 @@ public class ClienteService {
     private IEmailRepository _emailRepository;
     @Autowired
     private IClienteRepository _clienteRepository;
+    @Autowired
+    private ApplicationEventPublisher eventPublisher;
 
     @Transactional
     public Cliente Criar(Cliente cliente) {
@@ -58,12 +60,14 @@ public class ClienteService {
         cliente.setDataCadastro(Date.valueOf(LocalDate.now()));
         cliente.setStatus(Cliente.StatusCliente.ATIVO);
 
-        return _clienteRepository.save(cliente);
+        Cliente salvo = _clienteRepository.save(cliente);
+        publicarSyncCliente(salvo);
+        return salvo;
     }
 
     public List<Cliente> BuscaGeral() {
         try {
-            return  _clienteRepository.findAll();
+            return _clienteRepository.findAll();
         } catch (RuntimeException ex) {
             throw new RuntimeException(ex.getMessage());
         }
@@ -81,7 +85,7 @@ public class ClienteService {
 
     public List<Cliente> BuscaGeral(String status) {
         try {
-            return  _clienteRepository.findAll(status);
+            return _clienteRepository.findAll(status);
         } catch (RuntimeException ex) {
             throw new RuntimeException(ex.getMessage());
         }
@@ -104,27 +108,32 @@ public class ClienteService {
                 .toList();
     }
 
+    @Transactional
     public Cliente Atualizar(Cliente clienteUpdate) {
         Cliente cliente = _clienteRepository.findById(clienteUpdate.getId()).get();
         List<Email> emailsAtualizados = new ArrayList<>();
 
-        if (clienteUpdate.getNome() != null && clienteUpdate.getNome() != cliente.getNome()) cliente.setNome(clienteUpdate.getNome());
-        if (clienteUpdate.getTipo() != null && clienteUpdate.getTipo() != cliente.getTipo()) cliente.setTipo(clienteUpdate.getTipo());
+        if (clienteUpdate.getNome() != null && !clienteUpdate.getNome().equals(cliente.getNome()))
+            cliente.setNome(clienteUpdate.getNome());
+        if (clienteUpdate.getTipo() != null && clienteUpdate.getTipo() != cliente.getTipo())
+            cliente.setTipo(clienteUpdate.getTipo());
 
         if (clienteUpdate.getStatus() != null && clienteUpdate.getStatus() != cliente.getStatus()) {
-            if (clienteUpdate.getStatus() == Cliente.StatusCliente.ATIVO) cliente.setStatus(clienteUpdate.getStatus());
+            if (clienteUpdate.getStatus() == Cliente.StatusCliente.ATIVO)
+                cliente.setStatus(clienteUpdate.getStatus());
             else {
                 cliente.setStatus(clienteUpdate.getStatus());
                 cliente.setDataInativacao(Date.valueOf(LocalDate.now()));
             }
         }
 
-        clienteUpdate.getEmails().forEach(eu -> {
-            if (!cliente.getEmails().contains(eu)) emailsAtualizados.add(eu);
-            if (cliente.getEmails().contains(eu)) emailsAtualizados.addAll(cliente.getEmails());
-        });
-
-        cliente.setEmails(emailsAtualizados);
+        if (clienteUpdate.getEmails() != null) {
+            clienteUpdate.getEmails().forEach(eu -> {
+                if (!cliente.getEmails().contains(eu)) emailsAtualizados.add(eu);
+                if (cliente.getEmails().contains(eu)) emailsAtualizados.addAll(cliente.getEmails());
+            });
+            cliente.setEmails(emailsAtualizados);
+        }
 
         if (clienteUpdate.getEndereco() != null) {
 
@@ -157,26 +166,30 @@ public class ClienteService {
             }
         }
 
-        return _clienteRepository.save(cliente);
+        Cliente salvo = _clienteRepository.save(cliente);
+        publicarSyncCliente(salvo);
+        return salvo;
     }
 
+    @Transactional
     public Cliente InativarCliente(int id) {
         try {
-
             _clienteRepository.Disable(id, Date.valueOf(LocalDate.now()));
-
-            return BuscaPorId(id);
+            Cliente cliente = BuscaPorId(id);
+            publicarSyncCliente(cliente);
+            return cliente;
         } catch (RuntimeException ex) {
             throw new RuntimeException(ex.getMessage());
         }
     }
 
+    @Transactional
     public Cliente AtivarCliente(int id) {
         try {
-
             _clienteRepository.Activate(id);
-
-            return BuscaPorId(id);
+            Cliente cliente = BuscaPorId(id);
+            publicarSyncCliente(cliente);
+            return cliente;
         } catch (RuntimeException ex) {
             throw new RuntimeException(ex.getMessage());
         }
@@ -190,14 +203,18 @@ public class ClienteService {
         }
     }
 
+    @Transactional
     public List<Email> CriarEmailCliente(Integer idCliente, List<Email> emails) {
         try {
-            List<Email> novosEmails = new ArrayList<Email>();
+            List<Email> novosEmails = new ArrayList<>();
 
             for (Email email : emails) {
                 email.getCliente().setId(idCliente);
                 novosEmails.add(_emailRepository.save(email));
             }
+
+            Cliente cliente = BuscaPorId(idCliente);
+            publicarSyncCliente(cliente);
 
             return novosEmails;
         } catch (RuntimeException ex) {
@@ -211,5 +228,27 @@ public class ClienteService {
         } catch (RuntimeException ex) {
             throw new RuntimeException(ex.getMessage());
         }
+    }
+
+    private void publicarSyncCliente(Cliente cliente) {
+        String emailPrincipal = (cliente.getEmails() != null && !cliente.getEmails().isEmpty())
+                ? cliente.getEmails().get(0).getEndereco()
+                : null;
+
+        String cidade = cliente.getEndereco() != null ? cliente.getEndereco().getCidade() : null;
+        String estado = cliente.getEndereco() != null ? cliente.getEndereco().getEstado() : null;
+
+        ClienteSyncDTO syncDTO = new ClienteSyncDTO(
+                cliente.getId(),
+                cliente.getNome(),
+                cliente.getTipo() != null ? cliente.getTipo().name() : null,
+                cliente.getDataCadastro() != null ? cliente.getDataCadastro().toLocalDate() : null,
+                cliente.getStatus() != null ? cliente.getStatus().name() : null,
+                cidade,
+                estado,
+                emailPrincipal
+        );
+
+        eventPublisher.publishEvent(new SyncEvent("/sync/cliente", syncDTO));
     }
 }

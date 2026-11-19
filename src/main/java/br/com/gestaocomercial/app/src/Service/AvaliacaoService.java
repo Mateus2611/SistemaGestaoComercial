@@ -11,6 +11,7 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
+import org.springframework.web.client.RestClient;
 
 import java.sql.Date;
 import java.time.LocalDate;
@@ -22,6 +23,8 @@ public class AvaliacaoService {
     private IAvaliacaoRepository _avaliacaoRepository;
     @Autowired
     private IVendaRepository _vendaRepository;
+    @Autowired
+    private RestClient reportRestClient;
 
     public Avaliacao Criar(Avaliacao avaliacao) {
 
@@ -37,6 +40,8 @@ public class AvaliacaoService {
             avaliacao.setVenda(venda);
             avaliacao.setDataCriacao(Date.valueOf(LocalDate.now()));
             avaliacao = _avaliacaoRepository.save(avaliacao);
+
+            sincronizarNotaReport(avaliacao);
 
             return avaliacao;
         } catch (RuntimeException ex) {
@@ -72,7 +77,9 @@ public class AvaliacaoService {
             throw new RuntimeException("Objeto vazio. Preencha as informações.");
 
         try {
-            return _avaliacaoRepository.save(avaliacao);
+            Avaliacao salva = _avaliacaoRepository.save(avaliacao);
+            sincronizarNotaReport(salva);
+            return salva;
         } catch (Exception e) {
             throw new RuntimeException(e.getMessage());
         }
@@ -83,6 +90,21 @@ public class AvaliacaoService {
             _avaliacaoRepository.deleteById(id);
         } catch (IllegalArgumentException | OptimisticLockingFailureException e) {
             throw new RuntimeException(e.getMessage());
+        }
+    }
+
+    private void sincronizarNotaReport(Avaliacao avaliacao) {
+        if (avaliacao.getVenda() == null || avaliacao.getVenda().getId() == null || avaliacao.getNota() == null) {
+            return;
+        }
+        try {
+            reportRestClient.post()
+                    .uri("/sync/venda/" + avaliacao.getVenda().getId() + "/avaliacao")
+                    .body(avaliacao.getNota().floatValue())
+                    .retrieve()
+                    .toBodilessEntity();
+        } catch (Exception e) {
+            System.err.println("Falha ao sincronizar avaliação com api-report: " + e.getMessage());
         }
     }
 }

@@ -1,18 +1,23 @@
 package br.com.gestaocomercial.app.src.Service;
 
+import br.com.gestaocomercial.app.src.Model.DTO.SyncEvent;
 import br.com.gestaocomercial.app.src.Model.DTO.UpdateVendaDTO;
+import br.com.gestaocomercial.app.src.Model.DTO.VendaSyncDTO;
 import br.com.gestaocomercial.app.src.Model.Orcamento;
 import br.com.gestaocomercial.app.src.Model.Response.VendaResponse;
 import br.com.gestaocomercial.app.src.Model.Venda;
 import br.com.gestaocomercial.app.src.Repository.IOrcamentoRepository;
 import br.com.gestaocomercial.app.src.Repository.IVendaRepository;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
+import java.math.BigDecimal;
 import java.sql.Date;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -25,8 +30,10 @@ public class VendaService {
     private IVendaRepository _vendaRepository;
     @Autowired
     private IOrcamentoRepository _orcamentoRepository;
+    @Autowired
+    private ApplicationEventPublisher eventPublisher;
 
-
+    @Transactional
     public Venda Criar(Venda venda) {
 
         if (venda == null)
@@ -43,6 +50,8 @@ public class VendaService {
             venda.setStatusPagamento(Venda.StatusPagamento.PENDENTE.name());
             venda.setDataCriacao(new Date(System.currentTimeMillis()));
             venda = _vendaRepository.save(venda);
+
+            publicarSyncVenda(venda);
 
             return venda;
         } catch (RuntimeException ex) {
@@ -108,6 +117,7 @@ public class VendaService {
         }
     }
 
+    @Transactional
     public Venda Atualizar(UpdateVendaDTO vendaDTO) {
         Venda venda = _vendaRepository.findById(vendaDTO.id).get();
 
@@ -121,6 +131,32 @@ public class VendaService {
             }
         }
 
-        return _vendaRepository.save(venda);
+        Venda salva = _vendaRepository.save(venda);
+        publicarSyncVenda(salva);
+        return salva;
+    }
+
+    private void publicarSyncVenda(Venda venda) {
+        Orcamento orcamento = venda.getOrcamento();
+        Integer clienteId = (orcamento != null && orcamento.getCliente() != null)
+                ? orcamento.getCliente().getId()
+                : null;
+
+        // Ajuste o getter do valor caso o seu modelo Venda ou Orcamento use Double ou BigDecimal
+        BigDecimal valorFinal = (orcamento != null && orcamento.getValor() != null)
+                ? BigDecimal.valueOf(orcamento.getValor().doubleValue())
+                : BigDecimal.ZERO;
+
+        VendaSyncDTO syncDTO = new VendaSyncDTO(
+                venda.getId(),
+                orcamento != null ? orcamento.getId() : null,
+                clienteId,
+                venda.getDataCriacao() != null ? venda.getDataCriacao().toLocalDate() : null,
+                venda.getStatusPagamento().toString(),
+                valorFinal,
+                null
+        );
+
+        eventPublisher.publishEvent(new SyncEvent("/sync/venda", syncDTO));
     }
 }

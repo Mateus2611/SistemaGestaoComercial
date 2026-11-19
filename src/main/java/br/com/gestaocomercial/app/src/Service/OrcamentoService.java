@@ -3,6 +3,8 @@ package br.com.gestaocomercial.app.src.Service;
 import br.com.gestaocomercial.app.src.Model.Cliente;
 import br.com.gestaocomercial.app.src.Model.DTO.CreateOrcamentoDTO;
 import br.com.gestaocomercial.app.src.Model.DTO.ItemOrcamentoDTO;
+import br.com.gestaocomercial.app.src.Model.DTO.OrcamentoSyncDTO;
+import br.com.gestaocomercial.app.src.Model.DTO.SyncEvent;
 import br.com.gestaocomercial.app.src.Model.DTO.UpdateOrcamentoDTO;
 import br.com.gestaocomercial.app.src.Model.Orcamento;
 import br.com.gestaocomercial.app.src.Model.OrcamentoProduto;
@@ -13,6 +15,7 @@ import br.com.gestaocomercial.app.src.Repository.IOrcamentoRepository;
 import br.com.gestaocomercial.app.src.Repository.IProdutoRepository;
 import jakarta.persistence.EntityNotFoundException;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
@@ -37,6 +40,8 @@ public class OrcamentoService {
     private IOrcamentoProdutoRepository _orcamentoProdutoRepository;
     @Autowired
     private IProdutoRepository _produtoRepository;
+    @Autowired
+    private ApplicationEventPublisher eventPublisher;
 
     @Transactional
     public Orcamento criar(CreateOrcamentoDTO orcamentoDTO) {
@@ -87,7 +92,9 @@ public class OrcamentoService {
         orcamento.setValor(valorTotal);
         orcamento.setOrcamentoProdutos(orcamentoProdutos);
 
-        return _orcamentoRepository.save(orcamento);
+        Orcamento salvo = _orcamentoRepository.save(orcamento);
+        publicarSyncOrcamento(salvo);
+        return salvo;
     }
 
     public List<Orcamento> BuscaGeral() {
@@ -128,6 +135,7 @@ public class OrcamentoService {
         }
     }
 
+    @Transactional
     public Orcamento Atualizar(UpdateOrcamentoDTO orcamentoDTO) {
         if (orcamentoDTO == null) {
             throw new RuntimeException("Objeto vazio. Preencha as informações.");
@@ -147,12 +155,16 @@ public class OrcamentoService {
 
             if (LocalDate.now().isAfter(orcamento.getDataValidade().toLocalDate())) {
                 orcamento.setStatus(Orcamento.StatusOrcamento.EXPIRADO);
+                Orcamento expirado = _orcamentoRepository.save(orcamento);
+                publicarSyncOrcamento(expirado); // Garante que o status EXPIRADO também vá para o relatório
                 throw new RuntimeException("Atualização recusada. Orçamento expirado no dia: " + orcamento.getDataValidade());
             }
 
             orcamento.setStatus(orcamentoDTO.Status);
 
-            return _orcamentoRepository.save(orcamento);
+            Orcamento salvo = _orcamentoRepository.save(orcamento);
+            publicarSyncOrcamento(salvo);
+            return salvo;
 
         } catch (RuntimeException e) {
             throw new RuntimeException("Erro ao atualizar o orçamento: " + e.getMessage(), e);
@@ -165,5 +177,35 @@ public class OrcamentoService {
             throw new RuntimeException("Não foi possível criar o orçamento. Data de validade é menor que a data de criação. \nData de criação atual: " + dataCriacao);
 
         return validade;
+    }
+
+    private void publicarSyncOrcamento(Orcamento orcamento) {
+        Cliente cliente = orcamento.getCliente();
+
+        List<OrcamentoSyncDTO.ItemSyncDTO> itensSync = new ArrayList<>();
+        if (orcamento.getOrcamentoProdutos() != null) {
+            for (OrcamentoProduto op : orcamento.getOrcamentoProdutos()) {
+                if (op.getProduto() != null) {
+                    itensSync.add(new OrcamentoSyncDTO.ItemSyncDTO(
+                            op.getProduto().getId(),
+                            op.getQuantidade()
+                    ));
+                }
+            }
+        }
+
+        OrcamentoSyncDTO syncDTO = new OrcamentoSyncDTO(
+                orcamento.getId(),
+                cliente != null ? cliente.getId() : null,
+                cliente != null ? cliente.getNome() : null,
+                orcamento.getDataCriacao() != null ? orcamento.getDataCriacao().toLocalDate() : null,
+                orcamento.getDataValidade() != null ? orcamento.getDataValidade().toLocalDate() : null,
+                orcamento.getValor(),
+                orcamento.getDesconto(),
+                orcamento.getStatus() != null ? orcamento.getStatus().name() : null,
+                itensSync
+        );
+
+        eventPublisher.publishEvent(new SyncEvent("/sync/orcamento", syncDTO));
     }
 }
